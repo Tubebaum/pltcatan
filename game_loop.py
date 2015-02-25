@@ -20,6 +20,7 @@ class GameLoop:
         self.game.gen_board()
         print "Placing initial settlements..."
         self.initial_settlements()
+        print self.game.count_nodes()
 
 
     def initial_settlements(self):

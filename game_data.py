@@ -4,6 +4,12 @@ types = ["lumber", "ore", "gold", "wool"]
 
 
 def BFS_gen(node, depth):
+	def connect(node1, node2, ang):
+		if (node2 == None):
+			return
+		node1.adjlist[ang] = node2
+		node2.adjlist[(ang+3)%6] = node1
+
 	queue = deque()
 	queue.append(node)
 	queue.append("lvl++")
@@ -12,24 +18,22 @@ def BFS_gen(node, depth):
 		node = queue.popleft()
 		if (node == "lvl++"):
 			lvl += 1
+			print "lvl = " + str(lvl)
 			queue.append("lvl++")
 			if(lvl > depth):
 				return
 			continue
 
-		for neig_idx in range(len(node.adjlist)):
-			neig = node.adjlist[neig_idx]
-			if (neig == None):
-				neig = Node()
-				neig.adjlist[(neig_idx+3)%6]
-				queue.append(neig)
-
-
-def 
+		for idx in range(6):
+			if (node.adjlist[idx] == None):
+				new_node = Node()
+				connect(node, new_node, idx)
+				connect(new_node, node.adjlist[(idx+1)%6], (idx+2)%6)
+				connect(new_node, node.adjlist[(idx-1)%6], (idx-2)%6)
+				queue.append(new_node)
 
 class Node:
 	def __init__(self):
-		print Node.cont
 		self.data = None
 		self.adjlist = list(None for i in range(6))
 
@@ -41,5 +45,24 @@ class Game:
 
 
 	def gen_board(self):
-		center = Node()
-		BFS_gen(center, 2)
+		self.center = Node()
+		BFS_gen(self.center, 2)
+
+	# Intended for testing
+	def count_nodes(self):
+		return len(list(self.nodes()))
+
+	# Python generator returning each node
+	def nodes(self):
+		visited = set()
+		queue = deque()
+		queue.append(self.center)
+		visited.add(self.center)
+		while(len(queue) != 0):
+			node = queue.popleft()
+			for neig in node.adjlist:
+				# print neig
+				if (neig != None and neig not in visited):
+					queue.append(neig)
+					visited.add(neig)
+			yield node
