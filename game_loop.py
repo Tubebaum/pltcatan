@@ -1,15 +1,23 @@
 from game_data import Game
+from config import config
 import cmd
+
 
 
 #Some parsing utils
 def get_player_names():
     players = []
-    nplayers = int(input("Nplayers: "))
+    nplayers = int(input_def("Nplayers", "3"))
     for i in range(nplayers):
-        pname = input("p"+str(i+1) + ": ")
+        pname = input_def("Player "+str(i+1), "p"+str(i+1))
         players.append(pname)
     return players
+
+def input_def(msg, default):
+    result = input(msg + " [" + default + "]: ")
+    if (result == ""):
+        return default
+    return result
 
 
 class TurnCmd(cmd.Cmd):
@@ -32,6 +40,8 @@ class TurnCmd(cmd.Cmd):
 
         def do_print(self, line):
             print("This should print the board state.")
+            for node in self.gameloop.game.nodes():
+                print('Tile {0:2d}: {1:2d}'.format(node.n_id, 0))
 
         def do_end(self, line):
             print("Ended turn")
@@ -57,13 +67,9 @@ class GameLoop:
         while True:
             for pidx in range(len(self.players)):
                 print(self.players[pidx] + "'s turn")
-                # self.run_turn(pidx)
+                diced = config["dicer"]()
+                print("Diced value: " + str(diced))
                 TurnCmd(self, pidx).cmdloop()
-
-
-    def roll_dice(self):
-        import random
-        return random.randint(0,9)
 
 
 if __name__ == '__main__':

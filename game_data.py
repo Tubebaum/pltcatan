@@ -1,6 +1,5 @@
 from collections import deque
-
-types = ["lumber", "ore", "gold", "wool"]
+from config import config
 
 
 def BFS_gen(node, depth):
@@ -33,16 +32,20 @@ def BFS_gen(node, depth):
 				queue.append(new_node)
 				n_id += 1
 
+
 class Node:
+
 	def __init__(self, n_id):
 		self.n_id = n_id
 		self.data = None
 		self.adjlist = list(None for i in range(6))
 
+
 class Game:
 
 	def __init__(self, nplayers, boardsize=3):
-		self.players = []
+		self.nplayers = nplayers
+		self.player_resources = {}
 		self.boardsize = boardsize
 
 
@@ -68,3 +71,6 @@ class Game:
 					queue.append(neig)
 					visited.add(neig)
 			yield node
+
+	# def dist_resources(dice_v):
+		
