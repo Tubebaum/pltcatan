@@ -18,7 +18,7 @@ def BFS_gen(node, depth):
 		node = queue.popleft()
 		if (node == "lvl++"):
 			lvl += 1
-			print "lvl = " + str(lvl)
+			# print "lvl = " + str(lvl)
 			queue.append("lvl++")
 			if(lvl > depth):
 				return
