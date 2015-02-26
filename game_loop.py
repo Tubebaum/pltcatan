@@ -30,23 +30,12 @@ class TurnCmd(cmd.Cmd):
         def do_playcard(self, line):
             print("Development cards not implemented.")
 
-        #I'm thinking of this to print the current
-        #board situation
         def do_print(self, line):
             print("This should print the board state.")
 
         def do_end(self, line):
             print("Ended turn")
             return True
-        # def run_turn(self, pdix):
-        #     diced = self.roll_dice()
-        #     print "Dice roll: " + str(diced) + "\n"
-
-        #     print "Trading... not implemented\n"
-
-        #     print "Building...\n"
-
-        #     print "Playing card... not implemented\n"
 
 
 class GameLoop:
@@ -59,7 +48,6 @@ class GameLoop:
         print("Placing initial settlements...")
         self.initial_settlements()
         self.loop_turns()
-        # print self.game.count_nodes()
 
 
     def initial_settlements(self):

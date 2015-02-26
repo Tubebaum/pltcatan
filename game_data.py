@@ -4,6 +4,7 @@ types = ["lumber", "ore", "gold", "wool"]
 
 
 def BFS_gen(node, depth):
+	n_id = node.n_id + 1
 	def connect(node1, node2, ang):
 		if (node2 == None):
 			return
@@ -18,7 +19,6 @@ def BFS_gen(node, depth):
 		node = queue.popleft()
 		if (node == "lvl++"):
 			lvl += 1
-			# print "lvl = " + str(lvl)
 			queue.append("lvl++")
 			if(lvl > depth):
 				return
@@ -26,14 +26,16 @@ def BFS_gen(node, depth):
 
 		for idx in range(6):
 			if (node.adjlist[idx] == None):
-				new_node = Node()
+				new_node = Node(n_id)
 				connect(node, new_node, idx)
 				connect(new_node, node.adjlist[(idx+1)%6], (idx+2)%6)
 				connect(new_node, node.adjlist[(idx-1)%6], (idx-2)%6)
 				queue.append(new_node)
+				n_id += 1
 
 class Node:
-	def __init__(self):
+	def __init__(self, n_id):
+		self.n_id = n_id
 		self.data = None
 		self.adjlist = list(None for i in range(6))
 
@@ -45,7 +47,7 @@ class Game:
 
 
 	def gen_board(self):
-		self.center = Node()
+		self.center = Node(0)
 		BFS_gen(self.center, 2)
 
 	# Intended for testing
