@@ -3,6 +3,11 @@ from config import config
 import cmd
 
 
+#Python2/3 compatibility
+try:
+    input = raw_input
+except NameError:
+    pass
 
 #Some parsing utils
 def get_player_names():
@@ -23,7 +28,8 @@ def input_def(msg, default):
 class TurnCmd(cmd.Cmd):
 
         def __init__(self, game_loop, pidx):
-            super(self.__class__,self).__init__()
+            # print(issubclass(TurnCmd, object))
+            cmd.Cmd.__init__(self)
             self.prompt = game_loop.players[pidx] + ": "
             self.gameloop = game_loop
             self.pidx = pidx
@@ -40,15 +46,15 @@ class TurnCmd(cmd.Cmd):
 
         def do_print(self, line):
             print("This should print the board state.")
-            for node in self.gameloop.game.nodes():
-                print('Tile {0:2d}: {1:2d}'.format(node.n_id, 0))
+            for tile in self.gameloop.game.tiles():
+                print('Tile {0:2d}: {1:2d}'.format(tile.n_id, 0))
 
         def do_end(self, line):
             print("Ended turn")
             return True
 
 
-class GameLoop:
+class GameLoop(object):
 
     def start(self):
         self.players = get_player_names()

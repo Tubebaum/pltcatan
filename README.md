@@ -1,2 +1,3 @@
 # pltcatan
-We're using Python 3x
+
+We're using Python 2.7
