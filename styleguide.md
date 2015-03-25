@@ -21,10 +21,9 @@ set expandtab
 ### 2) Whitespace
 
 * No trailing whitespaces.
-* Each file should end with a
-newline character for prettier 'cat' output.
-* No unnecessary blank lines. There should be one blank line after each
-function and after the end of a class definition.
+* Each file should end with a newline character for prettier 'cat' output.
+* No unnecessary blank lines. There should be one blank line after each function
+and after the end of a class definition.
 
 ```
 #Correct:
@@ -112,7 +111,7 @@ def addAndPrint(firstNumber, secondNumber):
         print thirdNumber
 ```
 
-* Class names should use UpperCamelCase
+* Class names should use UpperCamelCase.
 
 ```
 class StringBuilder:
