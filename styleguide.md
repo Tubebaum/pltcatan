@@ -1,6 +1,7 @@
 # Skit Styleguide
 
 ## Python Style
+
 ### 1) Indentation
 
 * Python heavily inforces indentation and as such we should have consistent
@@ -14,11 +15,13 @@ set tabstop=4
 set shiftwidth=4
 set expandtab
 ```
+
 * Each line should only be 80 columns wide.
 
 ### 2) Whitespace
 
-* No trailing whitespaces. Only exception is that each file should end with a
+* No trailing whitespaces.
+* Each file should end with a
 newline character for prettier 'cat' output.
 * No unnecessary blank lines. There should be one blank line after each
 function and after the end of a class definition.
@@ -92,11 +95,11 @@ Wrong:
 ```
 
 * Can make an exception and use double quotes if the string contains a single
-quote character (of course you can escape the character but that makes it
-harder to read).
+quote character (of course you can escape the character but the point is to
+increase readability).
 
 ```
-    name = "John Smith's house is down the block"
+    sentence = "John Smith's house is down the block"
 ```
 
 ### 4) Shebangs
