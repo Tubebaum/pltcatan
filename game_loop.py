@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from game_data import Game
 from config import config
 import cmd
@@ -72,4 +74,7 @@ class GameLoop(object):
                 TurnCmd(self, pidx).cmdloop()
 
 if __name__ == '__main__':
-    GameLoop().start()
+    try:
+        GameLoop().start()
+    except KeyboardInterrupt:
+        print u'\n(╯°□°）╯︵ ┻━┻)'
