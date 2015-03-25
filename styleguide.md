@@ -18,7 +18,8 @@ set expandtab
 
 ### 2) Whitespace
 
-* No trailing whitespaces.
+* No trailing whitespaces. Only exception is that each file should end with a
+newline.
 * No unnecessary blank lines. There should be one blank line after each
 function and after the end of a class definition.
 
@@ -49,14 +50,16 @@ if __name__ == '__main__':
 ```
 
 * Every token involved in an operation should be seperated by one space.
+
 ```
 #Correct:
     num = 1 + 2
 #Wrong:
     num = 1+2
     num = 1  +  2
-* The only exception is for default arguments in a function's parameter list.
 ```
+
+* The only exception is for default arguments in a function's parameter list.
 #Correct:
     def __str__(name='John Smith', id):
         return '%s has id %d' % (name, id)
@@ -70,3 +73,4 @@ if __name__ == '__main__':
 * If a file is meant to be executable, the first line should be:
 ```
 #!/usr/bin/env python
+```
