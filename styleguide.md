@@ -57,33 +57,33 @@ if __name__ == '__main__':
 
 ```
 #Correct:
-    num = 1 + 2
+num = 1 + 2
 
 #Wrong:
-    num = 1+2
-    num = 1  +  2
+num = 1+2
+num = 1  +  2
 ```
 
 * The only exception is for default arguments in a function's parameter list.
 
 ```
 #Correct:
-    def __str__(name='John Smith', id):
-        return '%s has id %d' % (name, id)
+def __str__(name='John Smith', id):
+    return '%s has id %d' % (name, id)
 
 #Wrong:
-    def __str__(name = 'John Smith', id):
-        return '%s has id %d' % (name, id)
+def __str__(name = 'John Smith', id):
+    return '%s has id %d' % (name, id)
 ```
 
 * Comma-delimited tokens should have one space after every comma.
 
 ```
 #Correct:
-    goodTuple = (1, 2, 3)
+goodTuple = (1, 2, 3)
 
 Wrong:
-    badTuple = (1,2,3,   4)
+badTuple = (1,2,3,   4)
 ```
 
 ### 3) String literals
@@ -91,7 +91,7 @@ Wrong:
 * Use single quotes for string literals.
 
 ```
-    name = 'John Smith'
+name = 'John Smith'
 ```
 
 * Can make an exception and use double quotes if the string contains a single
@@ -99,10 +99,31 @@ quote character (of course you can escape the character but the point is to
 increase readability).
 
 ```
-    sentence = "John Smith's house is down the block"
+sentence = "John Smith's house is down the block"
 ```
 
-### 4) Shebangs
+### 4) Naming
+
+* Variable and function names should use lowerCamelCase.
+
+```
+def addAndPrint(firstNumber, secondNumber):
+        thirdNumber = firstNumber + secondNumber
+        print thirdNumber
+```
+
+* Class names should use UpperCamelCase
+
+```
+class StringBuilder:
+    def __init__(initialString):
+        self.builtString = initialString
+
+    def displayString():
+        print self.builtString
+```
+
+### 5) Shebangs
 
 * If a file is meant to be executable, the first line should be:
 
