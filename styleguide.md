@@ -1,7 +1,7 @@
 # Skit Styleguide
 
 ## Python Style
-### Spacing
+### 1) Indentation
 
 * Python heavily inforces indentation and as such we should have consistent
 indentation throughout the entire project.\n
@@ -14,30 +14,59 @@ set tabstop=4
 set shiftwidth=4
 set expandtab
 ```
+* Each line should only be 80 columns wide.
 
-* No trailing whitespaces anywhere.
-* There should only be one extra newline separating any two blocks.
+### 2) Whitespace
+
+* No trailing whitespaces.
+* No unnecessary blank lines. There should be one blank line after each
+function and after the end of a class definition.
 
 ```
-\#Correct:
+#Correct:
+class MathThing(object):
     def add(first, second):
         return first + second
 
     def sub(first, second):
         return first - second
-\#Wrong:
+
+if __name__ == '__main__':
+    thing = MathThing()
+    'One and one is %d' % thing.add(1, 1)
+#Wrong:
+class MathThing(object):
     def add(first, second):
         return first + second
 
 
     def sub(first, second):
         return first - second
+if __name__ == '__main__':
+
+    thing = MathThing()
+    'One and one is %d' % thing.add(1, 1)
 ```
 
-* Every arithmetic token should be seperated by one space.
+* Every token involved in an operation should be seperated by one space.
 ```
-\#Correct:
+#Correct:
     num = 1 + 2
-\#Wrong:
+#Wrong:
     num = 1+2
     num = 1  +  2
+* The only exception is for default arguments in a function's parameter list.
+```
+#Correct:
+    def __str__(name='John Smith', id):
+        return '%s has id %d' % (name, id)
+#Wrong:
+    def __str__(name = 'John Smith', id):
+        return '%s has id %d' % (name, id)
+```
+
+### 3) Shebangs
+
+* If a file is meant to be executable, the first line should be:
+```
+#!/usr/bin/env python
