@@ -5,6 +5,6 @@ def dicer():
 	return random.randint(1,6) + random.randint(1,6)
 
 config = {
-	'types': ["lumber", "ore", "wool"],
+	'types': ['lumber', 'wool', 'ore', 'grain', 'lumber'],
 	'dicer': dicer
 }

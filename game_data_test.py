@@ -2,7 +2,6 @@ from game_data import Game
 import unittest
 
 class TestGameData(unittest.TestCase):
-
     def setUp(self):
         self.game = Game(2, 2)
 
