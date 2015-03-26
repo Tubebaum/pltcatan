@@ -115,7 +115,7 @@ def addAndPrint(firstNumber, secondNumber):
 
 ```
 class StringBuilder:
-    def __init__(initialString):
+    def __init__(self, initialString):
         self.builtString = initialString
 
     def displayString():

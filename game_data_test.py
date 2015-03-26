@@ -8,9 +8,9 @@ class TestGameData(unittest.TestCase):
     #tests BFS_gen and nodes iterator
     #iterator should return nodes with
     #ids in order
-    def test_gen_it(self):
-        self.game.gen_board()
-        ids = [tile.n_id for tile in self.game.tiles()]
+    def testGenerator(self):
+        self.game.generateBoard()
+        ids = [tile.idNumber for tile in self.game.tiles()]
         self.assertEqual(ids, list(range(19)))
 
 if __name__ == '__main__':

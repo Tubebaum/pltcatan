@@ -4,7 +4,7 @@ class Vector2(object):
         self.y = y
 
     def __key(self):
-        return self.to_tuple()
+        return self.toTuple()
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
@@ -27,8 +27,8 @@ class Vector2(object):
     def __add__(self, other):
         return Vector2(self.x + other.x, self.y + other.y)
 
-    def to_tuple(self):
+    def toTuple(self):
         return (self.x, self.y)
 
     def __str__(self):
-        return str(self.to_tuple())
+        return str(self.toTuple())

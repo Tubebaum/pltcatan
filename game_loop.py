@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 from game_data import Game
@@ -11,67 +12,65 @@ except NameError:
     pass
 
 #Some parsing utils
-def get_player_names():
+def getPlayerNames():
     players = []
-    nplayers = int(input_def('Nplayers', '3'))
-    for i in range(nplayers):
-        pname = input_def('Player ' +str(i + 1), 'p' +str(i+1))
-        players.append(pname)
+    numPlayers = int(inputDef('Nplayers', '3'))
+    for i in range(numPlayers):
+        playerName = inputDef('Player ' + str(i + 1), 'p' + str(i + 1))
+        players.append(playerName)
     return players
 
-def input_def(msg, default):
+def inputDef(msg, default):
     result = input(msg + ' [' + default + ']: ')
     if (result == ''):
         return default
     return result
 
-
 class TurnCmd(cmd.Cmd):
-        def __init__(self, game_loop, pidx):
-            # print(issubclass(TurnCmd, object))
-            cmd.Cmd.__init__(self)
-            self.prompt = game_loop.players[pidx] + ': '
-            self.gameloop = game_loop
-            self.pidx = pidx
+    def __init__(self, gameLoop, playerIndex):
+        cmd.Cmd.__init__(self)
+        self.prompt = gameLoop.players[playerIndex] + ': '
+        self.gameLoop = gameLoop
+        self.playerIndex = playerIndex
 
-        def do_trade(self, line):
-            print('Trade not implemented.')
+    def do_trade(self, line):
+        print('Trade not implemented.')
 
-        def do_build(self, line):
-            print('Building not implemented.')
+    def do_build(self, line):
+        print('Building not implemented.')
 
-        def do_playcard(self, line):
-            print('Development cards not implemented.')
+    def do_playcard(self, line):
+        print('Development cards not implemented.')
 
-        def do_print(self, line):
-            print('This should print the board state.')
-            for tile in self.gameloop.game.tiles():
-                print('Tile {0:2d}: {1:2d}'.format(tile.n_id, 0))
+    def do_print(self, line):
+        print('This should print the board state.')
+        for tile in self.gameLoop.game.tiles():
+            print('Tile {0:2d}: {1:2d}'.format(tile.idNumber, 0))
 
-        def do_end(self, line):
-            print('Ended turn')
-            return True
+    def do_end(self, line):
+        print('Ended turn')
+        return True
 
 class GameLoop(object):
     def start(self):
-        self.players = get_player_names()
+        self.players = getPlayerNames()
         print('Generating board...')
         self.game = Game(len(self.players))
-        self.game.gen_board()
+        self.game.generateBoard()
         print('Placing initial settlements...')
-        self.initial_settlements()
-        self.loop_turns()
+        self.initialSettlements()
+        self.loopTurns()
 
-    def initial_settlements(self):
+    def initialSettlements(self):
         return
-    
-    def loop_turns(self):
+
+    def loopTurns(self):
         while True:
-            for pidx in range(len(self.players)):
-                print(self.players[pidx] + "'s turn")
+            for playerIndex in range(len(self.players)):
+                print(self.players[playerIndex] + "'s turn")
                 diced = config['dicer']()
                 print('Diced value: ' + str(diced))
-                TurnCmd(self, pidx).cmdloop()
+                TurnCmd(self, playerIndex).cmdloop()
 
 if __name__ == '__main__':
     try:
