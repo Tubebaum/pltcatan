@@ -1,5 +1,5 @@
 ## Skit
-####The Settlers of Catan Customization Kit Language
+#### The Settlers of Catan Customization Kit Language
 COMS W4115 Programming Languages and Translators
 Instructor: Alfred Aho
 Spring 2015
