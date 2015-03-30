@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
 
-from tile import *
+from tile import Tile
+from direction.edge_direction import EdgeDirection
 
 
 class Board(object):
     """A horizontal hextile board, such as that used in Settlers of Catan.
 
     Hextiles are referred to using axial coordinates.
-        See http://devmag.org.za/2013/08/31/geometry-with-hex-coordinates/
-        for more on axial hex coordinates.
+        See below for more on axial hex coordinates.
+            http://devmag.org.za/2013/08/31/geometry-with-hex-coordinates/
+            www.redblobgames.com/grids/hexagons
 
     Attributes:
         radius (int): The number of tiles between the center tile and the edge
@@ -20,8 +22,9 @@ class Board(object):
         radius (int): The number of tiles between the center tile and the edge
           of the board, including the center tile itself. Should be >= 1.
 
-    TODO: This class currently assumes a board of hextiles but ideally should
-          be generalized for differently shaped tiles.
+    TODO: This class could more specifically be called HextileBoard; when this
+          change is made, a generalized Board class should be constructed, i.e.
+          one that can have different shape tiles.
     """
 
     def __init__(self, radius):
@@ -61,7 +64,7 @@ class Board(object):
         self.tiles = {}
 
         # We'll go ahead and add the center tile.
-        self._add_tile_with_coords(0, 0)
+        self._add_new_tile_with_coords(0, 0)
 
         for ring_index in range(radius):
             # We start adding tiles from the westernmost one.
@@ -71,37 +74,73 @@ class Board(object):
             # First we scale the northwest side of the ring.
             # This is equivalent to moving along the y-axis of the board.
             while y != ring_index:
-                self._add_tile_with_coords(x, y)
+                self._add_new_tile_with_coords(x, y)
                 # Add the mirror tile along the southeast side of the ring.
-                self._add_tile_with_coords(y, x)
+                self._add_new_tile_with_coords(y, x)
                 y += 1
 
             # Then we scale the northern side of the ring.
             # This is equivalent to moving along the x-axis of the board.
             while x != 0:
-                self._add_tile_with_coords(x, y)
+                self._add_new_tile_with_coords(x, y)
                 # Add the mirror tile along the south side of the ring.
-                self._add_tile_with_coords(y, x)
+                self._add_new_tile_with_coords(y, x)
                 x += 1
 
             # Finally we scale the northeast side of the ring.
             # This is equivalent to moving along the z-axis of the board.
             while x != ring_index or y != 0:
-                self._add_tile_with_coords(x, y)
+                self._add_new_tile_with_coords(x, y)
                 # Add mirror tile along the southwest side of the ring.
-                self._add_tile_with_coords(y, x)
+                self._add_new_tile_with_coords(y, x)
                 x += 1
                 y -= 1
 
         # print self.tiles
 
-    def _add_tile_with_coords(self, x, y):
-        """Add a tile to the board at the given axial coordinates."""
+    def _add_new_tile_with_coords(self, x, y):
+        """Add a brand new tile to the board at the given axial coordinates."""
 
         if x not in self.tiles:
             self.tiles[x] = {}
 
-        self.tiles[x][y] = Tile(x, y)
+        tile = Tile(x, y)
+
+        # A new tile will have its own brand new vertices and edges,
+        # but we don't want new edges if that edge has already been defined
+        # by a neighbor. Here we sync such shared vertices and edges.
+        tile = self._sync_tile_vertices_and_edges(tile)
+
+        self.tiles[x][y] = tile
+
+    def _sync_tile_vertices_and_edges(self, tile):
+        """Synchronize shared vertices and edges across tiles.
+
+        New tile objects will create their own vertices and edges. When tiles
+        share edges and vertices with existing tiles on the board, however,
+        we want them to point to the same shared vertex or edge objects,
+        instead of each having their own. This method enforces this for the
+        given tile.
+
+        Args:
+            tile (tile.Tile): The tile whose vertices and edges we want to make
+              sure point to the same vertex and edge objects as that of its
+              existing neighbors with whom it shares a common vertex or edge.
+
+        Returns:
+            tile: Same as given tile object, with updated vertex and edge
+              objects.
+        """
+
+        neighboring_tiles = self.get_neighboring_tiles(tile)
+
+        # print "Given tile: {0}\nNeighboring tiles: {1}\n\n".format(
+        #     tile, neighboring_tiles)
+
+        for (direction, neighbor_tile) in neighboring_tiles.iteritems():
+            tile.update_common_edge_and_vertices(direction, neighbor_tile)
+
+        return tile
 
     def get_tile_with_coords(self, x, y):
         """Get the tile at the given coordinates, or None if no tile exists."""
@@ -117,7 +156,7 @@ class Board(object):
         Args:
             tile (tile.Tile): The tile for which we'd like to find the neighbor.
 
-            direction (tile.EdgeDirection): hextiles have 6 edges and thus
+            direction (direction.EdgeDirection): hextiles have 6 edges and thus
               neighbors in 6 different directions.
 
         Returns:
@@ -131,5 +170,25 @@ class Board(object):
 
         return self.get_tile_with_coords(x, y)
 
+    def get_neighboring_tiles(self, tile):
+        """Get all six neighboring tiles for the given hextile.
+
+        Args:
+            tile (tile.Tile): The tile whose neighbors we want to return.
+
+        Returns:
+            dict. Keys are directions and values are tiles that neighbor the
+              given tile in that direction.
+        """
+
+        neighboring_tiles = {}
+
+        for direction in EdgeDirection:
+            neighbor_tile = self.get_neighboring_tile(tile, direction)
+
+            if neighbor_tile:
+                neighboring_tiles[direction] = neighbor_tile
+
+        return neighboring_tiles
 
 
