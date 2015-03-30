@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from direction import Direction
+from .direction import Direction
 
 
 class VertexDirection(Direction):
@@ -14,7 +14,7 @@ class VertexDirection(Direction):
     See more on cubic coordinates here:
         http://www.redblobgames.com/grids/hexagons/#coordinates
 
-    Note: Be wary of reordering the below; uses of the iterator in board.py
+    Note: Be wary of reordering the below; uses of the iterator in hex_board.py
           are sensitive to the ordering.
     """
 

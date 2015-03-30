@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from tile import Tile
-from direction.edge_direction import EdgeDirection
+from ..tile.hex_tile import HexTile
+from ..direction.edge_direction import EdgeDirection
+from .board import Board
 
 
-class Board(object):
+class HexBoard(Board):
     """A horizontal hextile board, such as that used in Settlers of Catan.
 
     Hextiles are referred to using axial coordinates.
@@ -21,16 +22,20 @@ class Board(object):
     Args:
         radius (int): The number of tiles between the center tile and the edge
           of the board, including the center tile itself. Should be >= 1.
-
-    TODO: This class could more specifically be called HextileBoard; when this
-          change is made, a generalized Board class should be constructed, i.e.
-          one that can have different shape tiles.
     """
 
-    def __init__(self, radius):
+    MIN_BOARD_RADIUS = 1
 
-        # TODO: enforce positive integer radius
+    def __init__(self, radius, tile_cls=HexTile):
+
+        if radius < HexBoard.MIN_BOARD_RADIUS:
+            message = ("Specified radius does not meet the minimum "
+                       "board tile radius {0}").format(HexBoard.MIN_BOARD_RADIUS)
+            raise ValueError(message)
+
         self.radius = radius
+
+        self.tile_cls = tile_cls
 
         self.tiles = {}
         self._create_tiles(radius)
@@ -104,7 +109,7 @@ class Board(object):
         if x not in self.tiles:
             self.tiles[x] = {}
 
-        tile = Tile(x, y)
+        tile = self.tile_cls(x, y)
 
         # A new tile will have its own brand new vertices and edges,
         # but we don't want new edges if that edge has already been defined
@@ -123,7 +128,7 @@ class Board(object):
         given tile.
 
         Args:
-            tile (tile.Tile): The tile whose vertices and edges we want to make
+            tile (Tile): The tile whose vertices and edges we want to make
               sure point to the same vertex and edge objects as that of its
               existing neighbors with whom it shares a common vertex or edge.
 
@@ -154,15 +159,15 @@ class Board(object):
         """Get the tile neighboring the given tile in the given direction.
 
         Args:
-            tile (tile.Tile): The tile for which we'd like to find the neighbor.
+            tile (Tile): The tile for which we'd like to find the neighbor.
 
-            direction (direction.EdgeDirection): hextiles have 6 edges and thus
+            direction (EdgeDirection): hextiles have 6 edges and thus
               neighbors in 6 different directions.
 
         Returns:
             Tile. None if the tile has no valid neighbor in that direction.
 
-        TODO: enforce that direction is actually in Direction
+        TODO: enforce that direction is actually in EdgeDirection
         """
 
         x = tile.x + edge_direction[0]
@@ -174,7 +179,7 @@ class Board(object):
         """Get all six neighboring tiles for the given hextile.
 
         Args:
-            tile (tile.Tile): The tile whose neighbors we want to return.
+            tile (Tile): The tile whose neighbors we want to return.
 
         Returns:
             dict. Keys are directions and values are tiles that neighbor the

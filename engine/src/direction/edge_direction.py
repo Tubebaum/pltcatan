@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from direction import Direction
-from vertex_direction import VertexDirection
+from .direction import Direction
+from .vertex_direction import VertexDirection
 
 
 class EdgeDirection(Direction):

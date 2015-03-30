@@ -1,4 +1,12 @@
-from board import *
+from .board.game_board import GameBoard
 
-b = Board(2)
+
+class Game(object):
+
+    def __init__(self):
+        pass
+
+    def test(self):
+        b = GameBoard(2)
+
 

@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from vertex import Vertex
-from edge import Edge
-from direction.vertex_direction import VertexDirection
+from .tile import Tile
+from ..vertex.vertex import Vertex
+from ..edge.edge import Edge
+from ..direction.vertex_direction import VertexDirection
 
 
-class Tile(object):
+class HexTile(Tile):
     """A hexagonal tile, with 6 edges and 6 vertices.
 
     Attributes:
@@ -25,7 +26,6 @@ class Tile(object):
           used by the board to which this tile belongs.
 
     TODO: x and y are mostly here for testing purposes. Removable.
-    TODO: consider getting vertices by their directions, not object pointers
     """
 
     def __init__(self, x, y):
@@ -58,10 +58,10 @@ class Tile(object):
         Since edges aren't directed, edges[src][dst] = edges[dst][src].
 
         Args:
-            start_vertex_dir (direction.VertexDirection): Direction relative to
+            start_vertex_dir (VertexDirection): Direction relative to
               this tile to the vertex that comprises one end of the edge to add.
 
-            end_vertex_dir (direction.VertexDirection): Direction relative to
+            end_vertex_dir (VertexDirection): Direction relative to
               this tile of the edge-to-add's endpoint vertex.
 
         TODO: enforce that these are adjacent vertex directions.
@@ -81,10 +81,10 @@ class Tile(object):
         """Update vertices and edges this tile shares with the neighboring tile.
 
         Args:
-            edge_direction (direction.EdgeDirection): The given neighboring tile
+            edge_direction (EdgeDirection): The given neighboring tile
               should share an edge at the given direction relative to this tile.
 
-            neighboring_tile (tile.Tile): The tile whose relevant vertices and
+            neighboring_tile (Tile): The tile whose relevant vertices and
               edges we should use to overwrite those of this tile.
         """
         # Get the directions of the vertices comprising the endpoints of the

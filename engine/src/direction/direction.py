@@ -3,6 +3,12 @@ from enum import Enum
 
 
 class Direction(Enum):
+    """An abstract class that defines basic functions needed by direction enums.
+
+    TODO: Enforce that this class is an abstract class by having
+          its metaclass be ABCMeta. This seems to create some issues since
+          Enum is not a regular class and comes from a backport.
+    """
 
     def __str__(self):
         return '{0}'.format(self.value)
