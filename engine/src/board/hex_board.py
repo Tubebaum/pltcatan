@@ -38,70 +38,17 @@ class HexBoard(Board):
         self.tile_cls = tile_cls
 
         self.tiles = {}
-        self._create_tiles(radius)
+        self._create_tiles()
 
-    def _create_tiles(self, radius):
+    def _create_tiles(self):
         """Generates a dictionary of tiles, indexed by axial coordinates.
 
-        We can consider a hextile board a series of concentric rings where the
-        radius counts the number of concentric rings that compose the board.
-        When adding tiles to the board, we add each such ring one at a time,
-        starting from the innermost ring (i.e. the single center tile)
-        that has ring_index 0 to the outermost ring (i.e. the ring consisting
-        of tiles on the edge of the board) that has ring_index radius - 1.
-
-        When filling in a ring, we start from the westernmost tile of that ring
-        and continue around the ring in a clockwise fashion. We stop at the tile
-        directly before the easternmost ring. We can do this because, every time
-        we add a tile in the ring, we can add the tile mirror opposite it on
-        the ring by simpling flipping the axial coordinates.
-        
-        Args:
-            radius (int): the number of tiles between the center tile and the
-              edge of the board, including the center tile itself.
-              Should be >= 1. Can also be though of as the number of concentric
-              rings on the board + 1.
-        
-        Returns:
-            None (Modifies self.tiles)
+        See how coordinates are generated in _add_new_tile_with_coords()
         """
 
-        self.tiles = {}
+        for x, y in self.iter_tile_coords():
+            self._add_new_tile_with_coords(x, y)
 
-        # We'll go ahead and add the center tile.
-        self._add_new_tile_with_coords(0, 0)
-
-        for ring_index in range(radius):
-            # We start adding tiles from the westernmost one.
-            x = -1 * ring_index
-            y = 0
-
-            # First we scale the northwest side of the ring.
-            # This is equivalent to moving along the y-axis of the board.
-            while y != ring_index:
-                self._add_new_tile_with_coords(x, y)
-                # Add the mirror tile along the southeast side of the ring.
-                self._add_new_tile_with_coords(y, x)
-                y += 1
-
-            # Then we scale the northern side of the ring.
-            # This is equivalent to moving along the x-axis of the board.
-            while x != 0:
-                self._add_new_tile_with_coords(x, y)
-                # Add the mirror tile along the south side of the ring.
-                self._add_new_tile_with_coords(y, x)
-                x += 1
-
-            # Finally we scale the northeast side of the ring.
-            # This is equivalent to moving along the z-axis of the board.
-            while x != ring_index or y != 0:
-                self._add_new_tile_with_coords(x, y)
-                # Add mirror tile along the southwest side of the ring.
-                self._add_new_tile_with_coords(y, x)
-                x += 1
-                y -= 1
-
-        # print self.tiles
 
     def _add_new_tile_with_coords(self, x, y):
         """Add a brand new tile to the board at the given axial coordinates."""
@@ -140,7 +87,7 @@ class HexBoard(Board):
         neighboring_tiles = self.get_neighboring_tiles(tile)
 
         # print "Given tile: {0}\nNeighboring tiles: {1}\n\n".format(
-        #     tile, neighboring_tiles)
+            # tile, neighboring_tiles)
 
         for (direction, neighbor_tile) in neighboring_tiles.iteritems():
             tile.update_common_edge_and_vertices(direction, neighbor_tile)
@@ -195,5 +142,66 @@ class HexBoard(Board):
                 neighboring_tiles[direction] = neighbor_tile
 
         return neighboring_tiles
+
+    def iter_tiles(self):
+        """Iterate over the tiles in this board.
+
+        The order is that described in iter_tile_coords.
+        """
+
+        for x, y in self.iter_tile_coords():
+            yield self.get_tile_with_coords(x, y)
+
+    def iter_tile_coords(self):
+        """Iterate over axial coordinates for each tile in the board.
+
+        This is a generator function that will yield the coordinates to the
+        caller each time after they are computed.
+
+        We can consider a hextile board a series of concentric rings where the
+        radius counts the number of concentric rings that compose the board.
+        When generating coordinates, we traverse each such ring one at a time,
+        starting from the innermost ring (i.e. the single center tile)
+        that has ring_index 0 to the outermost ring (i.e. the ring consisting
+        of tiles on the edge of the board) that has ring_index radius - 1.
+
+        When traversing a ring, we start from the westernmost tile of that ring
+        and continue around the ring in a clockwise fashion. We stop at the tile
+        directly before the easternmost ring. We can do this because, every time
+        we find a tile's coordinates in the ring, we can also find the
+        coordinates of the tile mirror opposite it in the ring by simply
+        flipping the axial coordinates.
+        """
+
+        # Yield coordinates for the center tile.
+        yield 0, 0
+
+        for ring_index in range(self.radius):
+            # We start yielding coordinates from the westernmost tile.
+            x = -1 * ring_index
+            y = 0
+
+            # First we scale the northwest side of the ring.
+            # This is equivalent to moving along the y-axis of the board.
+            while y != ring_index:
+                yield x, y
+                yield y, x
+                y += 1
+
+            # Then we scale the northern side of the ring.
+            # This is equivalent to moving along the x-axis of the board.
+            while x != 0:
+                yield x, y
+                yield y, x
+                x += 1
+
+            # Finally we scale the northeast side of the ring.
+            # This is equivalent to moving along the z-axis of the board.
+            while x != ring_index or y != 0:
+                yield x, y
+                yield y, x
+                x += 1
+                y -= 1
+
 
 

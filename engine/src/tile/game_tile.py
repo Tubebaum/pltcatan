@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from .hex_tile import HexTile
+from ..resource_type import ResourceType
 
 
 class GameTile(HexTile):
@@ -13,9 +14,9 @@ class GameTile(HexTile):
           to be placed on this hex.
     """
 
-    def __init__(self, x, y, resource=None, chit_value=None):
+    def __init__(self, x, y, resource_type=ResourceType.FALLOW, chit_value=None):
 
         super(GameTile, self).__init__(x, y)
 
-        self.resource = resource
+        self.resource_type = resource_type
         self.chit_value = chit_value
