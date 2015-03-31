@@ -29,13 +29,13 @@ class GameBoard(HexBoard):
         else:
             assignment_func()
 
-    # def _default_assign_tile_resources(self):
-    #     """Distributes non-fallow resource types across the board evenly.
-    #
-    #     Specifically, assigns one ResourceType.FALLOW tile, then splits the
-    #     resource types of the remaining tiles evenly.
-    #     """
-    #
+    def _default_assign_tile_resources(self):
+        """Distributes non-fallow resource types across the board evenly.
+
+        Specifically, assigns one ResourceType.FALLOW tile, then splits the
+        resource types of the remaining tiles evenly.
+        """
+
     #     # Get a randomized list of the tiles of this board.
     #     tiles = list(self.iter_tiles())
     #     random.shuffle(tiles)
@@ -48,7 +48,7 @@ class GameBoard(HexBoard):
     #
     #
     #
-    #     pass
+        pass
 
     def _randomly_assign_tile_resources(self):
         """Randomly assign resource types to this board's tiles."""
