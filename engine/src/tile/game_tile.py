@@ -20,3 +20,7 @@ class GameTile(HexTile):
 
         self.resource_type = resource_type
         self.chit_value = chit_value
+
+    def __str__(self):
+        return "Coordinates: ({0}, {1})\nResource Type: {2}\nChit value: {3}\n"\
+            .format(self.x, self.y, self.resource_type, self.chit_value)

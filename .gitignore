@@ -1,4 +1,6 @@
 *.pyc
+*.diff
+output
 
 # Mac OS X
 .DS_Store

@@ -7,6 +7,6 @@ class Game(object):
         pass
 
     def test(self):
-        b = GameBoard(2)
+        b = GameBoard(3)
 
 

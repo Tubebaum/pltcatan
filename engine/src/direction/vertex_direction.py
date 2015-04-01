@@ -23,6 +23,7 @@ class VertexDirection(Direction):
     TOP_LEFT = (0, 1, 0)
 
     def get_opposite_direction(self):
+        """Get the direction of the vertex opposite one of this direction."""
         coordinates = self.value
 
         def toggle(val):
@@ -37,6 +38,7 @@ class VertexDirection(Direction):
 
     @classmethod
     def pairs(cls):
+        """Returns vertex pairs, each of which constitute an edge of a hex."""
         return (
             (cls.TOP, cls.TOP_RIGHT),
             (cls.TOP_RIGHT, cls.BOTTOM_RIGHT),

@@ -64,6 +64,9 @@ class HexTile(Tile):
             end_vertex_dir (VertexDirection): Direction relative to
               this tile of the edge-to-add's endpoint vertex.
 
+        Returns:
+            None.
+
         TODO: enforce that these are adjacent vertex directions.
         """
 
@@ -86,6 +89,9 @@ class HexTile(Tile):
 
             neighboring_tile (Tile): The tile whose relevant vertices and
               edges we should use to overwrite those of this tile.
+
+        Returns:
+            None.
         """
         # Get the directions of the vertices comprising the endpoints of the
         # edge in the given edge_direction i.e. the edge shared between this

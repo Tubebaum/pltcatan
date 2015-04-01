@@ -10,10 +10,11 @@ class ResourceType(Enum):
     used to build/buy structures, cards, etc.
     """
 
-    ORE = 'ore'
+    # Arable tiles are non-fallow tiles.
     GRAIN = 'grain'
     LUMBER = 'lumber'
     WOOL = 'wool'
+    ORE = 'ore'
     BRICK = 'brick'
 
     FALLOW = None
@@ -25,31 +26,41 @@ class ResourceType(Enum):
         return self.value == other
 
     @classmethod
-    def iter_non_fallow(cls):
+    def get_priority_arable_types(cls):
+
+        return cls.GRAIN, cls.LUMBER, cls.WOOL, cls.ORE, cls.BRICK
+
+    @classmethod
+    def get_arable_types(cls):
+        """Get a list of non-fallow ResourceTypes only."""
+
+        arable_types = filter(
+            lambda resource_type: resource_type != ResourceType.FALLOW,
+            list(ResourceType)
+        )
+
+        return arable_types
+
+    @classmethod
+    def iter_arable_types(cls):
         """Returns a generator over non-fallow enum members."""
 
-        arable_types = ResourceType.__members__.items()[:-1]
-
-        for resource_type in arable_types:
+        for resource_type in ResourceType.get_arable_types():
             yield resource_type
 
     @classmethod
-    def count(cls):
-        """Return number of non-fallow resources for this resource type."""
-        return len(ResourceType.__members__.items()) - 1
-
-    @classmethod
-    def random(cls):
+    def random_arable_type(cls):
         """Return a random non-fallow ResourceType."""
 
-        # Remove ResourceType.FALLOW from consideration.
-        types = ResourceType.__members__.items()[:-1]
-        random_index = random.randint(0, len(types) - 1)
+        arable_types = ResourceType.get_arable_types()
+        random_index = random.randint(0, len(arable_types))
 
-        return types[random_index]
+        return arable_types[random_index]
 
     @classmethod
     def find_by_value(cls, value):
+        """Find the ResourceType of the given value."""
+
         for resource in cls:
             if value == resource:
                 return resource
