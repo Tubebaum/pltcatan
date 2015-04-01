@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
+from abc import ABCMeta
 
 
 class Vertex(object):
-    pass
+    __metaclass__ = ABCMeta

@@ -1,6 +1,6 @@
-from .board.game_board import GameBoard
-from .dice.dice import Dice
-from .input_manager import InputManager
+from engine.src.dice.dice import Dice
+from engine.src.input_manager import InputManager
+from engine.src.board.game_board import GameBoard
 
 
 class Game(object):
@@ -17,6 +17,6 @@ class Game(object):
             for player_index in range(len(self.players)):
                 print(self.players[player_index] + "'s turn")
                 roll_value = self.dice.throw()
-                #self.board.distribute_resources_for_roll(row_value)
+                self.board.distribute_resources_for_roll(roll_value)
                 print('Diced value: ' + str(roll_value))
                 InputManager(self, player_index).cmdloop()
