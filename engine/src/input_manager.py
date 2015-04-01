@@ -13,7 +13,7 @@ class InputManager(cmd.Cmd):
         cmd.Cmd.__init__(self)
         self.prompt = game.players[player_index] + ': '
         self.game = game
-        self.playerIndex = player_index
+        self.player_index = player_index
 
     def do_trade(self, line):
         print('Trade not implemented.')

@@ -8,6 +8,9 @@ from engine.src.calamity.calamity import Calamity
 
 
 class GameBoard(HexBoard):
+    #TODO: Move to general configuration file
+    DEFAULT_RADIUS = 3
+
     """A Settlers of Catan playing board.
 
     Args:
