@@ -1,4 +1,4 @@
-import lex as lex
+import lex
 
 tokens = (
     'COLON',
@@ -41,3 +41,39 @@ def t_error(t):
     print "Illegal character '%s'" % t.value[0]
 
 lexer = lex.lex()
+
+import yacc
+
+def p_property_value(p):
+    'property : ID COLON value'
+    p[0] = {p[1]: p[3]}
+
+def p_structure_properties(p):
+    'structure : LCURLY properties RCURLY'
+    p[0] = p[2]
+
+def p_properties_comma(p):
+    'properties : property COMMA properties'
+    p[3].update(p[1])
+    p[0] = p[3]
+
+def p_properties_property(p):
+    'properties : property'
+    p[0] = p[1]
+
+def p_value_num(p):
+    'value : NUM'
+    p[0] = p[1]
+
+def p_value_str(p):
+    'value : STR'
+    p[0] = p[1]
+
+def p_value_structure(p):
+    'value : structure'
+    p[0] = p[1]
+
+def p_error(p):
+    print "Syntax error in input!"
+
+parser = yacc.yacc(debug=1)
