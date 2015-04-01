@@ -52,7 +52,7 @@ if __name__ == '__main__':
     'One and one is %d' % thing.add(1, 1)
 ```
 
-* Every token involved in an operation should be seperated by one space.
+* Every token involved in an operation should be separated by one space.
 
 ```
 #Correct:
@@ -103,29 +103,35 @@ sentence = "John Smith's house is down the block"
 
 ### 4) Naming
 
-* Variable and function names should use lowerCamelCase.
+* Variable and function names should be lowercase, with words separated by underscores as necessary.
 
 ```
-def addAndPrint(firstNumber, secondNumber):
-        thirdNumber = firstNumber + secondNumber
-        print thirdNumber
+def add_and_print(first_number, second_number):
+        third_number = first_number + second_number
+        print third_number
 ```
 
 * Class names should use UpperCamelCase.
 
 ```
 class StringBuilder:
-    def __init__(self, initialString):
-        self.builtString = initialString
+    def __init__(self, initial_string):
+        self.built_string = initial_string
 
-    def displayString():
-        print self.builtString
+    def display_string():
+        print self.built_string
 ```
 
-### 5) Shebangs
+### 5) Documentation
+
+TODO
+
+### 6) Shebangs
 
 * If a file is meant to be executable, the first line should be:
 
 ```
 #!/usr/bin/env python
 ```
+
+See more at: https://google-styleguide.googlecode.com/svn/trunk/pyguide.html

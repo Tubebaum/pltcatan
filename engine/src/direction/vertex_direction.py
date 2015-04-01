@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from .direction import Direction
+from engine.src.direction.direction import Direction
 
 
 class VertexDirection(Direction):
@@ -24,6 +24,7 @@ class VertexDirection(Direction):
 
     def get_opposite_direction(self):
         """Get the direction of the vertex opposite one of this direction."""
+
         coordinates = self.value
 
         def toggle(val):
@@ -34,11 +35,12 @@ class VertexDirection(Direction):
         y = toggle(coordinates[1])
         z = toggle(coordinates[2])
 
-        return x, y, z
+        return VertexDirection.find_by_value((x, y, z))
 
     @classmethod
     def pairs(cls):
         """Returns vertex pairs, each of which constitute an edge of a hex."""
+
         return (
             (cls.TOP, cls.TOP_RIGHT),
             (cls.TOP_RIGHT, cls.BOTTOM_RIGHT),

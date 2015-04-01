@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 import random
-import math
-from ..lib.utils import Utils
-from .hex_board import HexBoard
-from ..tile.game_tile import GameTile
-from ..resource_type import ResourceType
-from ..calamity.calamity import Calamity
+from engine.src.lib.utils import Utils
+from engine.src.board.hex_board import HexBoard
+from engine.src.tile.game_tile import GameTile
+from engine.src.resource_type import ResourceType
+from engine.src.calamity.calamity import Calamity
 
 
 class GameBoard(HexBoard):
@@ -49,6 +48,9 @@ class GameBoard(HexBoard):
 
         Returns:
             None.
+
+        TODO: Defaults to only one FALLOW tile regardless of board size.
+              Perhaps should make fallow tile count relative to board size.
         """
 
         # Get a randomized list of the tiles of this board.
@@ -214,7 +216,41 @@ class GameBoard(HexBoard):
             if tile.resource_type != ResourceType.FALLOW:
                 yield tile
 
+    def place_structure(self, structure, x, y, vertex_dir):
+        """Place a structure of the given type on the specified vertex.
 
+        Args:
+            See self.update_vertex().
 
+            structure (Structure): Structure to replace the specified vertex
+              with.
+        """
 
+        self.update_vertex(x, y, vertex_dir, structure)
 
+    def distribute_resources_for_roll(self, roll_value):
+        """Distribute resources to the players based on the given roll value.
+
+        Resources are distributed as follows: Whenever a value is rolled that
+        matches the chit value of a tile, for all structures on that tile,
+        distribute the number of resources dictated by the yield of that
+        structure of the type of that tile.
+        """
+
+        # Find those tiles whose chit value matches the roll value.
+        resource_tiles = filter(
+            lambda tile: tile.chit_value == roll_value,
+            list(self.iter_tiles())
+        )
+
+        for resource_tile in resource_tiles:
+
+            # Find any structures built on the vertices of the found tiles.
+            adjacent_structures = resource_tile.get_adjacent_structures()
+
+            for structure in adjacent_structures:
+                # Distribute resource cards to the player.
+                # The number of resources to be distributed is determined by
+                # the structure, and the type determined by the current tile.
+                structure.owning_player.add_resources(
+                    resource_tile.resource_type, structure.base_yield())

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-
-from .hex_tile import HexTile
-from ..resource_type import ResourceType
+from engine.src.tile.hex_tile import HexTile
+from engine.src.resource_type import ResourceType
+from engine.src.vertex.structure.structure import Structure
 
 
 class GameTile(HexTile):
@@ -14,7 +14,8 @@ class GameTile(HexTile):
           to be placed on this hex.
     """
 
-    def __init__(self, x, y, resource_type=ResourceType.FALLOW, chit_value=None):
+    def __init__(self, x, y,
+                 resource_type=ResourceType.FALLOW, chit_value=None):
 
         super(GameTile, self).__init__(x, y)
 
@@ -24,3 +25,13 @@ class GameTile(HexTile):
     def __str__(self):
         return "Coordinates: ({0}, {1})\nResource Type: {2}\nChit value: {3}\n"\
             .format(self.x, self.y, self.resource_type, self.chit_value)
+
+    def get_adjacent_structures(self):
+        """Return any vertices that are structures."""
+
+        return filter(
+            lambda vertex: issubclass(vertex.__class__, Structure),
+            list(self.iter_vertices())
+        )
+
+

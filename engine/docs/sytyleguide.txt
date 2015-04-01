@@ -1,5 +1,0 @@
-This engine is implemented using Python 2.7.
-To the best of our ability, we should try and follow the style guides specified by
-    https://google-styleguide.googlecode.com/svn/trunk/pyguide.html#Classes
-    http://sphinxcontrib-napoleon.readthedocs.org/en/latest/example_google.html
-    https://github.com/numpy/numpy/blob/master/doc/HOWTO_DOCUMENT.rst.txt
