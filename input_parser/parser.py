@@ -1,3 +1,5 @@
+import ast
+
 import ply.lex as lex
 import ply.yacc as yacc
 
@@ -9,7 +11,6 @@ tokens = ('NAME', 'NUMBER', 'NEWLINE', 'IDENT', 'DEDENT')
 literals = ['=', '+', '-', '*', '/', '(', ')', '{', '}']
 
 t_NAME = r'[a-zA-Z_][a-zA-Z0-9_]*'
-t_NEWLINE = r'\n+'
 
 def t_NUMBER(t):
 	r'\d+'
@@ -21,6 +22,11 @@ def t_NUMBER(t):
 	return t
 
 t_ignore = " \t"
+
+def t_NEWLINE(t):
+	r'\n+'
+	t.lexer.lineno += t.value.count('\n')
+	return t
 
 def t_error(t):
 	print "Illegal character '%s'" % t.value[0]
@@ -42,7 +48,7 @@ def p_stmt_assignment(p):
 
 def p_stmt_expr(p):
 	"""stmt : expr"""
-	print p[1]
+	print eval(compile(ast.fix_missing_locations(ast.Expression(p[1])), '<string>', 'eval'))
 
 def p_stmt_func(p):
 	"""stmt : func"""
@@ -95,14 +101,14 @@ def p_expr_binop(p):
 			| expr '-' expr
 			| expr '*' expr
 			| expr '/' expr"""
-	if   p[2] == '+': p[0] = p[1] + p[3]
-	elif p[2] == '-': p[0] = p[1] - p[3]
-	elif p[2] == '*': p[0] = p[1] * p[3]
-	elif p[2] == '/': p[0] = p[1] / p[3]
+	if   p[2] == '+': p[0] = ast.BinOp(p[1], ast.Add(), p[3]) #p[1] + p[3]
+	elif p[2] == '-': p[0] = ast.BinOp(p[1], ast.Sub(), p[3]) #p[1] - p[3]
+	elif p[2] == '*': p[0] = ast.BinOp(p[1], ast.Mult(), p[3]) #p[1] * p[3]
+	elif p[2] == '/': p[0] = ast.BinOp(p[1], ast.Div(), p[3]) #p[1] / p[3]
 
 def p_expr_uminus(p):
 	"""expr : '-' expr %prec UMINUS"""
-	p[0] = -p[2]
+	p[0] = ast.BinOp(p[2], ast.Mult(), ast.Num(-1))
 
 def p_expr_group(p):
 	"""expr : '(' expr ')'"""
@@ -110,7 +116,7 @@ def p_expr_group(p):
 
 def p_expr_number(p):
 	"""expr : NUMBER"""
-	p[0] = p[1]
+	p[0] = ast.Num(p[1])
 
 def p_expr_name(p):
 	"""expr : NAME"""
