@@ -1,4 +1,5 @@
 import lex as lex
+
 tokens = (
     'COLON',
     'LCURLY',
@@ -11,7 +12,6 @@ tokens = (
     'FUNC',
     'NUM'
 )
-
 t_COLON = r':'
 t_LCURLY = r'\{'
 t_RCURLY = r'\}'
