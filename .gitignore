@@ -1,1 +1,11 @@
 *.pyc
+
+# Mac OS X
+.DS_Store
+
+snippets/
+
+# IntelliJ IDE files
+.idea/
+pltcatan.iml
+
