@@ -5,7 +5,6 @@ class TestGameData(unittest.TestCase):
     def setUp(self):
         self.game = Game(2, 2)
 
-    #tests BFS_gen and nodes iterator
     #iterator should return nodes with
     #ids in order
     def testGenerator(self):

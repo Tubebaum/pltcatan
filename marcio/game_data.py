@@ -1,5 +1,3 @@
-from collections import deque
-from config import config
 from Vector2 import Vector2
 
 class Tile(object):
@@ -30,6 +28,7 @@ class Game(object):
         self.numPlayers = numPlayers
         self.player_resources = {}
         self.boardSize = boardSize
+        self.dice = Dice()
         self.board = {}
 
     def generateBoard(self):
@@ -38,7 +37,7 @@ class Game(object):
             self.board[hexag] = Tile()
 
     # Intended for testing
-    def countNodes(self):
+    def count_nodes(self):
         return len(list(self.nodes()))
 
     # Python generator returning each tile
