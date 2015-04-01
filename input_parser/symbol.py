@@ -1,7 +1,7 @@
 class Symbol(object):
 	def __init__(self, name="", tpe="", value=None):
 		self.name = name
-		self.type = tpe
+		self.tpe = tpe
 		self.value = value
 
 class SymbolTable(object):
@@ -10,7 +10,6 @@ class SymbolTable(object):
 
 	def add_symbol(self, name, tpe, value):
 		self.table[name] = Symbol(name, tpe, value)
-		print name, tpe, value
 
 	def get_symbol(self, name):
 		return self.table[name]
