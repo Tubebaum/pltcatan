@@ -1,4 +1,5 @@
-import lex
+import ply.lex as lex
+import ply.yacc as yacc
 
 tokens = (
     'COLON',
@@ -14,9 +15,11 @@ tokens = (
     'FUNC',
     'NUM'
 )
+
 reserved = {
     'uniform': 'UNIFORM'
 }
+
 tokens += tuple(reserved.values())
 t_COLON = r':'
 t_LCURLY = r'\{'
@@ -51,8 +54,6 @@ def t_error(t):
     print "Illegal character '%s'" % t.value[0]
 
 lexer = lex.lex()
-
-import yacc
 
 def p_property_value(p):
     'property : ID COLON value'
