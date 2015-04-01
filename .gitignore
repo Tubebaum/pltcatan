@@ -12,3 +12,6 @@ snippets/
 .idea/
 pltcatan.iml
 
+# PLY files
+**/*.out
+**/parsetab.py
