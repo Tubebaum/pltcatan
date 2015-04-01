@@ -7,6 +7,7 @@ tokens = (
     'LBRACKET',
     'RBRACKET',
     'COMMA',
+    'DOT',
     'ID',
     'STR',
     'FUNC',
@@ -17,7 +18,8 @@ t_LCURLY = r'\{'
 t_RCURLY = r'\}'
 t_LBRACKET = r'\['
 t_RBRACKET = r'\]'
-t_COMMA = ','
+t_COMMA = r','
+t_DOT = r'.'
 t_ID = r'[A-Za-z][A-Za-z-]*'
 t_STR = r'".*"'
 t_ignore = ' \t'
