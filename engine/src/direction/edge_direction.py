@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-from .direction import Direction
-from .vertex_direction import VertexDirection
+from engine.src.direction.direction import Direction
 
 
 class EdgeDirection(Direction):
@@ -34,29 +33,3 @@ class EdgeDirection(Direction):
         z = -(x + y)
 
         return EdgeDirection.find_by_value((x, y, z))
-
-    def get_vertex_directions(self):
-        """Get the vertex directions of endpoints of edge of this direction.
-
-        Returns:
-            tuple. A tuple of 2 tuples, each of which is a value in
-              VertexDirection that represents the endpoints of this edge.
-        """
-
-        edge_vertex_mapping = {
-            EdgeDirection.NORTH_WEST:
-                (VertexDirection.TOP_LEFT, VertexDirection.TOP),
-            EdgeDirection.NORTH_EAST:
-                (VertexDirection.TOP, VertexDirection.TOP_RIGHT),
-            EdgeDirection.WEST:
-                (VertexDirection.TOP_RIGHT, VertexDirection.BOTTOM_RIGHT),
-            EdgeDirection.SOUTH_WEST:
-                (VertexDirection.BOTTOM_RIGHT, VertexDirection.BOTTOM),
-            EdgeDirection.SOUTH_EAST:
-                (VertexDirection.BOTTOM, VertexDirection.BOTTOM_LEFT),
-            EdgeDirection.EAST:
-                (VertexDirection.BOTTOM_LEFT, VertexDirection.TOP_LEFT)
-        }
-
-        return edge_vertex_mapping[self]
-
