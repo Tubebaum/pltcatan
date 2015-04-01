@@ -10,13 +10,13 @@ class Game(object):
         self.players = InputManager.get_player_names()
 
     def start(self):
-        self.loop_turns()
+        self.game_loop()
 
-
-    def loop_turns(self):
+    def game_loop(self):
         while True:
             for player_index in range(len(self.players)):
                 print(self.players[player_index] + "'s turn")
-                diced = self.dice.throw()
-                print('Diced value: ' + str(diced))
+                roll_value = self.dice.throw()
+                #self.board.distribute_resources_for_roll(row_value)
+                print('Diced value: ' + str(roll_value))
                 InputManager(self, player_index).cmdloop()

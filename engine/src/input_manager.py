@@ -2,11 +2,18 @@ import cmd
 
 
 class InputManager(cmd.Cmd):
-    def __init__(self, game, playerIndex):
+    """Class managing input for a given player's turn. See docs for cmd.Cmd.
+
+    Args:
+        game (Game): The game being played.
+        player_index(int): Index of the current player.
+
+    """
+    def __init__(self, game, player_index):
         cmd.Cmd.__init__(self)
-        self.prompt = game.players[playerIndex] + ': '
+        self.prompt = game.players[player_index] + ': '
         self.game = game
-        self.playerIndex = playerIndex
+        self.playerIndex = player_index
 
     def do_trade(self, line):
         print('Trade not implemented.')
@@ -14,14 +21,12 @@ class InputManager(cmd.Cmd):
     def do_build(self, line):
         print('Building not implemented.')
 
-    def do_playcard(self, line):
+    def do_play_card(self, line):
         print('Development cards not implemented.')
 
     def do_print(self, line):
-        print('This should print the board state.')
         for tile in self.game.board.iter_tiles():
             print('({0:2d}, {1:2d})'.format(tile.x, tile.y))
-            # print('Tile {0:2d}: {1:2d}'.format(tile.idNumber, 0))
 
     def do_end(self, line):
         print('Ended turn')
@@ -29,16 +34,28 @@ class InputManager(cmd.Cmd):
 
     @staticmethod
     def input_default(msg, default):
+        """
+        Asks for user data using the format "msg [default]:"
+
+        Returns:
+            str. string entered by the user, or default if nothing was entered.
+        """
         result = raw_input(msg + ' [' + default + ']: ')
-        if (result == ''):
+        if result == '':
             return default
         return result
 
     @staticmethod
     def get_player_names():
+        """
+        Prompts the user for player names.
+
+        Returns:
+            list. Player names.
+        """
         players = []
-        numPlayers = int(InputManager.input_default('Nplayers', '3'))
-        for i in range(numPlayers):
-            playerName = InputManager.input_default('Player ' + str(i + 1), 'p' + str(i + 1))
-            players.append(playerName)
+        num_players = int(InputManager.input_default('Nplayers', '3'))
+        for i in range(num_players):
+            player_name = InputManager.input_default('Player ' + str(i + 1), 'p' + str(i + 1))
+            players.append(player_name)
         return players
