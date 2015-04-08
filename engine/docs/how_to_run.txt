@@ -1,2 +1,2 @@
 From pltcatan/engine
-    python start.py
+    make

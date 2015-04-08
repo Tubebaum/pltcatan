@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-
-from ..tile.hex_tile import HexTile
-from ..direction.edge_direction import EdgeDirection
-from .board import Board
+from engine.src.board.board import Board
+from engine.src.tile.hex_tile import HexTile
+from engine.src.direction.edge_direction import EdgeDirection
+from engine.src.direction.edge_vertex_mapping import EdgeVertexMapping
 
 
 class HexBoard(Board):
@@ -29,8 +29,8 @@ class HexBoard(Board):
     def __init__(self, radius, tile_cls=HexTile):
 
         if radius < HexBoard.MIN_BOARD_RADIUS:
-            message = ("Specified radius does not meet the minimum "
-                       "board tile radius {0}").format(HexBoard.MIN_BOARD_RADIUS)
+            message = ("Specified radius does not meet the minimum board "
+                       "tile radius {0}").format(HexBoard.MIN_BOARD_RADIUS)
             raise ValueError(message)
 
         self.radius = radius
@@ -44,11 +44,13 @@ class HexBoard(Board):
         """Generates a dictionary of tiles, indexed by axial coordinates.
 
         See how coordinates are generated in _add_new_tile_with_coords()
+
+        Returns:
+            None.
         """
 
         for x, y in self.iter_tile_coords():
             self._add_new_tile_with_coords(x, y)
-
 
     def _add_new_tile_with_coords(self, x, y):
         """Add a brand new tile to the board at the given axial coordinates."""
@@ -86,9 +88,6 @@ class HexBoard(Board):
 
         neighboring_tiles = self.get_neighboring_tiles(tile)
 
-        # print "Given tile: {0}\nNeighboring tiles: {1}\n\n".format(
-            # tile, neighboring_tiles)
-
         for (direction, neighbor_tile) in neighboring_tiles.iteritems():
             tile.update_common_edge_and_vertices(direction, neighbor_tile)
 
@@ -108,8 +107,9 @@ class HexBoard(Board):
         Args:
             tile (Tile): The tile for which we'd like to find the neighbor.
 
-            direction (EdgeDirection): hextiles have 6 edges and thus
-              neighbors in 6 different directions.
+            edge_direction (EdgeDirection): Hextiles have 6 edges and thus
+              neighbors in 6 different directions. Should be relative to the
+              given tile.
 
         Returns:
             Tile. None if the tile has no valid neighbor in that direction.
@@ -147,6 +147,9 @@ class HexBoard(Board):
         """Iterate over the tiles in this board.
 
         The order is that described in iter_tile_coords.
+
+        Yields:
+            Tile. Each tile of the board.
         """
 
         for x, y in self.iter_tile_coords():
@@ -166,11 +169,10 @@ class HexBoard(Board):
         of tiles on the edge of the board) that has ring_index radius - 1.
 
         When traversing a ring, we start from the westernmost tile of that ring
-        and continue around the ring in a clockwise fashion. We stop at the tile
-        directly before the easternmost ring. We can do this because, every time
-        we find a tile's coordinates in the ring, we can also find the
-        coordinates of the tile mirror opposite it in the ring by simply
-        flipping the axial coordinates.
+        and continue around the ring in a clockwise fashion.
+
+        Yields:
+            tuple. The axial (x, y) coordinates of each tile on the board.
         """
 
         # Yield coordinates for the center tile.
@@ -185,23 +187,71 @@ class HexBoard(Board):
             # This is equivalent to moving along the y-axis of the board.
             while y != ring_index:
                 yield x, y
-                yield y, x
                 y += 1
 
             # Then we scale the northern side of the ring.
             # This is equivalent to moving along the x-axis of the board.
             while x != 0:
                 yield x, y
-                yield y, x
                 x += 1
 
-            # Finally we scale the northeast side of the ring.
+            # Then we scale the northeast side of the ring.
             # This is equivalent to moving along the z-axis of the board.
             while x != ring_index or y != 0:
                 yield x, y
-                yield y, x
                 x += 1
                 y -= 1
 
+            # Then we scale the southeast side of the ring.
+            while y != -ring_index:
+                yield x, y
+                y -= 1
 
+            # Then the south side of the ring.
+            while x != 0:
+                yield x, y
+                x -= 1
 
+            # And finally the south west side of the ring.
+            while x != -ring_index:
+                yield x, y
+                x -= 1
+                y += 1
+
+    def update_vertex(self, x, y, vertex_dir, vertex_val):
+        """Update the value at the specified vertex location.
+
+        Also updates vertex for neighboring tiles.
+
+        Args:
+            x (int): Axial x-coordinate of the tile, one of whose vertices
+              we will update.
+
+            y (int): Axial y-coordinate of the tile, one of whose vertices
+              we will update.
+
+            vertex_dir (VertexDirection): Vertex direction, relative to the
+              tile specified by the x and y coordinates, of the vertex to
+              update.
+
+        Returns:
+            None.
+        """
+
+        tile = self.tiles[x][y]
+        tile.vertices[vertex_dir] = vertex_val
+
+        # Get the two edges of the found tile that have as an endpoint
+        # a vertex of the given vertex direction.
+        vertex_adj_edge_dirs = EdgeVertexMapping.get_edge_dirs_for_vertex_dir(
+            vertex_dir)
+
+        for vertex_adj_edge_dir in vertex_adj_edge_dirs:
+            neighbor_tile = self.get_neighboring_tile(tile, vertex_adj_edge_dir)
+
+            # Edge tiles may not have neighboring tiles in the given direction.
+            if neighbor_tile:
+                neighbor_vertex_dir = HexTile.get_opposite_vertex_dir(
+                    vertex_dir, vertex_adj_edge_dir)
+
+                neighbor_tile.update_vertex(neighbor_vertex_dir, vertex_val)

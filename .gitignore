@@ -1,9 +1,12 @@
 *.pyc
 
+# Development files
+*.diff
+output
+snippets/
+
 # Mac OS X
 .DS_Store
-
-snippets/
 
 # IntelliJ IDE files
 .idea/
