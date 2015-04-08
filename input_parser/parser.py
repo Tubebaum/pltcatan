@@ -7,10 +7,17 @@ from symbol import symbol_table
 
 # Token declarations
 
-tokens = ('NAME', 'NUMBER', 'NEWLINE', 'IDENT', 'DEDENT')
+reserved = {
+	'func': 'FUNC_DECL',
+	'return': 'RETURN'
+}
+tokens = ['NAME', 'NUMBER', 'NEWLINE'] + list(reserved.values())
 literals = ['=', '+', '-', '*', '/', '(', ')', '{', '}']
 
-t_NAME = r'[a-zA-Z_][a-zA-Z0-9_]*'
+def t_NAME(t):
+	r'[a-zA-Z_][a-zA-Z0-9_]*'
+	t.type = reserved.get(t.value, 'NAME') # Check for reserved words
+	return t
 
 def t_NUMBER(t):
 	r'\d+'
@@ -44,28 +51,28 @@ precedence = (
 
 def p_stmt_assignment(p):
 	"""stmt : NAME '=' expr"""
-	symbol_table.add_symbol(p[1], "num", p[3])
+	p[0] = ast.Assign([ast.Name(p[1], ast.Store())], p[3])
+
+def p_stmt_return(p):
+	"""stmt : RETURN expr
+		    | RETURN"""
+	if len(p) > 2:
+		p[0] = ast.Return(p[2])
+	else:
+		p[0] = ast.Return()
 
 def p_stmt_expr(p):
 	"""stmt : expr"""
-	print eval(compile(ast.fix_missing_locations(ast.Expression(p[1])), '<string>', 'eval'))
+	p[0] = ast.Expr(p[1])
 
 def p_stmt_func(p):
 	"""stmt : func"""
 	p[0] = p[1]
 
 def p_func(p):
-	"""func : NAME '(' params ')' '{' body '}'"""
-	symbol_table.add_symbol(p[1], "func", p[6])
-
-def p_funccall(p):
-	"""funccall : NAME '(' params ')'"""
-	symbol = symbol_table.get_symbol(p[1])
-	if symbol.tpe != "func":
-		print '%s is not a function' % p[1]
-		# raise error
-	else:
-		p[0] = symbol.value(*p[3])
+	"""func : FUNC_DECL NAME '(' params ')' '{' body '}'"""
+	args = ast.arguments(p[4], None, None, [])
+	p[0] = ast.FunctionDef(p[2], args, p[7], [])
 
 def p_params(p):
 	"""params : param ',' params
@@ -76,24 +83,41 @@ def p_params(p):
 
 def p_param(p):
 	"""param : NAME
-			 | NUMBER
 			 | empty"""
-	p[0] = p[1]
+	p[0] = ast.Name(p[1], ast.Param())
 
-def p_body(p):
-	"""body : expr"""
-	p[0] = p[1]
 
 def p_body_stmtlst(p):
-	"""body : NEWLINE IDENT stmtlst DEDENT"""
-	p[0] = p[3]
+	"""body : NEWLINE stmtlst
+			| stmtlst"""
+	p[0] = p[2] if len(p) > 2 else p[1]
 
 def p_stmtlst(p):
 	"""stmtlst : stmt NEWLINE stmtlst
-	           | stmt NEWLINE"""
+	           | stmt NEWLINE
+	           | stmt"""
+	p[0] = [p[1]]
+	if len(p) > 2:
+		p[0].extend(p[3])
 
 def p_expr_funccall(p):
 	"""expr : funccall"""
+	p[0] = p[1]
+
+def p_funccall(p):
+	"""funccall : NAME '(' in_params ')'"""
+	p[0] = ast.Call(ast.Name(p[1], ast.Load()), p[3], [], None, None)
+
+def p_in_params(p):
+	"""in_params : in_param ',' in_params
+			     | in_param"""
+	p[0] = [p[1]]
+	if len(p) > 2:
+		p[0].extend(p[3])
+
+def p_in_param(p):
+	"""in_param : expr
+			    | empty"""
 	p[0] = p[1]
 
 def p_expr_binop(p):
@@ -120,11 +144,7 @@ def p_expr_number(p):
 
 def p_expr_name(p):
 	"""expr : NAME"""
-	try:
-		p[0] = symbol_table.get_symbol(p[1]).value
-	except LookupError:
-		print "Undefined name '%s'" % p[1]
-		p[0] = 0
+	p[0] = ast.Name(p[1], ast.Load())
 
 def p_error(p):
 	print "Syntax error at '%s'" % p.value
