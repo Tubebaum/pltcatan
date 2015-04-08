@@ -147,6 +147,14 @@ def p_in_params(p):
 
 p_opt_expr = trivial('opt_expr', ['expr', 'empty'])
 
+# Property access
+
+@register('expr')
+def p_expr_property(p):
+   """property : expr '.' ID"""
+
+   p[0] = ast.Attribute(p[1], p[3], ast.Load())
+
 # Arithmetic
 
 def p_expr_binop(p):
