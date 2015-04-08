@@ -18,6 +18,9 @@ class HexBoard(Board):
           of the board, including the center tile itself. Should be >= 1.
 
         tiles (dict): A dictionary of tiles, indexed using axial coordinates
+
+        tile_cls (class): Class of the tiles to be generated during board
+          initialization.
         
     Args:
         radius (int): The number of tiles between the center tile and the edge

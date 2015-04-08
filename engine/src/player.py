@@ -1,22 +1,30 @@
 # -*- coding: utf-8 -*-
-from engine.src.resource_type import ResourceType
+from engine.src.trading.trading_entity import TradingEntity
 
 
-class Player(object):
+class Player(TradingEntity):
+    """A player in a game of Settlers of Catan.
+
+    Attributes:
+        resources (dict): See TradingEntity.
+
+        name (str): This player's name.
+
+    Args:
+        name (str): Name to assign a new player.
+    """
 
     def __init__(self, name):
 
+        super(Player, self).__init__()
+
         self.name = name
 
-        # Create an empty resource hand
-        self.resources = {}
-        for arable_type in ResourceType.get_arable_types():
-            self.resources[arable_type] = 0
+    def __hash__(self):
+        return hash(self.name)
 
-    def add_resources(self, resource_type, count):
-        """Add resources of the given type and count to this player's hand."""
-
-        self.resources[resource_type] += count
+    def __eq__(self, other):
+        return self.name == other.name
 
 
 

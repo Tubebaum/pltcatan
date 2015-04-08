@@ -1,21 +1,33 @@
 # -*- coding: utf-8 -*-
 import random
+
 from engine.src.lib.utils import Utils
 from engine.src.board.hex_board import HexBoard
 from engine.src.tile.game_tile import GameTile
 from engine.src.resource_type import ResourceType
 from engine.src.calamity.calamity import Calamity
+from engine.src.trading.bank import Bank
+from engine.src.exceptions import NotEnoughResourcesException
 
 
 class GameBoard(HexBoard):
-    #TODO: Move to general configuration file
-    DEFAULT_RADIUS = 3
-
     """A Settlers of Catan playing board.
+
+    Attributes:
+        radius (int): See HexBoard.
+
+        tiles (dict): See HexBoard.
+
+        tile_cls (class): See HexBoard.
+
+        bank (Bank): Bank of resources the board will interact with.
 
     Args:
         radius (int): See HexBoard.
     """
+
+    # TODO: Move to general configuration file
+    DEFAULT_RADIUS = 3
 
     def __init__(self, radius):
 
@@ -25,6 +37,9 @@ class GameBoard(HexBoard):
         # Here we assign resource types and chit values.
         self.assign_tile_resources()
         self.assign_tile_chit_values()
+        self.assign_tile_harbors()
+
+        self.bank = Bank(len(list(self.iter_tiles())))
 
     def assign_tile_resources(self, assignment_func=None):
         """Assign resource types to this board's tiles.
@@ -212,12 +227,19 @@ class GameBoard(HexBoard):
                                               chit_values_to_assign):
             tile.chit_value = chit_value_to_assign
 
+    def assign_tile_harbors(self):
+        """Assign harbors to this board."""
+
+        # TODO
+        pass
+
     def iter_arable_tiles(self):
         """Iterate over this board's non-fallow i.e. arable tiles."""
 
         for tile in self.iter_tiles():
             if tile.resource_type != ResourceType.FALLOW:
                 yield tile
+
 
     def place_structure(self, structure, x, y, vertex_dir):
         """Place a structure of the given type on the specified vertex.
@@ -238,6 +260,10 @@ class GameBoard(HexBoard):
         matches the chit value of a tile, for all structures on that tile,
         distribute the number of resources dictated by the yield of that
         structure of the type of that tile.
+
+        Args:
+            roll_value (int): Dice roll value used to determine which tiles
+              should yield resources this turn.
         """
 
         # Find those tiles whose chit value matches the roll value.
@@ -246,14 +272,43 @@ class GameBoard(HexBoard):
             list(self.iter_tiles())
         )
 
+        distributions = Utils.nested_dict()
+
+        # Create a dictionary that stores per-player resource distributions.
+        # i.e. distributions => player => resource_type => (int)
         for resource_tile in resource_tiles:
 
             # Find any structures built on the vertices of the found tiles.
             adjacent_structures = resource_tile.get_adjacent_structures()
 
             for structure in adjacent_structures:
-                # Distribute resource cards to the player.
-                # The number of resources to be distributed is determined by
-                # the structure, and the type determined by the current tile.
-                structure.owning_player.add_resources(
-                    resource_tile.resource_type, structure.base_yield())
+                player = structure.owning_player
+                resource_type = resource_tile.resource_type
+                resource_yield = structure.base_yield()
+
+                if not distributions[player][resource_type]:
+                    distributions[player][resource_type] = 0
+
+                distributions[player][resource_type] += resource_yield
+
+        # Now distribute resources to players, if the bank has enough.
+        for resource_type in ResourceType:
+
+            def get_per_player_production(player):
+                resource_count = distributions[player][resource_type]
+                return resource_count if resource_count else 0
+
+            total_count = sum(map(get_per_player_production, distributions))
+
+            try:
+                self.bank.withdraw_resources(resource_type, total_count)
+
+                for player, player_resource_dict in distributions.iteritems():
+                    player.deposit_resources(
+                        resource_type, player_resource_dict[resource_type])
+
+            except NotEnoughResourcesException:
+                # Bank didn't have enough of the current resource to distribute
+                # to all players, so distribute none of this resource.
+                pass
+

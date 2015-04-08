@@ -7,7 +7,7 @@ class Game(object):
     def __init__(self):
         self.board = GameBoard(GameBoard.DEFAULT_RADIUS)
         self.dice = Dice()
-        #TODO: Move this to the player class
+        # TODO: Move this to the player class
         self.players = InputManager.get_player_names()
 
     def start(self):
