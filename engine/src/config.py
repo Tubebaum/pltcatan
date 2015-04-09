@@ -3,6 +3,10 @@ from engine.src.trading.trade_offer import *
 
 # TODO: Improve Config structure. Normalize across classes.
 class Config(object):
+    # Game
+    POINTS_TO_WIN = 10
+    DEFAULT_PLAYER_COUNT = 3
+
     # GameBoard
     DEFAULT_TILE_COUNT = 19
 

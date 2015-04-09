@@ -1,13 +1,21 @@
 # -*- coding: utf-8 -*-
-from engine.src.edge.structure.structure import Structure
+from engine.src.structure.upgrade_structure import UpgradeStructure
+from engine.src.structure.vertex_structure.settlement import Settlement
+from engine.src.vertex import Vertex
 from engine.src.resource_type import ResourceType
 
 
-class City(Structure):
+class City(UpgradeStructure, Vertex):
     """Represents a city from the Settlers of Catan game.
 
+    Attributes:
+        owning_player (Player): Player who built this city and for whom this
+          city yields resources.
+
+        base_structure_cls (class): Class of structure this City upgrades.
+
     Args:
-        owning_player (Player): The player who built this city.
+        owning_player (Player): See above.
     """
     
     BASE_YIELD = 2
@@ -15,6 +23,7 @@ class City(Structure):
     def __init__(self, owning_player):
         
         self.owning_player = owning_player
+        self.base_structure_cls = Settlement
 
     def __str__(self):
         return 'City of {0}\n'.format(self.owning_player.name)

@@ -19,6 +19,8 @@ class Player(TradingEntity):
         super(Player, self).__init__()
 
         self.name = name
+        self.points = 0
+        self.development_cards = []
 
     def __hash__(self):
         return hash(self.name)

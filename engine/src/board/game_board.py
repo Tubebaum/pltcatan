@@ -7,7 +7,11 @@ from engine.src.tile.game_tile import GameTile
 from engine.src.resource_type import ResourceType
 from engine.src.calamity.calamity import Calamity
 from engine.src.trading.bank import Bank
+from engine.src.direction.edge_vertex_mapping import EdgeVertexMapping
 from engine.src.exceptions import NotEnoughResourcesException
+from engine.src.exceptions import InvalidBaseStructureException
+from engine.src.structure.upgrade_structure import UpgradeStructure
+from engine.src.structure.extension_structure import ExtensionStructure
 
 
 class GameBoard(HexBoard):
@@ -228,7 +232,12 @@ class GameBoard(HexBoard):
             tile.chit_value = chit_value_to_assign
 
     def assign_tile_harbors(self):
-        """Assign harbors to this board."""
+        """Assign harbors to this board.
+
+        TODO: Officially, harbors seem to be placed after every
+              3rd then 3rd then 4th edge. This is a pain to program given that
+              it only _seems_ that way.
+        """
 
         # TODO
         pass
@@ -240,8 +249,7 @@ class GameBoard(HexBoard):
             if tile.resource_type != ResourceType.FALLOW:
                 yield tile
 
-
-    def place_structure(self, structure, x, y, vertex_dir):
+    def place_vertex_structure(self, x, y, vertex_dir, structure):
         """Place a structure of the given type on the specified vertex.
 
         Args:
@@ -249,9 +257,39 @@ class GameBoard(HexBoard):
 
             structure (Structure): Structure to replace the specified vertex
               with.
+
+        Returns:
+            None.
+
+        Raises:
+            InvalidBaseStructureException. If structure to be placed is an
+              upgrade or extension of a structure class that hasn't been
+              placed at the defined vertex.
         """
 
-        self.update_vertex(x, y, vertex_dir, structure)
+        tile = self.tiles[x][y]
+        old_vertex_val = tile.vertices[vertex_dir]
+
+        if (isinstance(structure, UpgradeStructure) or
+                isinstance(structure, ExtensionStructure)) and not \
+                isinstance(old_vertex_val, structure.base_structure_cls):
+
+            raise InvalidBaseStructureException(old_vertex_val, structure)
+        else:
+            self.update_vertex(x, y, vertex_dir, structure)
+
+    def place_edge_structure(self, x, y, edge_dir, structure):
+        tile = self.tiles[x][y]
+        vertex_dirs = EdgeVertexMapping.get_vertex_dirs_for_edge_dir(edge_dir)
+        old_edge_val = tile.edges[vertex_dirs[0], vertex_dirs[1]]
+
+        if (isinstance(structure, UpgradeStructure) or
+                isinstance(structure, ExtensionStructure)) and not \
+                isinstance(old_edge_val, structure.base_structure_cls):
+
+            raise InvalidBaseStructureException(old_edge_val, structure)
+        else:
+            self.update_edge(x, y, edge_dir, structure)
 
     def distribute_resources_for_roll(self, roll_value):
         """Distribute resources to the players based on the given roll value.
@@ -264,6 +302,11 @@ class GameBoard(HexBoard):
         Args:
             roll_value (int): Dice roll value used to determine which tiles
               should yield resources this turn.
+
+        Returns:
+            dict. Primary keys are players and secondary keys are resource
+              types. Stored values are the number of a given resource that was
+              distributed to the player.
         """
 
         # Find those tiles whose chit value matches the roll value.
@@ -291,8 +334,14 @@ class GameBoard(HexBoard):
 
                 distributions[player][resource_type] += resource_yield
 
+        self.distribute_resources(distributions)
+
+        return distributions
+
+    def distribute_resources(self, distributions):
+
         # Now distribute resources to players, if the bank has enough.
-        for resource_type in ResourceType:
+        for resource_type in ResourceType.get_arable_types():
 
             def get_per_player_production(player):
                 resource_count = distributions[player][resource_type]
@@ -303,12 +352,16 @@ class GameBoard(HexBoard):
             try:
                 self.bank.withdraw_resources(resource_type, total_count)
 
-                for player, player_resource_dict in distributions.iteritems():
-                    player.deposit_resources(
-                        resource_type, player_resource_dict[resource_type])
+                for player in distributions:
+
+                    count = distributions[player][resource_type]
+
+                    if count:
+                        player.deposit_resources(resource_type, count)
 
             except NotEnoughResourcesException:
                 # Bank didn't have enough of the current resource to distribute
                 # to all players, so distribute none of this resource.
                 pass
 
+        return distributions

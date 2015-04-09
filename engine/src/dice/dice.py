@@ -15,8 +15,8 @@ class Dice(object):
         self.dice_count = dice_count
         self.values = values
 
-    def throw(self):
-        """ Throws dice.
+    def roll(self):
+        """ Rolls dice.
 
         Returns:
             int. Sum of dice face values after a random throw.

@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
-from engine.src.edge.structure.structure import Structure
+from engine.src.structure.structure import Structure
+from engine.src.vertex import Vertex
 from engine.src.resource_type import ResourceType
 
 
-class Settlement(Structure):
+class Settlement(Structure, Vertex):
     """Represents a settlement from the Settlers of Catan game.
 
     Args:

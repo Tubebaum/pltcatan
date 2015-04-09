@@ -47,12 +47,14 @@ class TradingEntity(object):
               resources than the entity currently has.
         """
 
+        if resource_type == ResourceType.FALLOW:
+            # TODO: raise exception.
+            return
+
         if self.resources[resource_type] >= resource_count:
             self.resources[resource_type] -= resource_count
         else:
-            message = '{0} does not have enough {1} cards!'.format(
-                self.__class__.__name__, resource_type)
-            raise NotEnoughResourcesException(message)
+            raise NotEnoughResourcesException(self, resource_type)
 
     def deposit_resources(self, resource_type, resource_count):
         """Deposit the specified number of resources from the entity.
@@ -64,7 +66,8 @@ class TradingEntity(object):
               deposit.
         """
 
-        self.resources[resource_type] += resource_count
+        if resource_type != ResourceType.FALLOW:
+            self.resources[resource_type] += resource_count
 
     def trade(self, requesting_entity, trade_offer):
         """Trade one resource for another at a given ratio.
@@ -86,12 +89,8 @@ class TradingEntity(object):
             trade_offer.validate(requesting_entity, self)
 
         if obstructing_entity is not None:
-
-            message = '{0} does not have enough {1} cards!'.format(
-                obstructing_entity.__class__.__name__,
-                obstructing_resource_type)
-
-            raise NotEnoughResourcesException(message)
+            raise NotEnoughResourcesException(obstructing_entity,
+                                              obstructing_resource_type)
 
         else:
             trade_offer.execute(requesting_entity, self)
