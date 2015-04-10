@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from .tile import Tile
-from engine.src.vertex.vertex import Vertex
-from engine.src.edge.edge import Edge
+from engine.src.vertex import Vertex
+from engine.src.edge import Edge
 from engine.src.direction.vertex_direction import VertexDirection
 from engine.src.direction.edge_vertex_mapping import EdgeVertexMapping
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from engine.src.tile.hex_tile import HexTile
 from engine.src.resource_type import ResourceType
-from engine.src.vertex.structure.structure import Structure
+from engine.src.structure.structure import Structure
 
 
 class GameTile(HexTile):
