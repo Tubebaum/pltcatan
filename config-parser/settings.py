@@ -6,6 +6,7 @@ class Resource(object):
     def __init__(self):
         self.count = 0
         self.card = None
+        self.name = None
 
     def setResource(self, resource):
         for k, v in resource.iteritems():
@@ -13,6 +14,8 @@ class Resource(object):
                 self.count = int(v)
             elif k == 'card':
                 self.card = v
+            elif k == 'name':
+                self.name = v.strip('"')
 
 class Exchange(object):
     def __init__(self):
@@ -58,21 +61,89 @@ class Tiles(object):
         self.distribution = 'uniform'
         self.types = []
 
+class DevelopmentCard(object):
+    def __init__(self):
+        self.name = None
+        self.description = None
+        self.maxCount = None
+        self.pointReward = 0
+        self.effects = None
+
+    def setDevelopmentCard(self, name, developmentCard):
+        self.name = name
+        for k, v in developmentCard.iteritems():
+            if k == 'description': 
+                self.description = v.strip('"')
+            elif k == 'max-count':
+                self.maxCount = int(v)
+            elif k == 'point-reward':
+                self.pointReward = int(v)
+            elif k == 'effect':
+                self.effects = Effects()
+                self.effects.setEffects(v)
+
+class SpecialCard(object):
+    def __init__(self):
+        self.name = None
+        self.description = None
+        self.maxCount = 0
+        self.pointReward = 0
+        self.criteria = None
+
+    def setSpecialCard(self, name, specialCard):
+        self.name = name
+        for k, v in specialCard.iteritems():
+            if k == 'description':
+                self.description = v.strip('"')
+            elif k == 'max-count':
+                self.maxCount = int(v)
+            elif k == 'point-reward':
+                self.pointReward = int(v)
+            elif k == 'criteria':
+                self.criteria = v
+
 class Cards(object):
     def __init__(self):
-        self.development = {}
-        self.developmentCost = {}
-        self.resource = {}
-        self.special = {}
+        self.developmentCards = {}
+        self.developmentCost = []
+        self.resource = []
+        self.specialCards = {}
+
+    def setDevelopmentCards(self, developmentCards):
+        for k, v in developmentCards.iteritems():
+            developmentCard = DevelopmentCard()
+            developmentCard.setDevelopmentCard(k, v)
+            self.developmentCards[k] = developmentCard
+
+    def setDevelopmentCost(self, developmentCost):
+        for k in developmentCost:
+            resource = Resource()
+            resource.setResource(k)
+            self.developmentCost.append(resource)
+
+    def setResource(self, resources):
+        for k in resources:
+            resource = Resource()
+            resource.setResource(k)
+            self.resource.append(k)
+
+    def setSpecial(self, special):
+        for k, v in special.iteritems():
+            specialCard = SpecialCard()
+            specialCard.setSpecialCard(k, v)
+            self.specialCards[k] = specialCard
 
 class Effects(object):
     def __init__(self):
         self.onRoll = None
+        self.whenPlayed = None
 
     def setEffects(self, effects):
         for k, v in effects.iteritems():
             if k == 'on-roll':
                 self.onRoll = v
+            elif k == 'when-played':
+                self.whenPlayed = v
 
 class Constraints(object):
     def __init__(self):
@@ -103,6 +174,7 @@ class BuildingCost(object):
 
 class Structure(object):
     def __init__(self):
+        self.name = None
         self.maxCountPerPlayer = 0
         self.victoryPointValue = 0
         self.upgradeOf = None
@@ -110,7 +182,8 @@ class Structure(object):
         self.constraints = None
         self.effects = None
 
-    def setStructure(self, structure):
+    def setStructure(self, name, structure):
+        self.name = name
         for k, v in structure.iteritems():
             if k == 'max-count-per-player':
                 self.maxCountPerPlayer = int(v)
@@ -135,7 +208,8 @@ class Structures(object):
     def setPlayerBuilt(self, playerBuilt):
         for k, v in playerBuilt.iteritems():
             structure = Structure()
-            structure.setStructure(v)
+            structure.setStructure(k, v)
+            self.playerBuilt[k] = structure
 
 class Board(object):
     def __init__(self):
@@ -173,6 +247,15 @@ class Game(object):
 
     def setCards(self, cards):
         self.cards = Cards()
+        for k, v in cards.iteritems():
+            if k == 'development':
+                self.cards.setDevelopmentCards(v)
+            elif k == 'development-cost':
+                self.cards.setDevelopmentCost(v)
+            elif k == 'resource':
+                self.cards.setResource(v)
+            elif k == 'special':
+                self.cards.setSpecial(v)
 
     def setStructures(self, structures):
         self.structures = Structures()
