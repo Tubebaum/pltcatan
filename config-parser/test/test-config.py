@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import sys
 sys.path.append('..')
-import config
+from settings import Settings
 
 def prettyPrint(structure, indent = 0):
     for key, value in structure.iteritems():
@@ -13,5 +13,4 @@ def prettyPrint(structure, indent = 0):
             sys.stdout.write(str(value) + '\n')
 
 if __name__ == '__main__':
-    game = config.parser.parse(open('../default.skit', 'r').read())
-    prettyPrint(game)
+    settings = Settings('../default.skit')
