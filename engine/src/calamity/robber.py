@@ -21,9 +21,7 @@ class Robber(Calamity):
         Triggering the robber effect elicits the following behavior:
             (1) All players who have more than some threshold of resource cards
                 must discard half of their resource hand, floored.
-            (2) The robber should be moved to a different tile.
-            (3) A resource card must be drawn from one of the players with
-                structures built adjacent to the tile.
+            (2) See self.outside_trigger_effect().
 
         Args:
             See Calamity.
@@ -45,6 +43,17 @@ class Robber(Calamity):
 
                 for index in resource_indices:
                     game_player.withdraw_resources(resources[index], 1)
+
+        self.outside_trigger_effect(game, player)
+
+    def outside_trigger_effect(self, game, player):
+        """When the robber is activated not by a dice roll, call this method.
+
+        Execute the following behavior:
+            (1) The robber should be moved to a different tile.
+            (2) A resource card must be drawn from one of the players with
+                structures built adjacent to the tile.
+        """
 
         robber_successfully_moved = True
         previous_tile = game.board.find_tile_with_calamity(self)

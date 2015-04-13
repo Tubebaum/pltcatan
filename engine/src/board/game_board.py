@@ -7,6 +7,7 @@ from engine.src.tile.game_tile import GameTile
 from engine.src.resource_type import ResourceType
 from engine.src.calamity.calamity import Calamity
 from engine.src.calamity.calamity import CalamityTilePlacementEffect
+from engine.src.calamity.robber import Robber
 from engine.src.trading.bank import Bank
 from engine.src.direction.edge_vertex_mapping import EdgeVertexMapping
 from engine.src.exceptions import NotEnoughResourcesException
@@ -370,6 +371,16 @@ class GameBoard(HexBoard):
                 pass
 
         return distributions
+
+    def find_robber(self):
+        """Return the robber we can find."""
+
+        for tile in self.iter_tiles():
+            for calamity in tile.calamities:
+                if isinstance(calamity, Robber):
+                    return calamity
+
+        return None
 
     def find_tile_with_calamity(self, calamity):
 

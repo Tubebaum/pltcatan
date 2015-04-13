@@ -16,8 +16,8 @@ class KnightCard(DevelopmentCard):
 
         game.input_manager.announce_development_card_played(player, self)
 
-        x, y = game.input_manager.prompt_tile_coordinates(game)
+        robber = game.board.find_robber()
 
-        # TODO: Robber.
+        robber.outside_trigger_effect(game, player)
 
         self.played = True
