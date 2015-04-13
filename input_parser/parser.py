@@ -26,7 +26,7 @@ reserved = {
     'return': 'RETURN'
 }
 tokens = ['ID', 'NUM', 'NEWLINE'] + list(reserved.values())
-literals = ['=', '+', '-', '*', '/', '(', ')', '{', '}', '[', ',', ']', '.']
+literals = ['=', '+', '-', '*', '/', '(', ')', '{', '}', '[', ',', ']', '.', '"', '\'']
 
 def t_ID(t):
     r'[a-zA-Z_][a-zA-Z0-9_]*'
@@ -81,10 +81,18 @@ def p_expr_group(p):
     """expr : '(' expr ')'"""
     p[0] = p[2]
 
+# Strings
+
 @register('expr')
 def p_list_braces(p):
     """list : '[' expr_list ']'"""
     p[0] = ast.List(p[2], ast.Load())
+
+@register('expr')
+def p_str(p):
+    """str : '"' ID '"'
+           | \"'\" ID \"'\""""
+    p[0] = ast.Str(p[2])
 
 # Statements
 
@@ -171,7 +179,7 @@ def p_expr_uminus(p):
     """expr : '-' expr %prec UMINUS"""
     p[0] = ast.BinOp(p[2], ast.Mult(), ast.Num(-1))
 
-# Non-terminal registration
+# Terminal registration
 
 p_expr_reg = gen_function('expr')
 p_stmt_reg = gen_function('stmt')
@@ -195,4 +203,4 @@ if __name__ == '__main__':
         except EOFError:
             break
         if not s: continue
-        yacc.parse(s)
+        print ast.dump(yacc.parse(s))
