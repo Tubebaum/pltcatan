@@ -6,4 +6,4 @@ from engine.src.edge import Edge
 class Road(Structure, Edge):
 
     def __init__(self, owning_player):
-        self.owning_player = owning_player
+        super(Road, self).__init__(owning_player)

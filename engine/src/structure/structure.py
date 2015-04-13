@@ -2,4 +2,6 @@
 
 
 class Structure(object):
-    pass
+
+    def __init__(self, owning_player):
+        self.owning_player = owning_player

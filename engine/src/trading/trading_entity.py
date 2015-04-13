@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import random
+from engine.src.lib.utils import Utils
 from engine.src.exceptions import NotEnoughResourcesException
 from engine.src.resource_type import ResourceType
 
@@ -19,7 +21,7 @@ class TradingEntity(object):
         # TODO: Freak error where Python isn't recognizing default arg.
         self._default_init_resources(0)
 
-    def _default_init_resources(self, count=0):
+    def _default_init_resources(self, count):
         """Initialize this entity to have count resources per resource type.
 
         Args:
@@ -32,6 +34,24 @@ class TradingEntity(object):
         self.resources = {}
         for arable_type in ResourceType.get_arable_types():
             self.resources[arable_type] = count
+
+    def count_resources(self):
+        return sum(self.resources.values())
+
+    def get_resource_list(self):
+        """Get a list of resource types, one for each "card" this player has."""
+
+        return Utils.flatten(map(
+            lambda resource_type:
+                [resource_type] * self.resources[resource_type],
+            self.resources
+        ))
+
+    def transfer_resources(self, to_entity, resource_type, resource_count):
+        """Transfer specified resources from this entity to the given entity."""
+
+        self.withdraw_resources(resource_type, resource_count)
+        to_entity.deposit_resources(resource_type, resource_count)
 
     def withdraw_resources(self, resource_type, resource_count):
         """Withdraw the specified number of resources from the entity.
@@ -55,6 +75,22 @@ class TradingEntity(object):
             self.resources[resource_type] -= resource_count
         else:
             raise NotEnoughResourcesException(self, resource_type)
+
+    def withdraw_random_resource(self):
+        """Remove a random resource from this trading entity.
+
+        Note that this method only withdraws a single random resource.
+        Callers of this method should check to make sure that this entity
+        still has resources using self.count_resources().
+        """
+
+        resources = self.get_resource_list()
+
+        resource_type = random.choice(resources)
+
+        self.resources[resource_type] -= 1
+
+        return resource_type
 
     def deposit_resources(self, resource_type, resource_count):
         """Deposit the specified number of resources from the entity.

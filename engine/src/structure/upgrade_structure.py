@@ -7,4 +7,7 @@ class UpgradeStructure(AugmentingStructure):
 
     An upgrade structure completely replaces the structure it upgraded.
     """
-    pass
+
+    def __init__(self, owning_player, base_structure_cls):
+        super(UpgradeStructure, self).__init__(owning_player,
+                                               base_structure_cls)

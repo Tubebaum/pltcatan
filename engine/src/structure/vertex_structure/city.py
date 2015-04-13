@@ -20,10 +20,8 @@ class City(UpgradeStructure, Vertex):
     
     BASE_YIELD = 2
     
-    def __init__(self, owning_player):
-        
-        self.owning_player = owning_player
-        self.base_structure_cls = Settlement
+    def __init__(self, owning_player, base_structure_cls=Settlement):
+        super(City, self).__init__(owning_player, base_structure_cls)
 
     def __str__(self):
         return 'City of {0}\n'.format(self.owning_player.name)

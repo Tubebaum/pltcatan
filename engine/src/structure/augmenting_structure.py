@@ -13,7 +13,6 @@ class AugmentingStructure(Structure):
         base_structure_cls (class): See above.
     """
 
-    def __init__(self, base_structure_cls):
+    def __init__(self, owning_player, base_structure_cls):
+        super(AugmentingStructure, self).__init__(owning_player)
         self.base_structure_cls = base_structure_cls
-
-

@@ -18,6 +18,28 @@ class NotEnoughResourcesException(Exception):
             trading_entity.__class__.__name__, resource_type)
 
 
+class NotEnoughStructuresException(Exception):
+    """Raise when a player tries to build a structure despite having none left.
+
+    Args:
+        player (Player): The player that tried to build a structure.
+
+        structure_cls (class): The class of structure the player attempted to
+          build despite having run out.
+    """
+
+    def __init__(self, player, structure_cls):
+        self.msg = '{0} does not have a {1} in stock.'.format(
+            player.name, structure_cls.__name__.lower())
+
+
+class NotEnoughDevelopmentCardsException(Exception):
+    """Raise when a player tries to buy a development card when none left."""
+
+    def __init__(self):
+        self.msg = 'No development cards remaining.'
+
+
 class InvalidBaseStructureException(Exception):
     """Raise when one tries to build an invalid upgrade or extension structure.
 
