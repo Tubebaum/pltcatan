@@ -7,11 +7,11 @@ class KnightCard(DevelopmentCard):
     def __init__(self):
         super(KnightCard, self).__init__()
 
-    def effect_when_held(self, game, player):
-        # No effect when held.
+    def draw_card(self, game, player):
+        # No effect when drawn/held.
         pass
 
-    def effect_when_played(self, game, player):
+    def play_card(self, game, player):
         """Move the robber and draw a card from another adjacent player."""
 
         game.input_manager.announce_development_card_played(player, self)
@@ -19,5 +19,7 @@ class KnightCard(DevelopmentCard):
         robber = game.board.find_robber()
 
         robber.outside_trigger_effect(game, player)
+
+        player.knights += 1
 
         self.played = True

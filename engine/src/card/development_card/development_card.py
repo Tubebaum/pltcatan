@@ -15,8 +15,8 @@ class DevelopmentCard(object):
         self.is_playable = True
         
     @abstractmethod
-    def effect_when_held(self, game, player):
-        """Activates effect of holding the current card.
+    def draw_card(self, game, player):
+        """Draw this card and activate any effect incurred by holding it.
          
          This method should be called only once when purchased by a player.
          
@@ -31,8 +31,8 @@ class DevelopmentCard(object):
         pass
 
     @abstractmethod
-    def effect_when_played(self, game, player):
-        """Activates effect of playing the current card.
+    def play_card(self, game, player):
+        """Draw this card and activate any relevant effect.
          
          This method should be called only once when played by a player.
          

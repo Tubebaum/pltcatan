@@ -9,10 +9,10 @@ class ProgressCard(DevelopmentCard):
     def __init__(self):
         super(ProgressCard, self).__init__()
 
-    def effect_when_held(self, game, player):
-        # Progress cards have no effect when held.
+    def draw_card(self, game, player):
+        # Progress cards have no effect when drawn/held.
         pass
 
     @abstractmethod
-    def effect_when_played(self, game, player):
+    def play_card(self, game, player):
         pass

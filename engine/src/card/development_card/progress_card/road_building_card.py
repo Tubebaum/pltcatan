@@ -11,7 +11,7 @@ class RoadBuildingCard(ProgressCard):
     def __init__(self):
         super(RoadBuildingCard, self).__init__()
 
-    def effect_when_played(self, game, player):
+    def play_card(self, game, player):
         """Allow player to take all carried cards of selected resource type."""
 
         game.input_manager.announce_development_card_played(player, self)

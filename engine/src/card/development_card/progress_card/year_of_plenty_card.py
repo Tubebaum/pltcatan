@@ -10,7 +10,7 @@ class YearOfPlentyCard(ProgressCard):
     def __init__(self):
         super(YearOfPlentyCard, self).__init__()
 
-    def effect_when_played(self, game, player):
+    def play_card(self, game, player):
         """Allow player to take 2 cards of their chosen resource type."""
 
         game.input_manager.announce_development_card_played(player, self)
