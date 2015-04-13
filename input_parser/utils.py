@@ -32,3 +32,18 @@ def trivial(name, nonterminals, indent=4, suffix='', docstring=None):
 
 def trivial_from_registry(name, registry, indent=4, suffix=''):
     return trivial(name, [func.__doc__.split(':')[0].strip() for func in registry.get(name)], indent=indent, suffix=suffix)
+
+
+class StateNotFound(Exception):
+    pass
+
+
+class GameOracle(object):
+    def __init__(self, state={}):
+        self.game_state = state
+
+    def get(self, var):
+        try:
+            return self.game_state[var]
+        except KeyError:
+            raise StateNotFound("Variable \"%s\" not present in game state" % var)

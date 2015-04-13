@@ -3,7 +3,8 @@ import ast
 import ply.lex as lex
 import ply.yacc as yacc
 
-from utils import get_registry, trivial_from_registry, trivial
+from utils import get_registry, trivial_from_registry, trivial, GameOracle
+from collections import defaultdict
 
 # Automatically build no-op nonterminals
 register = get_registry()
@@ -11,19 +12,28 @@ register = get_registry()
 def gen_function(name):
     return trivial_from_registry(name, register, suffix='_reg')
 
+# Access game state through the game oracle
+oracle = GameOracle({
+    'game': defaultdict(list)
+})
+
+def gen_access_func(var_name):
+    return ast.Call(ast.Attribute(ast.Name('oracle', ast.Load()), 'get', ast.Load()), [ast.Str(var_name)], [], None, None)
+
 # Helper functions
 
-def listify(p):
-    p[0] = [p[1]]
-    if len(p) > 2:
-        p[0].extend(p[3])
+def listify(p, item_pos=1, list_pos=3, size_check=2):
+    p[0] = [p[item_pos]]
+    if len(p) > size_check:
+        p[0].extend(p[list_pos])
     return p
 
 # Token declarations
 
 reserved = {
     'func': 'FUNC_DECL',
-    'return': 'RETURN'
+    'return': 'RETURN',
+    'print': 'PRINT'
 }
 tokens = ['ID', 'NUM', 'NEWLINE'] + list(reserved.values())
 literals = ['=', '+', '-', '*', '/', '(', ')', '{', '}', '[', ',', ']', '.', '"', '\'']
@@ -112,18 +122,30 @@ def p_stmt_return(p):
     else:
         p[0] = ast.Return()
 
+def p_stmt_print(p):
+    """stmt : PRINT expr"""
+    p[0] = ast.Print(None, p[2] if isinstance(p[2], list) else [p[2]], True)
+
 # Functions
 
 @register('stmt')
+def p_top_func(p):
+    """topfunc : FUNC_DECL '(' params ')' '{' opt_newline stmtlst '}'"""
+    args = ast.arguments(p[3], None, None, [gen_access_func(param.id) for param in p[3]])
+    p[0] = ast.FunctionDef("top", args, p[7], [])
+
+@register('stmt')
 def p_func(p):
-    """func : FUNC_DECL ID '(' params ')' '{' body '}'"""
+    """func : FUNC_DECL ID '(' params ')' '{' opt_newline stmtlst '}'"""
     args = ast.arguments(p[4], None, None, [])
-    p[0] = ast.FunctionDef(p[2], args, p[7], [])
+    p[0] = ast.FunctionDef(p[2], args, p[8], [])
 
 @register('expr')
 def p_funccall(p):
-    """funccall : ID '(' expr_list ')'"""
-    p[0] = ast.Call(ast.Name(p[1], ast.Load()), p[3], [], None, None)
+    """funccall : expr '(' expr_list ')'"""
+    p[0] = ast.Call(p[1], p[3], [], None, None)
+
+p_opt_newline = trivial('opt_newline', ['NEWLINE', 'empty'])
 
 # Lists
 
@@ -135,18 +157,13 @@ def p_params(p):
 def p_param(p):
     """param : ID
              | empty"""
-    p[0] = ast.Name(p[1], ast.Param())
-
-def p_body_stmtlst(p):
-    """body : NEWLINE stmtlst
-            | stmtlst"""
-    p[0] = p[2] if len(p) > 2 else p[1]
+    if p[1]:
+        p[0] = ast.Name(p[1], ast.Param())
 
 def p_stmtlst(p):
     """stmtlst : stmt NEWLINE stmtlst
-               | stmt NEWLINE
-               | stmt"""
-    p = listify(p)
+               | stmt opt_newline"""
+    p = listify(p, size_check=3)
 
 def p_in_params(p):
     """expr_list : opt_expr ',' expr_list
@@ -191,10 +208,16 @@ def p_empty(p):
     """empty :"""
     pass
 
-yacc.yacc(start='stmt')
+yacc.yacc(start='topfunc')
+#yacc.yacc(start='stmtlst')
 
 def parse_string(s):
-    return yacc.parse(s)
+    return ast.Module([yacc.parse(s)])
+
+def get_func(s, name='top'):
+    exec(compile(ast.fix_missing_locations(parse_string(s)), filename='<ast>', mode='exec'))
+    top.__name__ = top.func_name = name
+    return top
 
 if __name__ == '__main__':
     while 1:
@@ -203,4 +226,4 @@ if __name__ == '__main__':
         except EOFError:
             break
         if not s: continue
-        print ast.dump(yacc.parse(s))
+        print ast.dump(parse_string(s))
