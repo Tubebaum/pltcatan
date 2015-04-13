@@ -7,3 +7,4 @@ class Road(Structure, Edge):
 
     def __init__(self, owning_player):
         super(Road, self).__init__(owning_player)
+        self.point_worth = 0

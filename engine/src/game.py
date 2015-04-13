@@ -4,6 +4,7 @@ from engine.src.player import Player
 from engine.src.dice import Dice
 from engine.src.input_manager import InputManager
 from engine.src.board.game_board import GameBoard
+from engine.src.resource_type import ResourceType
 from engine.src.structure.vertex_structure.settlement import Settlement
 from engine.src.structure.edge_structure.road import Road
 
@@ -71,30 +72,42 @@ class Game(object):
 
         return x, y, edge_dir
 
+    # TODO: refactoring
     def initial_settlement_and_road_placement(self):
 
         InputManager.announce_initial_structure_placement_stage()
 
         for player in self.players:
+
             InputManager.announce_player_turn(player)
+
+            # Place settlement
             InputManager.announce_structure_placement(player, Settlement)
             self.place_vertex_structure(player, Settlement)
+
+            # Place road
             InputManager.announce_structure_placement(player, Road)
             self.place_edge_structure(player, Road)
 
         distributions = Utils.nested_dict()
 
         for player in list(reversed(self.players)):
+
             InputManager.announce_player_turn(player)
+
+            # Place settlement
             InputManager.announce_structure_placement(player, Settlement)
             x, y, vertex_dir = self.place_vertex_structure(player, Settlement)
+
+            # Place road
             InputManager.announce_structure_placement(player, Road)
             self.place_edge_structure(player, Road)
 
             # Give initial resource cards
-            resource_types = map(
-                lambda tile: tile.resource_type,
-                self.board.get_adjacent_tiles_to_vertex(x, y, vertex_dir)
+            resource_types = filter(
+                lambda resource_type: resource_type != ResourceType.FALLOW,
+                map(lambda tile: tile.resource_type,
+                    self.board.get_adjacent_tiles_to_vertex(x, y, vertex_dir))
             )
 
             for resource_type in resource_types:
@@ -124,5 +137,9 @@ class Game(object):
         return max(self.players, key=lambda player: player.points)
 
     def update_point_counts(self):
+
+        # Determine largest army
+        player_with_largest_army = max(self.players, key=lambda player: player.knights)
+
         print('update_point_counts not implemented.')
 

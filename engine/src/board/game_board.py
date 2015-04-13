@@ -283,7 +283,7 @@ class GameBoard(HexBoard):
     def place_edge_structure(self, x, y, edge_dir, structure):
         tile = self.tiles[x][y]
         vertex_dirs = EdgeVertexMapping.get_vertex_dirs_for_edge_dir(edge_dir)
-        old_edge_val = tile.edges[vertex_dirs[0], vertex_dirs[1]]
+        old_edge_val = tile.edges[vertex_dirs[0]][vertex_dirs[1]]
 
         if (isinstance(structure, UpgradeStructure) or
                 isinstance(structure, ExtensionStructure)) and not \

@@ -20,11 +20,14 @@ class Player(TradingEntity):
         super(Player, self).__init__()
 
         self.name = name
+
+        self.development_cards = []
+
         self.points = 0
         self.hidden_points = 0
-        self.longest_road_length = 0
+
         self.knights = 0
-        self.development_cards = []
+        self.longest_road_length = 0
 
         # TODO: move to config
         # TODO: programatically set these attributes
@@ -59,7 +62,7 @@ class Player(TradingEntity):
 
         if structure_count > 0:
             setattr(self, relevant_property, structure_count - 1)
-            return structure_cls()
+            return structure_cls(self)
         else:
             raise NotEnoughStructuresException(self, structure_cls)
 

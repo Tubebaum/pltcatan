@@ -22,6 +22,7 @@ class City(UpgradeStructure, Vertex):
     
     def __init__(self, owning_player, base_structure_cls=Settlement):
         super(City, self).__init__(owning_player, base_structure_cls)
+        self.point_worth = 2
 
     def __str__(self):
         return 'City of {0}\n'.format(self.owning_player.name)
