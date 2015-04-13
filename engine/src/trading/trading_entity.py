@@ -33,6 +33,15 @@ class TradingEntity(object):
         for arable_type in ResourceType.get_arable_types():
             self.resources[arable_type] = count
 
+    def count_resources(self):
+        return sum(self.resources.values())
+
+    def transfer_resources(self, to_entity, resource_type, resource_count):
+        """Transfer specified resources from this entity to the given entity."""
+
+        self.withdraw_resources(resource_type, resource_count)
+        to_entity.deposit_resources(resource_type, resource_count)
+
     def withdraw_resources(self, resource_type, resource_count):
         """Withdraw the specified number of resources from the entity.
 

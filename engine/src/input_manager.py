@@ -3,6 +3,7 @@ from engine.src.config import Config
 from engine.src.direction.vertex_direction import VertexDirection
 from engine.src.direction.edge_direction import EdgeDirection
 from engine.src.direction.edge_vertex_mapping import EdgeVertexMapping
+from engine.src.resource_type import ResourceType
 
 
 class InputManager(cmd.Cmd):
@@ -67,6 +68,13 @@ class InputManager(cmd.Cmd):
             return
         else:
             print 'Building not implemented.'
+
+    def do_buy_card(self, line):
+
+        if self.has_played_card:
+            print 'You may only play one card per turn.'
+        else:
+            print 'Purchasing development cards not implemented.'
 
     def do_play_card(self, line):
 
@@ -195,6 +203,14 @@ class InputManager(cmd.Cmd):
         return selected_enum
 
     @staticmethod
+    def prompt_select_resource_type():
+
+        msg = "Please enter the number (e.g. '1') of the resource type" + \
+              "you would like to choose."
+
+        return InputManager.prompt_select_enum_value(ResourceType, msg)
+
+    @staticmethod
     def prompt_vertex_direction():
 
         msg = "Please enter the number (e.g. '1') of the direction " + \
@@ -245,6 +261,12 @@ class InputManager(cmd.Cmd):
         prompt = "{0}, select where you would like to place your {1}".format(
             player.name, structure_cls.__name__.lower()
         )
+        InputManager.input_default(prompt, None, False)
+
+    @staticmethod
+    def announce_development_card_played(player, development_card):
+        prompt = "{0} played a development card: {1}".format(
+            player.name, development_card.__class__)
         InputManager.input_default(prompt, None, False)
 
     @staticmethod

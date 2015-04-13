@@ -1,7 +1,7 @@
 from engine.src.config import Config
 from engine.src.lib.utils import Utils
 from engine.src.player import Player
-from engine.src.dice.dice import Dice
+from engine.src.dice import Dice
 from engine.src.input_manager import InputManager
 from engine.src.board.game_board import GameBoard
 from engine.src.structure.vertex_structure.settlement import Settlement
@@ -16,6 +16,7 @@ class Game(object):
         self.dice = Dice()
         self.board = GameBoard(GameBoard.DEFAULT_RADIUS)
         self.players = []
+        self.input_manager = InputManager
 
     def start(self):
         self.create_players()
@@ -54,7 +55,7 @@ class Game(object):
 
         # TODO: Enforce valid.
         self.board.place_vertex_structure(x, y, vertex_dir,
-                                          structure_cls(player))
+                                          player.get_structure(structure_cls))
 
         return x, y, vertex_dir
 
