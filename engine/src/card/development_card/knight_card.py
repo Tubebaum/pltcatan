@@ -5,10 +5,7 @@ from engine.src.card.development_card.development_card import DevelopmentCard
 class KnightCard(DevelopmentCard):
 
     def __init__(self):
-        self.played = False
-
-    def is_playable(self):
-        return True
+        super(KnightCard, self).__init__()
 
     def effect_when_held(self, game, player):
         # No effect when held.

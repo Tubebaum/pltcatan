@@ -206,7 +206,7 @@ class HexBoard(Board):
 
         Here we generate the coordinates for all tiles of a single ring,
         designated by ring_index, traversing the ring one tile at a time,
-        starting from the westermost tile and continuing around the ring in a
+        starting from the westernmost tile and continuing around the ring in a
         clockwise fashion.
 
         Args:
@@ -313,7 +313,7 @@ class HexBoard(Board):
         tile = self.get_tile_with_coords(x, y)
 
         adjacent_tiles = map(
-            lambda dir: self.get_neighboring_tile(tile, dir),
+            lambda v_dir: self.get_neighboring_tile(tile, v_dir),
             EdgeVertexMapping.get_edge_dirs_for_vertex_dir(vertex_dir)
         )
 

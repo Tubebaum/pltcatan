@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-from engine.src.card.development_card.development_card import DevelopmentCard
-from engine.src.card.development_card.progress_card.progress_card import ProgressCard
+from engine.src.card.development_card.progress_card.progress_card \
+    import ProgressCard
 
 
 class MonopolyCard(ProgressCard):
 
     def __init__(self):
-        self.played = False
+        super(MonopolyCard, self).__init__()
 
     def effect_when_played(self, game, player):
         """Allow player to take all carried cards of selected resource type."""

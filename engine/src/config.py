@@ -7,7 +7,6 @@ from engine.src.card.development_card import RoadBuildingCard
 from engine.src.card.development_card import YearOfPlentyCard
 
 
-
 # TODO: Improve Config structure. Normalize across classes.
 # TODO: Config-DevCards ripe for circular import errors.
 class Config(object):

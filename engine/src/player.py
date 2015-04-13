@@ -55,8 +55,10 @@ class Player(TradingEntity):
         cls_str = structure_cls.__name__.lower()
         relevant_property = 'remaining_{0}_count'.format(cls_str)
 
-        if getattr(self, relevant_property) > 0:
-            setattr(self, relevant_property, getattr(self, relevant_property) - 1)
+        structure_count = getattr(self, relevant_property)
+
+        if structure_count > 0:
+            setattr(self, relevant_property, structure_count - 1)
             return structure_cls()
         else:
             raise NotEnoughStructuresException(self, structure_cls)

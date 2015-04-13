@@ -6,6 +6,7 @@ from engine.src.board.hex_board import HexBoard
 from engine.src.tile.game_tile import GameTile
 from engine.src.resource_type import ResourceType
 from engine.src.calamity.calamity import Calamity
+from engine.src.calamity.calamity import CalamityTilePlacementEffect
 from engine.src.trading.bank import Bank
 from engine.src.direction.edge_vertex_mapping import EdgeVertexMapping
 from engine.src.exceptions import NotEnoughResourcesException
@@ -309,9 +310,13 @@ class GameBoard(HexBoard):
               distributed to the player.
         """
 
-        # Find those tiles whose chit value matches the roll value.
+        # Find those tiles whose chit value matches the roll value,
+        # and whose yield isn't blocked by a calamity.
         resource_tiles = filter(
-            lambda tile: tile.chit_value == roll_value,
+            lambda tile:
+                tile.chit_value == roll_value and
+                (CalamityTilePlacementEffect.BLOCK_YIELD not in
+                    tile.get_calamity_tile_placement_effects()),
             list(self.iter_tiles())
         )
 
@@ -322,7 +327,7 @@ class GameBoard(HexBoard):
         for resource_tile in resource_tiles:
 
             # Find any structures built on the vertices of the found tiles.
-            adjacent_structures = resource_tile.get_adjacent_structures()
+            adjacent_structures = resource_tile.get_adjacent_vertex_structures()
 
             for structure in adjacent_structures:
                 player = structure.owning_player
@@ -365,3 +370,11 @@ class GameBoard(HexBoard):
                 pass
 
         return distributions
+
+    def find_tile_with_calamity(self, calamity):
+
+        for tile in self.iter_tiles():
+            if calamity in tile.calamities:
+                return tile
+
+        return None

@@ -2,7 +2,6 @@ import cmd
 from engine.src.config import Config
 from engine.src.direction.vertex_direction import VertexDirection
 from engine.src.direction.edge_direction import EdgeDirection
-from engine.src.direction.edge_vertex_mapping import EdgeVertexMapping
 from engine.src.resource_type import ResourceType
 
 
@@ -117,7 +116,7 @@ class InputManager(cmd.Cmd):
         prompt = '> {0}'.format(msg)
 
         if default:
-            prompt += " (or press enter to use default of {0}): ".format(default)
+            prompt += " (or press enter to use default {0}): ".format(default)
 
         if read_result:
             prompt += '\n< '
@@ -160,6 +159,17 @@ class InputManager(cmd.Cmd):
         return player_names
 
     @staticmethod
+    def prompt_select_player(game, players=None):
+
+        if players is None:
+            players = game.players
+
+        msg = "Please enter the number (e.g. '1') of the player" + \
+              "you would like to choose."
+
+        return InputManager.prompt_select_list_value(players, msg)
+
+    @staticmethod
     def prompt_tile_coordinates(game):
 
         x, y = None, None
@@ -182,25 +192,24 @@ class InputManager(cmd.Cmd):
         return x, y
 
     @staticmethod
-    def prompt_select_enum_value(enum_cls, prompt_msg):
+    def prompt_select_list_value(lst, prompt_msg):
 
-        enums = list(enum_cls)
-        selected_enum = None
+        selected_element = None
 
-        while selected_enum not in enums:
+        while selected_element not in lst:
 
-            for index, enum in enumerate(enums):
-                print '({0}) {1}'.format(index + 1, enum)
+            for index, element in enumerate(lst):
+                print '({0}) {1}'.format(index + 1, element)
 
             index = int(InputManager.input_default(prompt_msg))
 
             try:
-                selected_enum = enums[index - 1]
+                selected_element = lst[index - 1]
             except IndexError:
                 print "Invalid number given. You must give a number " + \
-                      "between 1 and {0}.".format(len(enums))
+                      "between 1 and {0}.".format(len(lst))
 
-        return selected_enum
+        return selected_element
 
     @staticmethod
     def prompt_select_resource_type():
@@ -208,7 +217,7 @@ class InputManager(cmd.Cmd):
         msg = "Please enter the number (e.g. '1') of the resource type" + \
               "you would like to choose."
 
-        return InputManager.prompt_select_enum_value(ResourceType, msg)
+        return InputManager.prompt_select_list_value(list(ResourceType), msg)
 
     @staticmethod
     def prompt_vertex_direction():
@@ -217,7 +226,7 @@ class InputManager(cmd.Cmd):
               "from the center of the tile to the vertex you would " + \
               "like to place a structure on."
 
-        return InputManager.prompt_select_enum_value(VertexDirection, msg)
+        return InputManager.prompt_select_list_value(list(VertexDirection), msg)
 
     @staticmethod
     def prompt_edge_direction():
@@ -226,7 +235,7 @@ class InputManager(cmd.Cmd):
               "from the center of the tile to the edge you would " + \
               "like to place a structure on."
 
-        return InputManager.prompt_select_enum_value(EdgeDirection, msg)
+        return InputManager.prompt_select_list_value(list(EdgeDirection), msg)
 
     @staticmethod
     def prompt_vertex_placement(game):

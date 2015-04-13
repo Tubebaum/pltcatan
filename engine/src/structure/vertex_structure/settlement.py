@@ -14,8 +14,7 @@ class Settlement(Structure, Vertex):
     BASE_YIELD = 1
 
     def __init__(self, owning_player):
-
-        self.owning_player = owning_player
+        super(Settlement, self).__init__(owning_player)
 
     @classmethod
     def base_yield(cls):
@@ -29,4 +28,3 @@ class Settlement(Structure, Vertex):
                (ResourceType.BRICK, 1), \
                (ResourceType.WOOL, 1), \
                (ResourceType.GRAIN, 1)
-

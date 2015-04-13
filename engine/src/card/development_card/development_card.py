@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from abc import ABCMeta, abstractmethod, abstractproperty
+from abc import ABCMeta, abstractmethod
 from engine.src.resource_type import ResourceType
 
 
@@ -7,19 +7,13 @@ class DevelopmentCard(object):
     __metaclass__ = ABCMeta
 
     def __init__(self):
+
         self.cost = {ResourceType.GRAIN: 1, ResourceType.ORE: 1,
                      ResourceType.WOOL: 1}
 
         self.played = False
+        self.is_playable = True
         
-    @abstractproperty
-    def is_playable(self):
-        """
-        
-        e.g. victory point cards cannot be played, but knights can.
-        """
-        pass
-
     @abstractmethod
     def effect_when_held(self, game, player):
         """Activates effect of holding the current card.
