@@ -180,6 +180,10 @@ def p_expr_property(p):
 
    p[0] = ast.Attribute(p[1], p[3], ast.Load())
 
+def p_expr_getitem(p):
+    """expr : ID '[' expr ']'"""
+    p[0] = ast.Subscript(ast.Name(p[1], ast.Load()), ast.Index(p[3]), ast.Load())
+
 # Arithmetic
 
 def p_expr_binop(p):
@@ -187,10 +191,10 @@ def p_expr_binop(p):
             | expr '-' expr
             | expr '*' expr
             | expr '/' expr"""
-    if   p[2] == '+': p[0] = ast.BinOp(p[1], ast.Add(), p[3]) #p[1] + p[3]
-    elif p[2] == '-': p[0] = ast.BinOp(p[1], ast.Sub(), p[3]) #p[1] - p[3]
-    elif p[2] == '*': p[0] = ast.BinOp(p[1], ast.Mult(), p[3]) #p[1] * p[3]
-    elif p[2] == '/': p[0] = ast.BinOp(p[1], ast.Div(), p[3]) #p[1] / p[3]
+    if   p[2] == '+': p[0] = ast.BinOp(p[1], ast.Add(), p[3])  # p[1] + p[3]
+    elif p[2] == '-': p[0] = ast.BinOp(p[1], ast.Sub(), p[3])  # p[1] - p[3]
+    elif p[2] == '*': p[0] = ast.BinOp(p[1], ast.Mult(), p[3]) # p[1] * p[3]
+    elif p[2] == '/': p[0] = ast.BinOp(p[1], ast.Div(), p[3])  # p[1] / p[3]
 
 def p_expr_uminus(p):
     """expr : '-' expr %prec UMINUS"""
