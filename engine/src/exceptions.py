@@ -1,3 +1,6 @@
+from engine.src.lib.utils import Utils
+
+
 class NotEnoughResourcesException(Exception):
     """Raise when a trader lacks enough resources cards for a transaction.
 
@@ -10,12 +13,27 @@ class NotEnoughResourcesException(Exception):
     Args:
         trading_entity (TradingEntity): The entity that lacked resources.
 
-        resource_type (ResourceType): The type of resource the entity lacked.
+        resource_type (ResourceType or list of ResourceType): The type(s) of
+          resource(s) the entity lacked.
     """
 
-    def __init__(self, trading_entity, resource_type):
+    def __init__(self, trading_entity, resource_types):
+
+        resource_type_strs = map(
+            lambda resource_type: str(resource_type),
+            Utils.convert_to_list(resource_types)
+        )
+
+        resource_type_str = ''
+
+        if len(resource_type_strs) == 1:
+            resource_type_str = resource_type_strs[0]
+        else:
+            resource_type_str = ', '.join(resource_type_strs[:-1]) +\
+                ', or ' + resource_type_strs[-1]
+
         self.msg = '{0} does not have enough {1} cards!'.format(
-            trading_entity.__class__.__name__, resource_type)
+            trading_entity.__class__.__name__, resource_type_str)
 
 
 class NotEnoughStructuresException(Exception):

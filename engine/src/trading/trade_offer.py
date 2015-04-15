@@ -4,6 +4,7 @@ from engine.src.resource_type import ResourceType
 
 
 class TradeOffer(object):
+    # TODO: Convert resources to collections.Counter
 
     def __init__(self, offered_resources, requested_resources):
 
