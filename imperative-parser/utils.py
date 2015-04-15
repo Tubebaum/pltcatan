@@ -1,49 +1,39 @@
-from collections import defaultdict
+from itertools import imap, chain
+from collections import Sequence
+
+def listlike(obj):
+    """Checks if the object is like a sequential container
+
+    Arguments:
+        obj -- the object to check
+
+    Return:
+        True if the object is listlike, False if it's a string
+
+    """
+    return isinstance(obj, Sequence) and not isinstance(obj, basestring)
 
 
-def get_registry():
-    registry = defaultdict(list)
-    def register(nonterminal):
-        def registrar(func):
-            registry[nonterminal] += [func]
-            return func
-        return registrar
-    register.get = lambda x: registry[x]
-    return register
+def one_or_many(value):
+    """Ensures the value can be used like a list
+
+    Arguments:
+        value -- the value to check
+
+    Return:
+        The value if it's listlike, or the value wrapped in a tuple if it isn't
+
+    """
+    return value if listlike(value) else (value,)
 
 
-def trivial(name, nonterminals, indent=4, suffix='', docstring=None):
-    def template(p):
-        p[0] = p[1]
+def flatten(values):
+    """Iterate over objects like a flat list
 
-    if not docstring:
-        docstring = "{} : {}".format(name, nonterminals[0])
-        padding = ' ' * (len(name) + 1 + indent) + '| '
+    Arguments:
+        values -- a list of objects to flatten
 
-        if len(nonterminals) > 1:
-            docstring += '\n' + padding + ('\n' + padding).join(nonterminals[1:])
-
-    template.__doc__ = docstring
-    
-    template.__name__ = template.func_name = 'p_' + name + suffix
-
-    return template
-
-
-def trivial_from_registry(name, registry, indent=4, suffix=''):
-    return trivial(name, [func.__doc__.split(':')[0].strip() for func in registry.get(name)], indent=indent, suffix=suffix)
-
-
-class StateNotFound(Exception):
-    pass
-
-
-class GameOracle(object):
-    def __init__(self, state={}):
-        self.game_state = state
-
-    def get(self, var):
-        try:
-            return self.game_state[var]
-        except KeyError:
-            raise StateNotFound("Variable \"%s\" not present in game state" % var)
+    Return:
+        A list containing the nested objects in values
+    """
+    return chain.from_iterable(imap(one_or_many, values))
