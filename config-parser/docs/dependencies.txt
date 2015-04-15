@@ -1,0 +1,3 @@
+Extended pickling for python objects available, see:
+    https://pypi.python.org/pypi/dill
+    pip install dill
