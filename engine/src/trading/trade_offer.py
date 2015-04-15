@@ -21,9 +21,6 @@ class TradeOffer(object):
         for arable_type in ResourceType.get_arable_types():
             resources[arable_type] = 0
 
-        for resource_type_crit in TradeMetaCriteria:
-            resources[resource_type_crit] = 0
-
         return resources
 
     def validate(self, proposing_entity, receiving_entity):
@@ -46,13 +43,13 @@ class TradeOffer(object):
 
         # Check that the proposing_entity has all the resources listed in this
         # trade's offered_resources dict.
-        for resource_type, count in self.offered_resources:
+        for resource_type, count in self.offered_resources.iteritems():
             if proposing_entity.resources[resource_type] < count:
                 return proposing_entity, resource_type
 
         # Check that the receiving entity has all the resources listed in this
         # trade's requested_resources dict.
-        for resource_type, count in self.requested_resources:
+        for resource_type, count in self.requested_resources.iteritems():
             if receiving_entity.resources[resource_type] < count:
                 return receiving_entity, resource_type
 
@@ -72,13 +69,13 @@ class TradeOffer(object):
 
         # Take the offered resources from the entity that proposed the deal
         # and give them to the entity that accepted the deal.
-        for resource_type, count in self.offered_resources:
+        for resource_type, count in self.offered_resources.iteritems():
             proposing_entity.withdraw_resources(resource_type, count)
             receiving_entity.deposit_resources(resource_type, count)
 
         # Take the resources requested by the proposing entity from the
         # entity that accepted the deal and give them to the proposing entity.
-        for resource_type, count in self.requested_resources:
+        for resource_type, count in self.requested_resources.iteritems():
             proposing_entity.deposit_resources(resource_type, count)
             receiving_entity.withdraw_resources(resource_type, count)
 

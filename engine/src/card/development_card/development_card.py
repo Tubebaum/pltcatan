@@ -13,6 +13,9 @@ class DevelopmentCard(object):
 
         self.played = False
         self.is_playable = True
+
+    def __str__(self):
+        return self.__class__.__name__
         
     @abstractmethod
     def draw_card(self, game, player):
@@ -46,4 +49,3 @@ class DevelopmentCard(object):
         """
 
         self.played = True
-

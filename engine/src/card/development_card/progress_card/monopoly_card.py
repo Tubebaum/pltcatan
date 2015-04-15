@@ -16,7 +16,17 @@ class MonopolyCard(ProgressCard):
 
         for game_player in game.players:
             if player != game_player:
-                game_player.transfer_resources(player, resource_type,
-                                               player.resources[resource_type])
+                count = player.resources[resource_type]
+
+                game_player.transfer_resources(player, resource_type, count)
+
+                msg = '{0} received {1} {2} from {3}'.format(
+                    player.name, count, resource_type, game_player.name)
+
+                game.input_manager.input_default(msg, None, False)
+
+        # Announce finished collecting resources.
+        msg = 'Done monopolizing resources.'
+        game.input_manager.input_default(msg, None, False)
 
         self.played = True

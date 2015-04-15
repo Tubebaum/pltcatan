@@ -1,8 +1,14 @@
 import cmd
+import sys
 from engine.src.config import Config
 from engine.src.direction.vertex_direction import VertexDirection
 from engine.src.direction.edge_direction import EdgeDirection
 from engine.src.resource_type import ResourceType
+from engine.src.vertex import Vertex
+from engine.src.edge import Edge
+from engine.src.exceptions import *
+import engine.src.structure.vertex_structure as vertex_structure_mod
+import engine.src.structure.edge_structure as edge_structure_mod
 
 
 class InputManager(cmd.Cmd):
@@ -12,6 +18,8 @@ class InputManager(cmd.Cmd):
         game (Game): The game being played.
         player (Player): Current player.
 
+    Note that method docstrings are displayed to the user when they enter help.
+    Implementation documentation should thus be given below the usual docstring.
     """
     def __init__(self, game, player):
 
@@ -24,12 +32,14 @@ class InputManager(cmd.Cmd):
         self.has_rolled = False
         self.has_played_card = False
 
+        self.structure_classes = vertex_structure_mod.CLASSES + \
+            edge_structure_mod.CLASSES
+
     def default(self, line):
         """Print menu of commands when unrecognized command given."""
 
         print 'Unrecognized command <{0}> given.'.format(line)
-        print 'Please try one of the following commands:\n{0}'.format(
-            InputManager.list_cmds())
+        self.do_help(None)
 
     def preloop(self):
         """Announce start of player turn."""
@@ -41,69 +51,148 @@ class InputManager(cmd.Cmd):
 
         print "End of {0}'s turn.".format(self.player.name)
 
-    def do_roll(self, line):
-        """Roll the dice (and have game handle resulting roll value)."""
+    def do_roll(self, value):
+        """Roll the dice."""
 
-        self.game.roll_dice()
+        self.game.roll_dice(value)
         self.has_rolled = True
 
-    @staticmethod
-    def announce_roll_value(roll_value):
-        print 'Player rolled a {0}'.format(roll_value)
-
+    # TODO: Incomplete.
     def do_trade(self, line):
+        """Trade resources with other players or with the bank."""
 
         # TODO: consider reusable wrapper function.
         if not self.has_rolled:
             print 'You must roll before you can trade.'
             return
         else:
+            # Need input resources, output resources
             print 'Trade not implemented.'
 
     def do_build(self, line):
+        """Build structures, including settlements, cities, and roads."""
 
         if not self.has_rolled:
-            print 'You must roll before you can trade.'
+            print 'You must roll before you can build.'
             return
-        else:
-            print 'Building not implemented.'
 
+        try:
+
+            msg = "Please enter the number (e.g. '1') of the structure " + \
+                  "you would like to build."
+
+            structure_cls = InputManager.prompt_select_list_value(
+                msg,
+                map(lambda cls: cls.__name__,
+                    self.structure_classes),
+                self.structure_classes
+            )
+
+            structure = self.player.get_structure(structure_cls)
+
+            if issubclass(structure_cls, Edge):
+                x, y, edge_dir = InputManager.prompt_edge_placement(self.game)
+                self.game.board.place_edge_structure(x, y, edge_dir, structure)
+
+            elif issubclass(structure_cls, Vertex):
+                x, y, vertex_dir = \
+                    InputManager.prompt_vertex_placement(self.game)
+                self.game.board.place_vertex_structure(x, y,
+                                                       vertex_dir, structure)
+
+        except NotEnoughStructuresException as n:
+            InputManager.input_default(n, None, False)
+        except BoardPositionOccupiedException as b:
+            InputManager.input_default(b, None, False)
+        except InvalidBaseStructureException as i:
+            InputManager.input_default(i, None, False)
+
+    # TODO: Enforce can't play card bought during same turn.
     def do_buy_card(self, line):
+        """Buy a development card."""
 
-        if self.has_played_card:
-            print 'You may only play one card per turn.'
+        if not self.has_rolled:
+            msg = 'You must roll before you can buy a development card.'
+            InputManager.input_default(msg, None, False)
+        elif self.has_played_card:
+            msg = 'You may only play one card per turn.'
+            InputManager.input_default(msg, None, False)
         else:
-            print 'Purchasing development cards not implemented.'
+
+            try:
+                dev_card = self.game.board.bank.buy_development_card(self.player)
+
+                success_msg = 'You received a {0}!'.format(str(dev_card))
+
+                InputManager.input_default(success_msg, None, False)
+
+            except NotEnoughDevelopmentCardsException as n:
+                InputManager.input_default(n, None, False)
+            except NotEnoughResourcesException as n:
+                InputManager.input_default(n, None, False)
 
     def do_play_card(self, line):
+        """Play a development card."""
 
         if self.has_played_card:
-            print 'You may only play one card per turn.'
+            msg = 'You may only play one card per turn.'
+            InputManager.input_default(msg, None, False)
         else:
-            print 'Development cards not implemented.'
 
+            msg = "Please enter the number (e.g. '1') of the development " + \
+                  "card you would like to play."
+
+            dev_card = InputManager.prompt_select_list_value(
+                msg,
+                map(lambda card: card.__class__.__name__,
+                    self.player.development_cards),
+                self.player.development_cards
+            )
+
+            try:
+                dev_card.play_card(self.game, self.player)
+            # TODO: Make clear which exceptions can be caught.
+            except Exception as e:
+                InputManager.input_default(e, None, False)
+
+    # TODO: Improve.
     def do_print_board(self, line):
-        for tile in self.game.board.iter_tiles():
-            print('({0:2d}, {1:2d})'.format(tile.x, tile.y))
+        """View the board."""
 
-    def do_end(self, line):
-        """End the player's turn and exit the command loop."""
+        for tile in self.game.board.iter_tiles():
+            print tile
+
+    def do_print_resource_cards(self, line):
+        """View your resource cards."""
+
+        msg = map(lambda resource_type: str(resource_type),
+                  self.player.get_resource_list())
+
+        InputManager.input_default(msg, None, False)
+
+    def do_end_turn(self, line):
+        """End your current turn."""
 
         if not self.has_rolled:
             print 'You must roll before you can end your turn.'
         else:
             return True
 
-    @staticmethod
-    def list_cmds():
-        # TODO: improve
-        cmds = ['trade', 'build', 'play card', 'print board', 'help', 'end']
-        display_cmds_str = ''
+    def do_quit(self, line):
+        """Quit the game for all players."""
+        print '\nYou quit the game.'
+        sys.exit(0)
 
-        for cmd in cmds:
-            display_cmds_str += '\t{0}\n'.format(cmd)
+    # Testing Methods
+    def do_aybabtu(self, count):
 
-        return display_cmds_str
+        if not count:
+            count = 100
+        else:
+            count = int(count)
+
+        for resource_type in ResourceType.get_arable_types():
+            self.player.deposit_resources(resource_type, count)
 
     @staticmethod
     def input_default(msg, default=None, read_result=True):
@@ -167,7 +256,7 @@ class InputManager(cmd.Cmd):
         msg = "Please enter the number (e.g. '1') of the player" + \
               "you would like to choose."
 
-        return InputManager.prompt_select_list_value(players, msg)
+        return InputManager.prompt_select_list_value(msg, players)
 
     @staticmethod
     def prompt_tile_coordinates(game):
@@ -177,37 +266,54 @@ class InputManager(cmd.Cmd):
         valid_coords = False
 
         while not valid_coords:
-            x = int(InputManager.input_default(
-                'Please specify a tile x coordinate:', None))
+            try:
+                x = int(InputManager.input_default(
+                    'Please specify a tile x coordinate:', None))
 
-            y = int(InputManager.input_default(
-                'Please specify a tile y coordinate:', None))
+                y = int(InputManager.input_default(
+                    'Please specify a tile y coordinate:', None))
 
-            valid_coords = game.board.valid_tile_coords(x, y)
+                valid_coords = game.board.valid_tile_coords(x, y)
 
-            if not valid_coords:
+                if not valid_coords:
+                    raise ValueError
+            except Exception:
                 error_msg = "Invalid coordinates. Please try again."
                 InputManager.input_default(error_msg, None, False)
 
         return x, y
 
     @staticmethod
-    def prompt_select_list_value(lst, prompt_msg):
+    def prompt_select_list_value(prompt_msg, display_list, value_list=None):
+        """Select and return a list element.
+
+        Whenever we want to display a list and have the user select one entry
+        in the list, we should use this method.
+
+        If we want to display elements of one list to the user, but want to
+        return a value different from the display value, we can provide both
+        display and value lists. The user will select an index based on the
+        values displayed, but the return value will result from using that same
+        index to index into the value list.
+        """
 
         selected_element = None
 
-        while selected_element not in lst:
+        if value_list is None:
+            value_list = display_list
 
-            for index, element in enumerate(lst):
+        while selected_element not in value_list:
+
+            for index, element in enumerate(display_list):
                 print '({0}) {1}'.format(index + 1, element)
 
             index = int(InputManager.input_default(prompt_msg))
 
             try:
-                selected_element = lst[index - 1]
+                selected_element = value_list[index - 1]
             except IndexError:
                 print "Invalid number given. You must give a number " + \
-                      "between 1 and {0}.".format(len(lst))
+                      "between 1 and {0}.".format(len(display_list))
 
         return selected_element
 
@@ -217,7 +323,7 @@ class InputManager(cmd.Cmd):
         msg = "Please enter the number (e.g. '1') of the resource type" + \
               "you would like to choose."
 
-        return InputManager.prompt_select_list_value(list(ResourceType), msg)
+        return InputManager.prompt_select_list_value(msg, list(ResourceType))
 
     @staticmethod
     def prompt_vertex_direction():
@@ -226,7 +332,7 @@ class InputManager(cmd.Cmd):
               "from the center of the tile to the vertex you would " + \
               "like to place a structure on."
 
-        return InputManager.prompt_select_list_value(list(VertexDirection), msg)
+        return InputManager.prompt_select_list_value(msg, list(VertexDirection))
 
     @staticmethod
     def prompt_edge_direction():
@@ -235,7 +341,7 @@ class InputManager(cmd.Cmd):
               "from the center of the tile to the edge you would " + \
               "like to place a structure on."
 
-        return InputManager.prompt_select_list_value(list(EdgeDirection), msg)
+        return InputManager.prompt_select_list_value(msg, list(EdgeDirection))
 
     @staticmethod
     def prompt_vertex_placement(game):
@@ -255,18 +361,29 @@ class InputManager(cmd.Cmd):
 
         return x, y, edge_dir
 
+    # TODO: Roll announce methods into single method using getattr?
+
+    @staticmethod
+    def announce_roll_value(roll_value):
+
+        prompt = 'Player rolled a {0}'.format(roll_value)
+        InputManager.input_default(prompt, None, False)
+
     @staticmethod
     def announce_initial_structure_placement_stage():
+
         prompt = 'Beginning initial structure placement stage.'
         InputManager.input_default(prompt, None, False)
 
     @staticmethod
     def announce_player_turn(player):
+
         prompt = "Beginning {0}'s turn.".format(player.name)
         InputManager.input_default(prompt, None, False)
 
     @staticmethod
     def announce_structure_placement(player, structure_cls):
+
         prompt = "{0}, select where you would like to place your {1}".format(
             player.name, structure_cls.__name__.lower()
         )
@@ -274,8 +391,9 @@ class InputManager(cmd.Cmd):
 
     @staticmethod
     def announce_development_card_played(player, development_card):
+
         prompt = "{0} played a development card: {1}".format(
-            player.name, development_card.__class__)
+            player.name, str(development_card))
         InputManager.input_default(prompt, None, False)
 
     @staticmethod

@@ -10,10 +10,8 @@ from engine.src.calamity.calamity import CalamityTilePlacementEffect
 from engine.src.calamity.robber import Robber
 from engine.src.trading.bank import Bank
 from engine.src.direction.edge_vertex_mapping import EdgeVertexMapping
-from engine.src.exceptions import NotEnoughResourcesException
-from engine.src.exceptions import InvalidBaseStructureException
-from engine.src.structure.upgrade_structure import UpgradeStructure
-from engine.src.structure.extension_structure import ExtensionStructure
+from engine.src.exceptions import *
+from engine.src.structure import *
 
 
 class GameBoard(HexBoard):
@@ -272,26 +270,41 @@ class GameBoard(HexBoard):
         tile = self.tiles[x][y]
         old_vertex_val = tile.vertices[vertex_dir]
 
-        if (isinstance(structure, UpgradeStructure) or
-                isinstance(structure, ExtensionStructure)) and not \
-                isinstance(old_vertex_val, structure.base_structure_cls):
+        self.validate_structure_placement(x, y, old_vertex_val, structure)
 
-            raise InvalidBaseStructureException(old_vertex_val, structure)
-        else:
-            self.update_vertex(x, y, vertex_dir, structure)
+        self.update_vertex(x, y, vertex_dir, structure)
 
     def place_edge_structure(self, x, y, edge_dir, structure):
         tile = self.tiles[x][y]
         vertex_dirs = EdgeVertexMapping.get_vertex_dirs_for_edge_dir(edge_dir)
         old_edge_val = tile.edges[vertex_dirs[0]][vertex_dirs[1]]
 
-        if (isinstance(structure, UpgradeStructure) or
-                isinstance(structure, ExtensionStructure)) and not \
-                isinstance(old_edge_val, structure.base_structure_cls):
+        self.validate_structure_placement(x, y, old_edge_val, structure)
 
-            raise InvalidBaseStructureException(old_edge_val, structure)
-        else:
-            self.update_edge(x, y, edge_dir, structure)
+        self.update_edge(x, y, edge_dir, structure)
+
+    def validate_structure_placement(self, x, y, old_pos_value, new_pos_value):
+
+        # Player cannot place structure if position taken by another player.
+        if isinstance(old_pos_value, Structure) and not \
+                old_pos_value.owning_player != new_pos_value.owning_player:
+
+            raise BoardPositionOccupiedException((x, y), old_pos_value,
+                                                 old_pos_value.owning_player)
+
+        # Player can't replace existing structure with non-augmenting structure.
+        elif (isinstance(old_pos_value, Structure) and not \
+              isinstance(new_pos_value, AugmentingStructure)):
+
+            raise BoardPositionOccupiedException((x, y), old_pos_value,
+                                                 old_pos_value.owning_player)
+
+        # Augmenting structures must replace structure of the proper base class.
+        elif (isinstance(new_pos_value, UpgradeStructure) or
+                isinstance(new_pos_value, ExtensionStructure)) and not \
+                isinstance(old_pos_value, new_pos_value.base_structure_cls):
+
+            raise InvalidBaseStructureException(old_pos_value, new_pos_value)
 
     def distribute_resources_for_roll(self, roll_value):
         """Distribute resources to the players based on the given roll value.
@@ -382,6 +395,15 @@ class GameBoard(HexBoard):
 
         return None
 
+    def get_tile_of_resource_type(self, resource_type):
+        """Returns first found file of specified resource type."""
+
+        for tile in self.iter_tiles():
+            if tile.resource_type == resource_type:
+                return tile
+
+        return None
+
     def find_tile_with_calamity(self, calamity):
 
         for tile in self.iter_tiles():
@@ -389,3 +411,8 @@ class GameBoard(HexBoard):
                 return tile
 
         return None
+
+    def place_calamity(self, x, y, calamity):
+
+        tile = self.get_tile_with_coords(x, y)
+        tile.add_calamity(calamity)

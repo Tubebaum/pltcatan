@@ -38,7 +38,10 @@ class HexTile(Tile):
         self._create_vertices_and_edges()
 
     def __repr__(self):
-        return "({0}, {1})".format(self.x, self.y)
+        return '({0}, {1})'.format(self.x, self.y)
+
+    def __str__(self):
+        return '({0}, {1})'.format(self.x, self.y)
 
     def _create_vertices_and_edges(self):
         """Create brand new vertices and edges for this tile."""

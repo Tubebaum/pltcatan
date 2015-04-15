@@ -54,3 +54,16 @@ class InvalidBaseStructureException(Exception):
             augmenting_structure.base_structure.__class__.__name__,
             base_structure.__class__.__name__
         )
+
+class BoardPositionOccupiedException(Exception):
+    """Raise when a player tries to build on a taken board position.
+
+    Players can not place structures on positions taken by other players.
+    Players can not replace existing structures with non-augmenting structures.
+    """
+
+    def __init__(self, position, structure, owning_player):
+
+        self.msg = 'Position {0} already has a {1} belonging to {1}'.format(
+            position, structure.__class__.__name__, owning_player.name)
+

@@ -27,9 +27,8 @@ class GameTile(HexTile):
         self.calamities = []
 
     def __str__(self):
-
-        return "Coordinates: ({0}, {1})\nResource Type: {2}\nChit value: {3}\n"\
-            .format(self.x, self.y, self.resource_type, self.chit_value)
+        return '({0}, {1}) {2} {3}'.format(self.x, self.y,
+                                           self.resource_type, self.chit_value)
 
     def get_adjacent_vertex_structures(self):
         """Return any vertices that are structures."""

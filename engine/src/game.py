@@ -7,6 +7,7 @@ from engine.src.board.game_board import GameBoard
 from engine.src.resource_type import ResourceType
 from engine.src.structure.vertex_structure.settlement import Settlement
 from engine.src.structure.edge_structure.road import Road
+from engine.src.calamity.robber import Robber
 
 
 class Game(object):
@@ -16,6 +17,12 @@ class Game(object):
 
         self.dice = Dice()
         self.board = GameBoard(GameBoard.DEFAULT_RADIUS)
+
+        # Place the robber on a fallow tile.
+        self.robber = Robber()
+        tile = self.board.get_tile_of_resource_type(ResourceType.FALLOW)
+        tile.add_calamity(self.robber)
+
         self.players = []
         self.input_manager = InputManager
 
@@ -120,13 +127,12 @@ class Game(object):
         self.board.distribute_resources(distributions)
         InputManager.announce_resource_distributions(distributions)
 
-    def roll_dice(self):
+    def roll_dice(self, value=None):
 
         roll_value = self.dice.roll()
         InputManager.announce_roll_value(roll_value)
 
         # If a calamity value, handle calamity
-        # Else
         distributions = self.board.distribute_resources_for_roll(roll_value)
 
         InputManager.announce_resource_distributions(distributions)
