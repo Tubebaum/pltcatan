@@ -1,21 +1,39 @@
 # -*- coding: utf-8 -*-
 import random
+
 from engine.src.lib.utils import Utils
 from engine.src.board.hex_board import HexBoard
 from engine.src.tile.game_tile import GameTile
 from engine.src.resource_type import ResourceType
 from engine.src.calamity.calamity import Calamity
+from engine.src.calamity.calamity import CalamityTilePlacementEffect
+from engine.src.calamity.robber import Robber
+from engine.src.trading.bank import Bank
+from engine.src.direction.edge_vertex_mapping import EdgeVertexMapping
+from engine.src.exceptions import NotEnoughResourcesException
+from engine.src.exceptions import InvalidBaseStructureException
+from engine.src.structure.upgrade_structure import UpgradeStructure
+from engine.src.structure.extension_structure import ExtensionStructure
 
 
 class GameBoard(HexBoard):
-    #TODO: Move to general configuration file
-    DEFAULT_RADIUS = 3
-
     """A Settlers of Catan playing board.
+
+    Attributes:
+        radius (int): See HexBoard.
+
+        tiles (dict): See HexBoard.
+
+        tile_cls (class): See HexBoard.
+
+        bank (Bank): Bank of resources the board will interact with.
 
     Args:
         radius (int): See HexBoard.
     """
+
+    # TODO: Move to general configuration file
+    DEFAULT_RADIUS = 3
 
     def __init__(self, radius):
 
@@ -25,6 +43,9 @@ class GameBoard(HexBoard):
         # Here we assign resource types and chit values.
         self.assign_tile_resources()
         self.assign_tile_chit_values()
+        self.assign_tile_harbors()
+
+        self.bank = Bank(len(list(self.iter_tiles())))
 
     def assign_tile_resources(self, assignment_func=None):
         """Assign resource types to this board's tiles.
@@ -212,6 +233,17 @@ class GameBoard(HexBoard):
                                               chit_values_to_assign):
             tile.chit_value = chit_value_to_assign
 
+    def assign_tile_harbors(self):
+        """Assign harbors to this board.
+
+        TODO: Officially, harbors seem to be placed after every
+              3rd then 3rd then 4th edge. This is a pain to program given that
+              it only _seems_ that way.
+        """
+
+        # TODO
+        pass
+
     def iter_arable_tiles(self):
         """Iterate over this board's non-fallow i.e. arable tiles."""
 
@@ -219,7 +251,7 @@ class GameBoard(HexBoard):
             if tile.resource_type != ResourceType.FALLOW:
                 yield tile
 
-    def place_structure(self, structure, x, y, vertex_dir):
+    def place_vertex_structure(self, x, y, vertex_dir, structure):
         """Place a structure of the given type on the specified vertex.
 
         Args:
@@ -227,9 +259,39 @@ class GameBoard(HexBoard):
 
             structure (Structure): Structure to replace the specified vertex
               with.
+
+        Returns:
+            None.
+
+        Raises:
+            InvalidBaseStructureException. If structure to be placed is an
+              upgrade or extension of a structure class that hasn't been
+              placed at the defined vertex.
         """
 
-        self.update_vertex(x, y, vertex_dir, structure)
+        tile = self.tiles[x][y]
+        old_vertex_val = tile.vertices[vertex_dir]
+
+        if (isinstance(structure, UpgradeStructure) or
+                isinstance(structure, ExtensionStructure)) and not \
+                isinstance(old_vertex_val, structure.base_structure_cls):
+
+            raise InvalidBaseStructureException(old_vertex_val, structure)
+        else:
+            self.update_vertex(x, y, vertex_dir, structure)
+
+    def place_edge_structure(self, x, y, edge_dir, structure):
+        tile = self.tiles[x][y]
+        vertex_dirs = EdgeVertexMapping.get_vertex_dirs_for_edge_dir(edge_dir)
+        old_edge_val = tile.edges[vertex_dirs[0], vertex_dirs[1]]
+
+        if (isinstance(structure, UpgradeStructure) or
+                isinstance(structure, ExtensionStructure)) and not \
+                isinstance(old_edge_val, structure.base_structure_cls):
+
+            raise InvalidBaseStructureException(old_edge_val, structure)
+        else:
+            self.update_edge(x, y, edge_dir, structure)
 
     def distribute_resources_for_roll(self, roll_value):
         """Distribute resources to the players based on the given roll value.
@@ -238,22 +300,92 @@ class GameBoard(HexBoard):
         matches the chit value of a tile, for all structures on that tile,
         distribute the number of resources dictated by the yield of that
         structure of the type of that tile.
+
+        Args:
+            roll_value (int): Dice roll value used to determine which tiles
+              should yield resources this turn.
+
+        Returns:
+            dict. Primary keys are players and secondary keys are resource
+              types. Stored values are the number of a given resource that was
+              distributed to the player.
         """
 
-        # Find those tiles whose chit value matches the roll value.
+        # Find those tiles whose chit value matches the roll value,
+        # and whose yield isn't blocked by a calamity.
         resource_tiles = filter(
-            lambda tile: tile.chit_value == roll_value,
+            lambda tile:
+                tile.chit_value == roll_value and
+                (CalamityTilePlacementEffect.BLOCK_YIELD not in
+                    tile.get_calamity_tile_placement_effects()),
             list(self.iter_tiles())
         )
 
+        distributions = Utils.nested_dict()
+
+        # Create a dictionary that stores per-player resource distributions.
+        # i.e. distributions => player => resource_type => (int)
         for resource_tile in resource_tiles:
 
             # Find any structures built on the vertices of the found tiles.
-            adjacent_structures = resource_tile.get_adjacent_structures()
+            adjacent_structures = resource_tile.get_adjacent_vertex_structures()
 
             for structure in adjacent_structures:
-                # Distribute resource cards to the player.
-                # The number of resources to be distributed is determined by
-                # the structure, and the type determined by the current tile.
-                structure.owning_player.add_resources(
-                    resource_tile.resource_type, structure.base_yield())
+                player = structure.owning_player
+                resource_type = resource_tile.resource_type
+                resource_yield = structure.base_yield()
+
+                if not distributions[player][resource_type]:
+                    distributions[player][resource_type] = 0
+
+                distributions[player][resource_type] += resource_yield
+
+        self.distribute_resources(distributions)
+
+        return distributions
+
+    def distribute_resources(self, distributions):
+
+        # Now distribute resources to players, if the bank has enough.
+        for resource_type in ResourceType.get_arable_types():
+
+            def get_per_player_production(player):
+                resource_count = distributions[player][resource_type]
+                return resource_count if resource_count else 0
+
+            total_count = sum(map(get_per_player_production, distributions))
+
+            try:
+                self.bank.withdraw_resources(resource_type, total_count)
+
+                for player in distributions:
+
+                    count = distributions[player][resource_type]
+
+                    if count:
+                        player.deposit_resources(resource_type, count)
+
+            except NotEnoughResourcesException:
+                # Bank didn't have enough of the current resource to distribute
+                # to all players, so distribute none of this resource.
+                pass
+
+        return distributions
+
+    def find_robber(self):
+        """Return the robber we can find."""
+
+        for tile in self.iter_tiles():
+            for calamity in tile.calamities:
+                if isinstance(calamity, Robber):
+                    return calamity
+
+        return None
+
+    def find_tile_with_calamity(self, calamity):
+
+        for tile in self.iter_tiles():
+            if calamity in tile.calamities:
+                return tile
+
+        return None

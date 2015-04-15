@@ -11,7 +11,7 @@ class Direction(Enum):
     """
 
     def __str__(self):
-        return '{0}'.format(self.value)
+        return '{0}: {1}'.format(self.name, self.value)
 
     def __getitem__(self, index):
         return self.value[index]
@@ -23,6 +23,9 @@ class Direction(Enum):
         return iter(self.value)
 
     def __eq__(self, other):
+
+        if not other:
+            return False
 
         if not len(other) == len(self):
             return False

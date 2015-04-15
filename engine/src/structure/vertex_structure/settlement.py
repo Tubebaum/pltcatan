@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
-from engine.src.edge.structure.structure import Structure
+from engine.src.structure.structure import Structure
+from engine.src.vertex import Vertex
 from engine.src.resource_type import ResourceType
 
 
-class Settlement(Structure):
+class Settlement(Structure, Vertex):
     """Represents a settlement from the Settlers of Catan game.
 
     Args:
@@ -13,8 +14,7 @@ class Settlement(Structure):
     BASE_YIELD = 1
 
     def __init__(self, owning_player):
-
-        self.owning_player = owning_player
+        super(Settlement, self).__init__(owning_player)
 
     @classmethod
     def base_yield(cls):
@@ -28,4 +28,3 @@ class Settlement(Structure):
                (ResourceType.BRICK, 1), \
                (ResourceType.WOOL, 1), \
                (ResourceType.GRAIN, 1)
-
