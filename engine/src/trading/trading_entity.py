@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 import random
+from collections import Counter
 from engine.src.lib.utils import Utils
 from engine.src.exceptions import NotEnoughResourcesException
 from engine.src.resource_type import ResourceType
+from engine.src.trading.trade_offer import TradeOffer
 
 
 class TradingEntity(object):
@@ -37,6 +39,28 @@ class TradingEntity(object):
 
     def count_resources(self):
         return sum(self.resources.values())
+
+    def validate_resources(self, resources):
+        """Check that this player has at least as many resources as given."""
+
+        default_resources = TradeOffer._get_empty_resources()
+        default_resources.update(resources)
+
+        resources = default_resources
+
+        # This entity does not have the given resources if the difference
+        # between its count and the given resources dict count for any given
+        # resource type is negative.
+        resource_debt = {resource_type: count - resources[resource_type]
+                         for resource_type, count in self.resources.items()
+                         if count - resources[resource_type] < 0}
+
+        valid = len(resource_debt.keys()) == 0
+
+        if valid:
+            return True
+        else:
+            raise NotEnoughResourcesException(self, resource_debt.keys())
 
     def get_resource_list(self):
         """Get a list of resource types, one for each "card" this player has."""

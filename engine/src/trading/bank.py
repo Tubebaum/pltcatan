@@ -4,6 +4,7 @@ from engine.src.config import Config
 from engine.src.trading.trading_entity import TradingEntity
 from engine.src.exceptions import NotEnoughDevelopmentCardsException
 from engine.src.trading.trade_offer import TradeOffer
+from engine.src.exceptions import *
 
 
 class Bank(TradingEntity):
@@ -77,6 +78,8 @@ class Bank(TradingEntity):
         if not obstructing_entity and not obstructing_resource_type:
             trade_offer.execute(player, self)
             player.development_cards.append(card)
+            return card
         # Otherwise, return the development card to the deck.
         else:
             self.development_cards.append(card)
+            raise NotEnoughResourcesException(player, obstructing_resource_type)

@@ -17,7 +17,7 @@ class ResourceType(Enum):
     ORE = 'ore'
     BRICK = 'brick'
 
-    FALLOW = None
+    FALLOW = 'fallow'
 
     def __str__(self):
         return '{0}'.format(self.value)

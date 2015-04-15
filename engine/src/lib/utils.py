@@ -6,6 +6,10 @@ class Utils(object):
     """A general utility class."""
 
     @classmethod
+    def noop(cls, *args, **kwargs):
+        pass
+
+    @classmethod
     def flatten(cls, lst):
         """Flattens a 2D list of lists."""
 
@@ -29,3 +33,22 @@ class Utils(object):
             http://stackoverflow.com/questions/16724788/how-can-i-get-python-to-automatically-create-missing-key-value-pairs-in-a-dictio
         """
         return collections.defaultdict(cls.nested_dict)
+
+    @classmethod
+    def convert_list_to_count_dict(cls, lst):
+
+        dct = {}
+
+        for val in lst:
+            if val in dct:
+                dct[val] += 1
+            else:
+                dct[val] = 1
+
+        return dct
+
+    @classmethod
+    def convert_to_list(cls, e):
+        """Convert to a list if not already a list."""
+        return list(e) if not hasattr(e,"__iter__") else e
+

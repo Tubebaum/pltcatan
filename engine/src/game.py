@@ -4,8 +4,10 @@ from engine.src.player import Player
 from engine.src.dice import Dice
 from engine.src.input_manager import InputManager
 from engine.src.board.game_board import GameBoard
+from engine.src.resource_type import ResourceType
 from engine.src.structure.vertex_structure.settlement import Settlement
 from engine.src.structure.edge_structure.road import Road
+from engine.src.calamity.robber import Robber
 
 
 class Game(object):
@@ -15,6 +17,12 @@ class Game(object):
 
         self.dice = Dice()
         self.board = GameBoard(GameBoard.DEFAULT_RADIUS)
+
+        # Place the robber on a fallow tile.
+        self.robber = Robber()
+        tile = self.board.get_tile_of_resource_type(ResourceType.FALLOW)
+        tile.add_calamity(self.robber)
+
         self.players = []
         self.input_manager = InputManager
 
@@ -71,30 +79,42 @@ class Game(object):
 
         return x, y, edge_dir
 
+    # TODO: refactoring
     def initial_settlement_and_road_placement(self):
 
         InputManager.announce_initial_structure_placement_stage()
 
         for player in self.players:
+
             InputManager.announce_player_turn(player)
+
+            # Place settlement
             InputManager.announce_structure_placement(player, Settlement)
             self.place_vertex_structure(player, Settlement)
+
+            # Place road
             InputManager.announce_structure_placement(player, Road)
             self.place_edge_structure(player, Road)
 
         distributions = Utils.nested_dict()
 
         for player in list(reversed(self.players)):
+
             InputManager.announce_player_turn(player)
+
+            # Place settlement
             InputManager.announce_structure_placement(player, Settlement)
             x, y, vertex_dir = self.place_vertex_structure(player, Settlement)
+
+            # Place road
             InputManager.announce_structure_placement(player, Road)
             self.place_edge_structure(player, Road)
 
             # Give initial resource cards
-            resource_types = map(
-                lambda tile: tile.resource_type,
-                self.board.get_adjacent_tiles_to_vertex(x, y, vertex_dir)
+            resource_types = filter(
+                lambda resource_type: resource_type != ResourceType.FALLOW,
+                map(lambda tile: tile.resource_type,
+                    self.board.get_adjacent_tiles_to_vertex(x, y, vertex_dir))
             )
 
             for resource_type in resource_types:
@@ -107,13 +127,12 @@ class Game(object):
         self.board.distribute_resources(distributions)
         InputManager.announce_resource_distributions(distributions)
 
-    def roll_dice(self):
+    def roll_dice(self, value=None):
 
         roll_value = self.dice.roll()
         InputManager.announce_roll_value(roll_value)
 
         # If a calamity value, handle calamity
-        # Else
         distributions = self.board.distribute_resources_for_roll(roll_value)
 
         InputManager.announce_resource_distributions(distributions)
@@ -124,5 +143,9 @@ class Game(object):
         return max(self.players, key=lambda player: player.points)
 
     def update_point_counts(self):
+
+        # Determine largest army
+        player_with_largest_army = max(self.players, key=lambda player: player.knights)
+
         print('update_point_counts not implemented.')
 

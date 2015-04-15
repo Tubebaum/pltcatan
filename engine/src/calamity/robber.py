@@ -55,9 +55,16 @@ class Robber(Calamity):
                 structures built adjacent to the tile.
         """
 
-        robber_successfully_moved = True
+        robber_successfully_moved = False
         previous_tile = game.board.find_tile_with_calamity(self)
         previous_tile.remove_calamity(self)
+
+        tile = None
+
+        prompt = 'Select a tile to move the robber to. Current location: {0}'\
+            .format(previous_tile)
+
+        game.input_manager.input_default(prompt, None, False)
 
         while not robber_successfully_moved:
             x, y = game.input_manager.prompt_tile_coordinates(game)
@@ -81,10 +88,19 @@ class Robber(Calamity):
 
         if eligible_players:
 
+            # Chose a player to randomly select a resource from.
             chosen_player = game.input_manager.prompt_select_player(
                 game, eligible_players)
 
             resource_type = chosen_player.withdraw_random_resource()
             player.deposit_resources(resource_type, 1)
 
-        # TODO: else announce to player
+            # Announce received resource.
+            msg = 'You received 1 {0} from {1}.'.format(
+                resource_type, chosen_player.name)
+            game.input_manager.input_default(msg, None, False)
+
+        else:
+            # Announce no eligible players to draw from.
+            msg = 'No qualifying players to draw from.'
+            game.input_manager.input_default(msg, None, False)
