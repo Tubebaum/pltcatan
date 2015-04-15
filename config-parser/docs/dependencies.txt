@@ -1,3 +1,6 @@
 Extended pickling for python objects available, see:
     https://pypi.python.org/pypi/dill
     pip install dill
+Lex and Yacc implementation for python available, see:
+    https://pypi.python.org/pypi/ply
+    pip install ply

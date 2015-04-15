@@ -64,9 +64,8 @@ def run(file):
         skit = pickle.load(open(compile_file, 'rb'))
     game = Game()
     skit = skit.get(os.path.splitext(base_file)[0], None)
-    if skit.get('game', None) == 'default.game':
+    if skit.get('game', None):
         game.start()
-        return game
 
 if __name__ == '__main__':
     arg_parser = argparse.ArgumentParser(description='Skit compiler')
