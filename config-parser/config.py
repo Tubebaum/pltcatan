@@ -11,6 +11,7 @@ tokens = (
     'DOT',
     'WILD',
     'ID',
+    'EXTENSION',
     'STR',
     'FUNC',
     'NUM'
@@ -41,6 +42,10 @@ def t_ID(t):
     t.type = reserved.get(t.value, 'ID')
     return t
 
+def t_EXTENSION(t):
+    r'@extend'
+    return t
+
 def t_NUM(t):
     r'\d+'
     t.value = int(t.value)
@@ -57,6 +62,10 @@ lexer = lex.lex()
 
 def p_property_value(p):
     'property : ID COLON value'
+    p[0] = {p[1]: p[3]}
+
+def p_property_extension(p):
+    'property : EXTENSION COLON value'
     p[0] = {p[1]: p[3]}
 
 def p_value_structure(p):
@@ -77,7 +86,7 @@ def p_value_num(p):
 
 def p_value_str(p):
     'value : STR'
-    p[0] = p[1]
+    p[0] = p[1].strip('\'"')
 
 def p_value_uniform(p):
     'value : UNIFORM'

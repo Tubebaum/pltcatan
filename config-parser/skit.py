@@ -8,15 +8,41 @@ import sys
 sys.path.append('..')
 from engine.src.game import Game
 
+properties = {}
+
+def extend(skit):
+    '''
+    Replace all extended properties with the contents of the actual value
+    denoted by the dot-notated property name and set any additional properties
+    '''
+    for property, value in skit.iteritems():
+        if isinstance(value, dict):
+            extension = value.get('@extend')
+            if extension:
+                extended = properties
+                extension = extension.split('.')
+                extension.reverse()
+                while extension:
+                    extended = extended[extension.pop()]
+                skit[property] = extended.copy()
+                for extended_property, extended_value in value.iteritems():
+                    if extended_property != '@extend':
+                        skit[property][extended_property] = extended_value
+            extend(skit[property])
+
 def compile(file, clean=False):
     '''
     Cleans tmp/ directory and reinitializes with compiled skit code
     '''
+    base_file = os.path.basename(file)
+    compile_file = 'tmp/' + base_file
     if clean:
         shutil.rmtree('tmp/', True)
-    skit = config.parser.parse(open(args.file, 'r').read())
-    base_file = os.path.basename(args.file)
-    compile_file = 'tmp/' + base_file
+        compile('default.skit')
+    skit = config.parser.parse(open(file, 'r').read())
+    main_property = os.path.splitext(base_file)[0]
+    extend(skit)
+    properties[main_property] = skit.get(main_property)
     if not os.path.isdir('tmp/'):
         os.makedirs('tmp/')
     pickle.dump(skit, open(compile_file, 'wb'))
@@ -27,7 +53,8 @@ def run(file):
     Runs skit game
     Recompiles skit code only if code has been changed
     '''
-    base_file = os.path.basename(args.file)
+    compile('default.skit')
+    base_file = os.path.basename(file)
     compile_file = 'tmp/' + base_file
     skit = None
     if not os.path.isfile(compile_file) or\
@@ -35,7 +62,11 @@ def run(file):
         skit = compile(file)
     else:
         skit = pickle.load(open(compile_file, 'rb'))
-
+    game = Game()
+    skit = skit.get(os.path.splitext(base_file)[0], None)
+    if skit.get('game', None) == 'default.game':
+        game.start()
+        return game
 
 if __name__ == '__main__':
     arg_parser = argparse.ArgumentParser(description='Skit compiler')

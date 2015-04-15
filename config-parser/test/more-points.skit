@@ -1,0 +1,6 @@
+more-points: {
+    game: {
+        @extend: default.game,
+        points-to-win: 15
+    }
+}
