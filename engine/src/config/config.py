@@ -22,10 +22,6 @@ config = {
         'default_tile_count': 19,
         'default_radius': 3,
     },
-    'bank' : {
-        'default_ration_trade_input_count': 4,
-        'default_ration_trade_output_count': 1
-    },
     # Cards
     'card' : {
         # Development Cards
