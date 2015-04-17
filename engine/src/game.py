@@ -1,4 +1,4 @@
-from engine.src.config import Config
+from engine.src.config.config import Config
 from engine.src.lib.utils import Utils
 from engine.src.player import Player
 from engine.src.dice import Dice
@@ -16,7 +16,7 @@ class Game(object):
     def __init__(self):
 
         self.dice = Dice()
-        self.board = GameBoard(GameBoard.DEFAULT_RADIUS)
+        self.board = GameBoard(Config.get('board.default_radius'))
 
         # Place the robber on a fallow tile.
         self.robber = Robber()
@@ -35,7 +35,7 @@ class Game(object):
 
         max_point_count = 0
 
-        while max_point_count < Config.POINTS_TO_WIN:
+        while max_point_count < Config.get('game.points_to_win'):
             for player in self.players:
                 InputManager(self, player).cmdloop()
 

@@ -1,23 +1,37 @@
 # -*- coding: utf-8 -*-
-from abc import ABCMeta, abstractmethod
-from engine.src.resource_type import ResourceType
+from engine.src.config.config import Config
+from engine.src.lib.utils import Utils
 
 
 class DevelopmentCard(object):
-    __metaclass__ = ABCMeta
+    """
+    Attributes:
+        From Config:
+            count (int)
+            name (str)
+            description (str)
+            draw_card (func)
+            play_card (func)
+            cost (int)
 
-    def __init__(self):
+        played (bool)
+        is_playable (bool)
+    """
 
-        self.cost = {ResourceType.GRAIN: 1, ResourceType.ORE: 1,
-                     ResourceType.WOOL: 1}
+    def __init__(self, **kwargs):
+
+        # Initialize default values.
+        Config.init_from_config(self, 'card.development.default')
+
+        # Overwrite default values with custom values.
+        Utils.init_from_kwargs(self, **kwargs)
 
         self.played = False
         self.is_playable = True
 
     def __str__(self):
-        return self.__class__.__name__
+        return self.name
         
-    @abstractmethod
     def draw_card(self, game, player):
         """Draw this card and activate any effect incurred by holding it.
          
@@ -33,7 +47,6 @@ class DevelopmentCard(object):
         """
         pass
 
-    @abstractmethod
     def play_card(self, game, player):
         """Draw this card and activate any relevant effect.
          
