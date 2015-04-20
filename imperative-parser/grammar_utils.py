@@ -14,6 +14,8 @@ def get_registry():
 
 def gen_grammar(name, nonterminals, indent=4):
     """Generates a grammar docstring for the provided name and nonterminals
+    E.x. name : nonterminal1
+              | nonterminal2
 
     Args:
         name (String): The nonterminal name
@@ -22,17 +24,13 @@ def gen_grammar(name, nonterminals, indent=4):
     Returns:
         String. A docstring representing the grammar of the nonterminal
     """
-    try:
-        docstring = "{} : {}".format(name, nonterminals[0])
-    except:
-        print name, nonterminals
+    docstring = "{} : {}".format(name, nonterminals[0])
     padding = ' ' * (len(name) + 1 + indent) + '| '
 
     if len(nonterminals) > 1:
         docstring += '\n' + padding + ('\n' + padding).join(nonterminals[1:])
 
     return docstring
-
 
 def trivial(name, nonterminals, indent=4, suffix=''):
     """Generates a method for a trivial terminal, where p[0] = p[1]
@@ -56,7 +54,6 @@ def trivial(name, nonterminals, indent=4, suffix=''):
     template.__name__ = template.func_name = 'p_' + name + suffix
 
     return template
-
 
 def trivial_from_registry(name, registry, indent=4, suffix=''):
     """Generates a method for a trivial terminal, where p[0] = p[1], sourcing nonterminals from a registry

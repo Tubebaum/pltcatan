@@ -99,7 +99,7 @@ precedence = (
     ('left','+','-'),
     ('left','*','/'),
     ('right','UMINUS'),
-    )
+)
 
 # Simple expressions
 
