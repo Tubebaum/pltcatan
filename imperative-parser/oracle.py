@@ -14,22 +14,22 @@ class GameOracle(object):
     def __init__(self, state={}):
         """Creates an instance of a GameOracle
 
-        Named Arguments:
-            state ({}) -- a dictionary containing references from variable name strings to game state objects
+        Named Args:
+            state (Dict): {} -- a dictionary containing references from variable name strings to game state objects
 
-        Return:
-            A GameOracle which can access the provided state dictionary
+        Returns:
+            GameOracle. An oracle which can access the provided state dictionary
         """
         self.game_state = state
 
     def get(self, var):
         """Get a variable from the GameOracle's state
 
-        Arguments:
-            var -- a string representing the name of the variable to retrieve
+        Args:
+            var (String): A string representing the name of the variable to retrieve
 
-        Return:
-            The value of the variable being retrieved
+        Returns:
+            Any. The value of the variable being retrieved
 
         Throws:
             StateNotFound -- when a state being accessed isn't present in the state dict
@@ -42,9 +42,9 @@ class GameOracle(object):
     def set(self, name, var):
         """Set a particular variable in the state dict to a particular value
 
-        Arguments:
-            name -- a string representing the name to store the variable under
-            var -- the value to store for the variable
+        Args:
+            name (String): A string representing the name to store the variable under
+            var (Any): The value to store for the variable
         """
         self.game_state[name] = var
 

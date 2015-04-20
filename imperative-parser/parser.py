@@ -13,11 +13,11 @@ from oracle import ORACLE
 def gen_access_func(var_name):
     """Generates an AST to access the given variable using the GameOracle
 
-    Arguments:
-        name -- a string representing the variable name
+    Args:
+        name (String): A string representing the variable name
 
-    Return:
-        An AST representing a call to the GameOracle for the given variable
+    Returns:
+        ast.Call. An AST representing a call to the GameOracle for the given variable
     """
     return ast.Call(ast.Attribute(ast.Name('ORACLE', ast.Load()), 'get', ast.Load()), [ast.Str(var_name)], [], None, None)
 
@@ -27,11 +27,11 @@ register = get_registry()
 def gen_function(name):
     """Generates a function for the given trivial nonterminal based on the registry
 
-    Arguments:
-        name -- a string representing the nonterminal to generate the function for
+    Args:
+        name (String): A string representing the nonterminal to generate the function for
 
-    Return:
-        A trivial function p[0] = p[1] for the nonterminal
+    Returns:
+        Func. A trivial function p[0] = p[1] for the nonterminal
     """
     return trivial_from_registry(name, register, suffix='_reg')
 
@@ -40,16 +40,16 @@ def gen_function(name):
 def listify(p, item_pos=1, list_pos=3, size_check=2):
     """Creates a list of values from the given nonterminal parse p
 
-    Arguments:
-        p -- a list representing the parse
+    Args:
+        p (List): A list representing the parse
 
-    Named Arguments:
-        item_pos (1) -- an int representing the position of the item at the head of the list
-        list_pos (3) -- an int representing the position of the rest of the list
-        size_check (2) -- an int representing the length of the parse of a single item of the list
+    Named Args:
+        item_pos (Int): 1 -- An int representing the position of the item at the head of the list
+        list_pos (Int): 3 -- An int representing the position of the rest of the list
+        size_check (Int): 2 -- An int representing the length of the parse of a single item of the list
 
-    Return:
-        The parse p, with p[0] set to the list of items
+    Returns:
+        List. The parse p, with p[0] set to the list of items
     """
     p[0] = [p[item_pos]]
     if len(p) > size_check:
@@ -247,25 +247,25 @@ yacc.yacc(start='topfunc')
 def parse_string(s):
     """Parses a given string into a Python AST
 
-    Arguments:
-        s -- the string to parse into an AST
+    Args:
+        s (String): The string to parse into an AST
 
-    Return:
-        The AST representation of the provided code string
+    Returns:
+        ast.Module. The AST representation of the provided code string
     """
     return ast.Module([yacc.parse(s)])
 
 def parse_function(s, name='top'):
     """Parses a string representing a Skit function into a first-class Python function
 
-    Arguments:
-        s -- the string representing a Skit function to parse into a Python function
+    Args:
+        s (String): The string representing a Skit function to parse into a Python function
 
-    Named Arguments:
-        name ('top') -- a string representing the name to give the function being parsed
+    Named Args:
+        name (String): 'top' -- A string representing the name to give the function being parsed
 
-    Return:
-        A first-class Python function that performs the actions of the Skit function provided
+    Returns:
+        Func. A first-class Python function that performs the actions of the Skit function provided
     """
     exec(compile(ast.fix_missing_locations(parse_string(s)), filename='<ast>', mode='exec'))
     locals()[name].__name__ = locals()[name].func_name = name
