@@ -10,7 +10,31 @@ from engine.src.game import Game
 
 properties = {}
 
-def extend(skit):
+def undot(property):
+    '''
+    Get the value of a dot.notated.property from the properties dict
+    '''
+    extended = properties
+    extension = property.split('.')
+    extension.reverse()
+    while extension:
+        extended = extended[extension.pop()]
+    if isinstance(extended, dict) or isinstance(extended, list):
+        return extended.copy()
+    else:
+        return extended
+
+def extendVerbose(skit, property, value, extension):
+    skit[property] = undot(extension)
+    for extended_property, extended_value in value.iteritems():
+        if extended_property != '@extend':
+            if isinstance(extended_value, str) and '+' in extended_value:
+                extension, addition = extended_value.split('+')
+                extended = undot(extension.strip())
+                extended_value = extended + int(addition)
+            skit[property][extended_property] = extended_value
+
+def extend(skit, parent=None):
     '''
     Replace all extended properties with the contents of the actual value
     denoted by the dot-notated property name and set any additional properties
@@ -19,15 +43,8 @@ def extend(skit):
         if isinstance(value, dict):
             extension = value.get('@extend')
             if extension:
-                extended = properties
-                extension = extension.split('.')
-                extension.reverse()
-                while extension:
-                    extended = extended[extension.pop()]
-                skit[property] = extended.copy()
-                for extended_property, extended_value in value.iteritems():
-                    if extended_property != '@extend':
-                        skit[property][extended_property] = extended_value
+                if isinstance(extension, str):
+                    extendVerbose(skit, property, value, extension)
             extend(skit[property])
 
 def compile(file, clean=False):

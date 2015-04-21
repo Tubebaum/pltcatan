@@ -10,6 +10,7 @@ tokens = (
     'COMMA',
     'DOT',
     'WILD',
+    'PLUS',
     'ID',
     'EXTENSION',
     'STR',
@@ -30,6 +31,7 @@ t_RBRACKET = r'\]'
 t_COMMA = r','
 t_DOT = r'\.'
 t_WILD = r'\*'
+t_PLUS = r'\+'
 t_STR = r'".*"'
 t_ignore = ' \t'
 
@@ -113,6 +115,10 @@ def p_list_value(p):
 def p_dots_dot(p):
     'dots : ID DOT dots'
     p[0] = p[1] + '.' + p[3]
+
+def p_dots_plus(p):
+    'dots : ID PLUS NUM'
+    p[0] = p[1] + ' + ' + str(p[3])
 
 def p_dots_id(p):
     'dots : ID'
