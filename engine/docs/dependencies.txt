@@ -1,3 +1,2 @@
-Back-ported enums for 2.7.x are available, see:
-    https://pypi.python.org/pypi/enum34/
-    pip install enum34
+Dependencies are specified in requirements.txt, to install run:
+    pip install -r requirements.txt
