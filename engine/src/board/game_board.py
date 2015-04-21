@@ -30,9 +30,6 @@ class GameBoard(HexBoard):
         radius (int): See HexBoard.
     """
 
-    # TODO: Move to general configuration file
-    DEFAULT_RADIUS = 3
-
     def __init__(self, radius):
 
         super(GameBoard, self).__init__(radius, GameTile)

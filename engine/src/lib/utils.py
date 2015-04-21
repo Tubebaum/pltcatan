@@ -1,9 +1,23 @@
 # -*- coding: utf-8 -*-
 import collections
+from types import MethodType
 
 
 class Utils(object):
     """A general utility class."""
+
+    @classmethod
+    def init_from_kwargs(cls, obj, **kwargs):
+
+        for key, val in kwargs.iteritems():
+            if Utils.is_function(val):
+                setattr(obj, key, MethodType(val, obj, obj.__class__))
+            else:
+                setattr(obj, key, val)
+
+    @classmethod
+    def is_function(cls, func):
+        return hasattr(func, '__call__')
 
     @classmethod
     def noop(cls, *args, **kwargs):

@@ -1,6 +1,7 @@
 import cmd
 import sys
-from engine.src.config import Config
+
+from engine.src.config.config import Config
 from engine.src.direction.vertex_direction import VertexDirection
 from engine.src.direction.edge_direction import EdgeDirection
 from engine.src.resource_type import ResourceType
@@ -59,6 +60,7 @@ class InputManager(cmd.Cmd):
         self.game.roll_dice(value)
         self.has_rolled = True
 
+    # TODO: Trade with bank, harbor
     def do_trade(self, line):
         """Trade resources with other players or with the bank."""
 
@@ -115,9 +117,10 @@ class InputManager(cmd.Cmd):
                 }
 
                 InputManager.input_default('Trade complete.', None, False)
+
             # TODO: Specify explicit possible exceptions.
             except Exception as e:
-                InputManager.input_default(e.msg, None, False)
+                InputManager.input_default(e, None, False)
 
     def do_build(self, line):
         """Build structures, including settlements, cities, and roads."""
@@ -151,11 +154,11 @@ class InputManager(cmd.Cmd):
                                                        vertex_dir, structure)
 
         except NotEnoughStructuresException as n:
-            InputManager.input_default(n.msg, None, False)
+            InputManager.input_default(n, None, False)
         except BoardPositionOccupiedException as b:
-            InputManager.input_default(b.msg, None, False)
+            InputManager.input_default(b, None, False)
         except InvalidBaseStructureException as i:
-            InputManager.input_default(i.msg, None, False)
+            InputManager.input_default(i, None, False)
 
     # TODO: Enforce can't play card bought during same turn.
     def do_buy_card(self, line):
@@ -177,9 +180,9 @@ class InputManager(cmd.Cmd):
                 InputManager.input_default(success_msg, None, False)
 
             except NotEnoughDevelopmentCardsException as n:
-                InputManager.input_default(n.msg, None, False)
+                InputManager.input_default(n, None, False)
             except NotEnoughResourcesException as n:
-                InputManager.input_default(n.msg, None, False)
+                InputManager.input_default(n, None, False)
 
     def do_play_card(self, line):
         """Play a development card."""
@@ -194,16 +197,22 @@ class InputManager(cmd.Cmd):
 
             dev_card = InputManager.prompt_select_list_value(
                 msg,
-                map(lambda card: card.__class__.__name__,
-                    self.player.development_cards),
+                map(lambda card: card.name, self.player.development_cards),
                 self.player.development_cards
             )
 
+            if not dev_card:
+                InputManager.input_default(
+                    'Player has no development cards to choose from',
+                    None, False)
+                return
+
             try:
                 dev_card.play_card(self.game, self.player)
+
             # TODO: Make clear which exceptions can be caught.
             except Exception as e:
-                InputManager.input_default(e.msg, None, False)
+                InputManager.input_default(e, None, False)
 
     # TODO: Improve.
     def do_print_board(self, line):
@@ -235,6 +244,7 @@ class InputManager(cmd.Cmd):
 
     # Testing Methods
     def do_aybabtu(self, count):
+        """All your base are belong to us."""
 
         if not count:
             count = 100
@@ -252,7 +262,7 @@ class InputManager(cmd.Cmd):
             str. string entered by the user, or default if nothing was entered.
         """
 
-        prompt = '> {0}'.format(msg)
+        prompt = '> {0}'.format(str(msg))
 
         if default:
             prompt += " (or press enter to use default {0}): ".format(default)
@@ -278,8 +288,11 @@ class InputManager(cmd.Cmd):
         while num_players <= 0:
             try:
                 num_players = int(
-                    InputManager.input_default('Enter number of players',
-                                               Config.DEFAULT_PLAYER_COUNT))
+                    InputManager.input_default(
+                        'Enter number of players',
+                        Config.get('game.default_player_count')
+                    )
+                )
 
                 if num_players <= 0:
                     raise ValueError
@@ -348,6 +361,9 @@ class InputManager(cmd.Cmd):
         index to index into the value list.
         """
 
+        if len(display_list) == 0:
+            return None
+
         selected_element = None
 
         if value_list is None:
@@ -366,7 +382,7 @@ class InputManager(cmd.Cmd):
 
                 valid = True
 
-            except (IndexError, ValueError):
+            except (IndexError, ValueError, TypeError):
                 print "Invalid number given. You must give a number " + \
                       "between 1 and {0}.".format(len(display_list))
 
@@ -409,7 +425,7 @@ class InputManager(cmd.Cmd):
                 print "Invalid number given. All numbers must be " + \
                       "between 1 and {0}.".format(len(allowed_values_lst))
             except NotEnoughResourcesException as n:
-                InputManager.input_default(n.msg, None, False)
+                InputManager.input_default(n, None, False)
 
         return resource_count_dict
 

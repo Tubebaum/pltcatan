@@ -65,4 +65,3 @@ class Player(TradingEntity):
             return structure_cls(self)
         else:
             raise NotEnoughStructuresException(self, structure_cls)
-

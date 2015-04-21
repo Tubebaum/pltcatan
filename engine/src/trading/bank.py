@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 import random
-from engine.src.config import Config
+
+from engine.src.config.config import Config
 from engine.src.trading.trading_entity import TradingEntity
-from engine.src.exceptions import NotEnoughDevelopmentCardsException
 from engine.src.trading.trade_offer import TradeOffer
 from engine.src.exceptions import *
+from engine.src.card.development_card import DevelopmentCard
 
 
 class Bank(TradingEntity):
@@ -20,7 +21,7 @@ class Bank(TradingEntity):
           with.
     """
 
-    def __init__(self, tile_count=Config.DEFAULT_TILE_COUNT):
+    def __init__(self, tile_count=Config.get('board.default_tile_count')):
 
         super(Bank, self).__init__()
 
@@ -50,11 +51,12 @@ class Bank(TradingEntity):
     def _default_init_development_cards(self):
         """Add a configured number of each development card type to the bank."""
 
-        dev_card_count_dict = Config.DEFAULT_DEVELOPMENT_CARD_ALLOCATION
+        dev_card_dict = Config.get('card.development')
 
-        for card_cls, card_count in dev_card_count_dict.iteritems():
-            for _ in range(card_count):
-                self.development_cards.append(card_cls())
+        for name, card in dev_card_dict.iteritems():
+            for _ in range(card['count']):
+                dev_card = DevelopmentCard(**card)
+                self.development_cards.append(dev_card)
 
         random.shuffle(self.development_cards)
 
