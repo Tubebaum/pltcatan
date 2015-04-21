@@ -295,7 +295,7 @@ def p_empty(p):
 
 parser = yacc.yacc(start='topfunc')
 
-def parse_string(s):
+def parse_string(s, debug=False):
     """Parses a given string into a Python AST
 
     Args:
@@ -304,9 +304,9 @@ def parse_string(s):
     Returns:
         ast.Module. The AST representation of the provided code string
     """
-    return ast.Module([parser.parse(s, lexer=lexer)])
+    return ast.Module([parser.parse(s, debug=debug, lexer=lexer)])
 
-def parse_function(s, name='top'):
+def parse_function(s, name='top', debug=False):
     """Parses a string representing a Skit function into a first-class Python function
 
     Args:
@@ -318,7 +318,7 @@ def parse_function(s, name='top'):
     Returns:
         Func. A first-class Python function that performs the actions of the Skit function provided
     """
-    exec(compile(ast.fix_missing_locations(parse_string(s)), filename='<ast>', mode='exec'))
+    exec(compile(ast.fix_missing_locations(parse_string(s, debug=debug)), filename='<ast>', mode='exec'))
     locals()[name].__name__ = locals()[name].func_name = name
     return locals()[name]
 
