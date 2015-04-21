@@ -61,9 +61,10 @@ def listify(p, item_pos=1, list_pos=3, size_check=2):
 reserved = {
     'func': 'FUNC_DECL',
     'return': 'RETURN',
-    'print': 'PRINT'
+    'print': 'PRINT',
+    'if': 'IF'
 }
-tokens = ['ID', 'NUM', 'NEWLINE'] + list(reserved.values())
+tokens = ['ID', 'NUM', 'COMPOP', 'NEWLINE'] + list(reserved.values())
 literals = ['=', '+', '-', '*', '/', '(', ')', '{', '}', '[', ',', ']', '.', '"', '\'', '@']
 
 def t_ID(t):
@@ -78,6 +79,10 @@ def t_NUM(t):
     except ValueError:
         print 'Integer value too large', t.value
         t.value = 0
+    return t
+
+def t_COMPOP(t):
+    r'==|<=|>=|<|>|!='
     return t
 
 t_ignore = " \t"
@@ -193,6 +198,27 @@ def p_body(p):
         p[0] = [ast.Pass()]
 
 p_opt_newline = trivial('opt_newline', ['NEWLINE', 'empty'])
+
+# Conditionals
+
+@register('expr')
+def p_expr_compare(p):
+    """compare : expr COMPOP expr"""
+    symbol_conversions = {
+        '==': ast.Eq,
+        '!=': ast.NotEq,
+        '<=': ast.LtE,
+        '>=': ast.GtE,
+        '<': ast.Lt,
+        '>': ast.Gt
+    }
+
+    p[0] = ast.Compare(p[1], [symbol_conversions[p[2]]()], [p[3]])
+
+@register('stmt')
+def p_if(p):
+    """if : IF expr '{' body '}'"""
+    p[0] = ast.If(p[2], p[4], [])
 
 # Lists
 
