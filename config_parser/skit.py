@@ -85,7 +85,7 @@ def compile(file, clean=False):
     if clean:
         shutil.rmtree('tmp/', True)
         compile('default.skit')
-    skit = config.parser.parse(open(file, 'r').read())
+    skit = config.parser.parse(open(file, 'r').read(), lexer=config.lexer)
     main_property = os.path.splitext(base_file)[0]
     extend(skit)
     properties[main_property] = skit.get(main_property)

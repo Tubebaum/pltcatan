@@ -100,7 +100,6 @@ def p_value_uniform(p):
 
 def p_value_func(p):
     'value : FUNC'
-    print repr(p[1])
     p[0] = parse_function(p[1])
 
 def p_structure_properties(p):
