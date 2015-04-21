@@ -25,6 +25,10 @@ def undot(property):
         return extended
 
 def extendVerbose(skit, property, value, extension):
+    '''
+    Extend properties using the verbose syntax where every extension must use an
+    @extend explicitly
+    '''
     skit[property] = undot(extension)
     for extended_property, extended_value in value.iteritems():
         if extended_property != '@extend':
@@ -33,6 +37,28 @@ def extendVerbose(skit, property, value, extension):
                 extended = undot(extension.strip())
                 extended_value = extended + int(addition)
             skit[property][extended_property] = extended_value
+
+def extendClean(skit, property, value, extension):
+    explicit = extension['explicit-overwrite-only']
+    extension = extension['value']
+    extendVerbose(skit, property, value, extension)
+    if explicit:
+        for extended_property, extended_value in value.iteritems():
+            if isinstance(extended_value, dict) and extended_property != '@extend':
+                if needs_extending(extended_value):
+                    skit[property][extended_property]['@extend'] = make_extend(extension, extended_property, explicit)
+    return extension
+
+def needs_extending(skit):
+    children_structures = False
+    for property, value in skit.iteritems():
+        if isinstance(value, dict):
+            children_structures = True
+    return children_structures
+
+def make_extend(extension, extended_property, explicit):
+    return {'value': '%s.%s' % (extension, extended_property),
+            'explicit-overwrite-only': explicit}
 
 def extend(skit, parent=None):
     '''
@@ -45,7 +71,10 @@ def extend(skit, parent=None):
             if extension:
                 if isinstance(extension, str):
                     extendVerbose(skit, property, value, extension)
-            extend(skit[property])
+                    extension = None
+                else:
+                    extension = extendClean(skit, property, value, extension)
+            extend(skit[property], extension)
 
 def compile(file, clean=False):
     '''
@@ -62,6 +91,7 @@ def compile(file, clean=False):
     properties[main_property] = skit.get(main_property)
     if not os.path.isdir('tmp/'):
         os.makedirs('tmp/')
+    print skit
     pickle.dump(skit, open(compile_file, 'wb'))
     return skit
 
