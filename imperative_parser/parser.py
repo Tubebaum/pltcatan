@@ -1,5 +1,6 @@
 import ast
 from collections import defaultdict
+from shlex import split
 
 import ply.lex as lex
 import ply.yacc as yacc
@@ -64,7 +65,7 @@ reserved = {
     'print': 'PRINT'
 }
 tokens = ['ID', 'NUM', 'NEWLINE'] + list(reserved.values())
-literals = ['=', '+', '-', '*', '/', '(', ')', '{', '}', '[', ',', ']', '.', '"', '\'']
+literals = ['=', '+', '-', '*', '/', '(', ')', '{', '}', '[', ',', ']', '.', '"', '\'', '@']
 
 def t_ID(t):
     r'[a-zA-Z_][a-zA-Z0-9_]*'
@@ -76,7 +77,7 @@ def t_NUM(t):
     try:
         t.value = int(t.value)
     except ValueError:
-        print "Integer value too large", t.value
+        print 'Integer value too large', t.value
         t.value = 0
     return t
 
@@ -88,7 +89,7 @@ def t_NEWLINE(t):
     return t
 
 def t_error(t):
-    print "Illegal character '%s'" % t.value[0]
+    print 'Illegal character "%s"' % t.value[0]
     t.lexer.skip(1)
 
 # Build the lexer
@@ -122,11 +123,6 @@ def p_expr_group(p):
 # Strings
 
 @register('expr')
-def p_list_braces(p):
-    """list : '[' expr_list ']'"""
-    p[0] = ast.List(p[2], ast.Load())
-
-@register('expr')
 def p_str(p):
     """str : '"' ID '"'
            | \"'\" ID \"'\""""
@@ -158,20 +154,35 @@ def p_stmt_print(p):
 
 @register('stmt')
 def p_top_func(p):
-    """topfunc : FUNC_DECL '(' params ')' '{' opt_newline stmtlst '}'"""
+    """topfunc : FUNC_DECL '(' params ')' '{' opt_newline body '}'"""
     args = ast.arguments(p[3], None, None, [gen_access_func(param.id) for param in p[3]])
     p[0] = ast.FunctionDef("top", args, p[7], [])
 
 @register('stmt')
 def p_func(p):
-    """func : FUNC_DECL ID '(' params ')' '{' opt_newline stmtlst '}'"""
-    args = ast.arguments(p[4], None, None, [])
+    """func : FUNC_DECL ID '(' params ')' '{' opt_newline body '}'"""
+    arg_names, defaults = tuple([filter(lambda x: x is not None, item) for item in zip(*p[4])])
+    args = ast.arguments(arg_names, None, None, defaults)
     p[0] = ast.FunctionDef(p[2], args, p[8], [])
 
 @register('expr')
 def p_funccall(p):
     """funccall : expr '(' expr_list ')'"""
     p[0] = ast.Call(p[1], p[3], [], None, None)
+
+@register('expr')
+def p_lambda(p):
+    """lamdba : '@' '(' params ')' ':' stmt"""
+    arg_names, defaults = tuple([filter(lambda x: x is not None, item) for item in zip(*p[3])])
+    args = ast.arguments(arg_names, None, None, defaults)
+    p[0] = ast.Lambda(args, p[6])
+
+def p_body(p):
+    """body : stmtlst"""
+    if p[1]:
+        p[0] = p[1]
+    else:
+        p[0] = ast.Pass()
 
 p_opt_newline = trivial('opt_newline', ['NEWLINE', 'empty'])
 
@@ -184,9 +195,10 @@ def p_params(p):
 
 def p_param(p):
     """param : ID
+             | ID '=' expr
              | empty"""
     if p[1]:
-        p[0] = ast.Name(p[1], ast.Param())
+        p[0] = (ast.Name(p[1], ast.Param()), None if len(p) < 3 else p[3])
 
 def p_stmtlst(p):
     """stmtlst : stmt NEWLINE stmtlst
@@ -199,6 +211,11 @@ def p_in_params(p):
     p = listify(p)
 
 p_opt_expr = trivial('opt_expr', ['expr', 'empty'])
+
+@register('expr')
+def p_list_braces(p):
+    """list : '[' expr_list ']'"""
+    p[0] = ast.List(p[2], ast.Load())
 
 # Property access
 
@@ -236,7 +253,7 @@ p_stmt_reg = gen_function('stmt')
 # Meta terminals
 
 def p_error(p):
-    print "Syntax error at '%s'" % p.value
+    print 'Syntax error at "%s"' % p.value
 
 def p_empty(p):
     """empty :"""
@@ -280,12 +297,16 @@ def print_grammar():
                name.startswith('p_') and
                hasattr(func, '__call__') and
                name != 'p_error']
-    print p_funcs
+    for func in p_funcs:
+        try:
+            name, nonterminals = split(func.__doc__, ':')
+        except:
+            print func, func.__doc__
     grammar = defaultdict(list)
-    for name, nonterminals in [func.__doc__.split(':') for func in p_funcs]:
+    for name, nonterminals in [split(func.__doc__, ':') for func in p_funcs]:
         grammar[name.strip()].append(nonterminals)
     grammar = {key: [item for item in flatten(
-        [[docstr.strip() for docstr in item.split('|')] for item in value]
+        [[docstr.strip() for docstr in split(item, '|')] for item in value]
     )] for key, value in grammar.iteritems()}
 
     for name, nonterminals in grammar.iteritems():
