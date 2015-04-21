@@ -154,7 +154,7 @@ def p_stmt_print(p):
 def p_top_func(p):
     """topfunc : FUNC_DECL '(' params ')' '{' opt_newline body '}'"""
     if p[3]:
-        args = ast.arguments(p[3], None, None, [gen_access_func(param.id) for param in p[3]])
+        args = ast.arguments(map(lambda x: x[0], p[3]), None, None, [gen_access_func(param[0].id) for param in p[3]])
     else:
         args = ast.arguments([], None, None, [])
     p[0] = ast.FunctionDef("top", args, p[7], [])
@@ -174,20 +174,20 @@ def p_funccall(p):
     """funccall : expr '(' expr_list ')'"""
     p[0] = ast.Call(p[1], p[3], [], None, None)
 
-#@register('expr')
+@register('expr')
 def p_lambda(p):
-    """lamdba : '@' '(' params ')' stmt"""
+    """lambda : '@' '(' params ')' expr"""
     if p[3]:
         arg_names, defaults = tuple([filter(lambda x: x is not None, item) for item in zip(*p[3])])
-        args = ast.arguments(arg_names, None, None, defaults)
+        args = ast.arguments(list(arg_names), None, None, list(defaults))
     else:
         args = ast.arguments([], None, None, [])
-    p[0] = ast.Lambda(args, p[6])
+    p[0] = ast.Lambda(args, p[5])
 
 def p_body(p):
     """body : stmtlst
             | empty"""
-    if len(p) > 2:
+    if len(p) > 1:
         p[0] = p[1]
     else:
         p[0] = [ast.Pass()]
