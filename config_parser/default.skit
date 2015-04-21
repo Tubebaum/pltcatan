@@ -192,7 +192,14 @@ default: {
                     description: "Move the robber. Steal 1 resource from the owner of a settlement or city adjacent to that robber's new hex.",
                     max-count: 14,
                     effect: {
-                        when-played: func() {
+                        when-played: func(board, player) {
+                            player.cards.ongoing.development.knight += 1
+                            var position = player.prompt_for_tile()
+                            board.move_robber(position)
+                            var target = player.prompt_choose_one(map(filter(board.get_structures(position), lambda x: x.type == "settlement" or x.type == "city"), lambda x: x.owner))
+                            var resource = random.choice(map(filter(target.cards.hand.resource.iteritems(), lambda x: x[1] != 0), lambda x: x[0]))
+                            player.cards.hand.resource[resource] += 1
+                            player.cards.hand.resource[resource] -= 1
                         }
                     }
                 },
@@ -205,7 +212,10 @@ default: {
                     description: "Place 2 new roads as if you have just built them.",
                     max-count: 2,
                     effect: {
-                        when-played: func() {
+                        when-played: func(board, player) {
+                            var positions = [player.prompt_for_edge(), player.prompt_for_edge()]
+                            for position in positions:
+                                board.place_structure(main.game.structures.player-built.road, player, position)
                         }
                     }
                 },
@@ -213,7 +223,11 @@ default: {
                     description: "Take any 2 resources from the bank, add them in your hand. They can be 2 of the same resource or 2 different resources",
                     max-count: 2,
                     effect: {
-                        when-played: func() {
+                        when-played: func(bank, player) {
+                            var resources = [player.prompt_for_resource(), player.prompt_for_resource()]
+                            for resource in resources:
+                                player.cards.hand.resource[resource] += 1
+                                bank.resource[resource] -= 1
                         }
                     }
                 },
@@ -221,7 +235,11 @@ default: {
                     description: "When you play this card, announce 1 type of resource. All other players must give you all of their resources of that type.",
                     max-count: 2,
                     effect: {
-                        when-played: func() {
+                        when-played: func(players, player) {
+                            var resource = player.prompt_for_resource()
+                            for target_player in players:
+                                player.cards.hand.resource[resource] += target_player.cards.hand.resource[resource]
+                                target_player.cards.hand.resource[resource] = 0
                         }
                     }
                 }
@@ -242,14 +260,19 @@ default: {
                 longest-road: {
                     description: "2 Victory Points!\nThis card goes to the player with the longest road of at least 5 segments. Another player who builds a longer road takes this card.",
                     max-count: 1,
-                    criteria: func() {
+                    criteria: func(players) {
+                        longest_road = None
+                        for player in players:
+                            for road in player.structures.placed.road:
+                                \\ TODO figure out algorithm for longest road
                     },
                     point-reward: 2
                 },
                 largest-army: {
                     description: "2 Victory Points!\nThe first player to play 3 knight cards gets this card. Another player who plays more knight cards takes this card.",
                     max-count: 1,
-                    criteria: func() {
+                    criteria: func(players) {
+                        return sort(players, key=lambda x: x.cards.ongoing.development.knight)
                     },
                     point-reward: 2
                 }
@@ -325,7 +348,10 @@ default: {
                         ]
                     },
                     effects: {
-                        on-roll: func() {
+                        on-roll: func(dice_value, placementTiles, player) {
+                            for placement in placementTiles:
+                                if placement.chit == dice_value:
+                                    player.cards.hand.resource[placement.resource.name] += placement.baseYield
                         }
                     }
                 },
@@ -352,7 +378,10 @@ default: {
                         ]
                     },
                     effects: {
-                        on-roll: func() {
+                        on-roll: func(dice_value, placementTiles, player) {
+                            for placement in placementTiles:
+                                if placement.chit == dice_value:
+                                    player.cards.hand.resource[placement.resource.name] += placement.baseYield * 2
                         }
                     }
                 }
