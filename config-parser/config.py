@@ -10,7 +10,9 @@ tokens = (
     'COMMA',
     'DOT',
     'WILD',
+    'PLUS',
     'ID',
+    'EXTENSION',
     'STR',
     'FUNC',
     'NUM'
@@ -29,6 +31,7 @@ t_RBRACKET = r'\]'
 t_COMMA = r','
 t_DOT = r'\.'
 t_WILD = r'\*'
+t_PLUS = r'\+'
 t_STR = r'".*"'
 t_ignore = ' \t'
 
@@ -39,6 +42,10 @@ def t_FUNC(t):
 def t_ID(t):
     r'[A-Za-z][A-Za-z-]*'
     t.type = reserved.get(t.value, 'ID')
+    return t
+
+def t_EXTENSION(t):
+    r'@extend'
     return t
 
 def t_NUM(t):
@@ -59,6 +66,10 @@ def p_property_value(p):
     'property : ID COLON value'
     p[0] = {p[1]: p[3]}
 
+def p_property_extension(p):
+    'property : EXTENSION COLON value'
+    p[0] = {p[1]: p[3]}
+
 def p_value_structure(p):
     'value : structure'
     p[0] = p[1]
@@ -77,7 +88,7 @@ def p_value_num(p):
 
 def p_value_str(p):
     'value : STR'
-    p[0] = p[1]
+    p[0] = p[1].strip('\'"')
 
 def p_value_uniform(p):
     'value : UNIFORM'
@@ -104,6 +115,10 @@ def p_list_value(p):
 def p_dots_dot(p):
     'dots : ID DOT dots'
     p[0] = p[1] + '.' + p[3]
+
+def p_dots_plus(p):
+    'dots : ID PLUS NUM'
+    p[0] = p[1] + ' + ' + str(p[3])
 
 def p_dots_id(p):
     'dots : ID'

@@ -14,4 +14,4 @@ def prettyPrint(structure, indent = 0):
 
 if __name__ == '__main__':
     game = config.parser.parse(open('../default.skit', 'r').read())
-    prettyPrint(game)
+    print game
