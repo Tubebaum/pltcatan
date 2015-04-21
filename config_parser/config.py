@@ -1,5 +1,9 @@
 import ply.lex as lex
 import ply.yacc as yacc
+import sys
+import os
+sys.path.append('..')
+from imperative_parser.parser import parse_function
 
 tokens = (
     'COLON',
@@ -96,7 +100,8 @@ def p_value_uniform(p):
 
 def p_value_func(p):
     'value : FUNC'
-    p[0] = p[1]
+    print repr(p[1])
+    p[0] = parse_function(p[1])
 
 def p_structure_properties(p):
     'structure : LCURLY properties RCURLY'
