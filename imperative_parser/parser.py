@@ -1,6 +1,5 @@
 import ast
 from collections import defaultdict
-from shlex import split
 
 import ply.lex as lex
 import ply.yacc as yacc
@@ -52,7 +51,7 @@ def listify(p, item_pos=1, list_pos=3, size_check=2):
     Returns:
         List. The parse p, with p[0] set to the list of items
     """
-    p[0] = [p[item_pos]]
+    p[0] = [p[item_pos]] if p[item_pos] else None
     if len(p) > size_check:
         p[0].extend(p[list_pos])
     return p
@@ -155,14 +154,20 @@ def p_stmt_print(p):
 @register('stmt')
 def p_top_func(p):
     """topfunc : FUNC_DECL '(' params ')' '{' opt_newline body '}'"""
-    args = ast.arguments(p[3], None, None, [gen_access_func(param.id) for param in p[3]])
+    if p[3]:
+        args = ast.arguments(p[3], None, None, [gen_access_func(param.id) for param in p[3]])
+    else:
+        args = ast.arguments([], None, None, [])
     p[0] = ast.FunctionDef("top", args, p[7], [])
 
 @register('stmt')
 def p_func(p):
     """func : FUNC_DECL ID '(' params ')' '{' opt_newline body '}'"""
-    arg_names, defaults = tuple([filter(lambda x: x is not None, item) for item in zip(*p[4])])
-    args = ast.arguments(arg_names, None, None, defaults)
+    if p[4]:
+        arg_names, defaults = tuple([filter(lambda x: x is not None, item) for item in zip(*p[4])])
+        args = ast.arguments(arg_names, None, None, defaults)
+    else:
+        args = ast.arguments([], None, None, [])
     p[0] = ast.FunctionDef(p[2], args, p[8], [])
 
 @register('expr')
@@ -170,19 +175,23 @@ def p_funccall(p):
     """funccall : expr '(' expr_list ')'"""
     p[0] = ast.Call(p[1], p[3], [], None, None)
 
-@register('expr')
+#@register('expr')
 def p_lambda(p):
-    """lamdba : '@' '(' params ')' ':' stmt"""
-    arg_names, defaults = tuple([filter(lambda x: x is not None, item) for item in zip(*p[3])])
-    args = ast.arguments(arg_names, None, None, defaults)
+    """lamdba : '@' '(' params ')' stmt"""
+    if p[3]:
+        arg_names, defaults = tuple([filter(lambda x: x is not None, item) for item in zip(*p[3])])
+        args = ast.arguments(arg_names, None, None, defaults)
+    else:
+        args = ast.arguments([], None, None, [])
     p[0] = ast.Lambda(args, p[6])
 
 def p_body(p):
-    """body : stmtlst"""
-    if p[1]:
+    """body : stmtlst
+            | empty"""
+    if len(p) > 2:
         p[0] = p[1]
     else:
-        p[0] = ast.Pass()
+        p[0] = [ast.Pass()]
 
 p_opt_newline = trivial('opt_newline', ['NEWLINE', 'empty'])
 
@@ -297,16 +306,11 @@ def print_grammar():
                name.startswith('p_') and
                hasattr(func, '__call__') and
                name != 'p_error']
-    for func in p_funcs:
-        try:
-            name, nonterminals = split(func.__doc__, ':')
-        except:
-            print func, func.__doc__
     grammar = defaultdict(list)
-    for name, nonterminals in [split(func.__doc__, ':') for func in p_funcs]:
+    for name, nonterminals in [func.__doc__.split(':') for func in p_funcs]:
         grammar[name.strip()].append(nonterminals)
     grammar = {key: [item for item in flatten(
-        [[docstr.strip() for docstr in split(item, '|')] for item in value]
+        [[docstr.strip() for docstr in item.split('|')] for item in value]
     )] for key, value in grammar.iteritems()}
 
     for name, nonterminals in grammar.iteritems():
