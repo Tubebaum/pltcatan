@@ -108,7 +108,8 @@ game_config = {
                 'base_yield': 1,
                 # TODO: Rename vars to reflect that they should be structure names?
                 'extends': None,
-                'upgrades': None
+                'upgrades': None,
+                'position_type': None
             },
             # Edge Structures
             'road': {
@@ -121,7 +122,8 @@ game_config = {
                 'point_value': 0,
                 'base_yield': 0,
                 'extends': None,
-                'upgrades': None
+                'upgrades': None,
+                'position_type': 'edge'
             },
             # Vertex Structures
             'settlement': {
@@ -136,7 +138,8 @@ game_config = {
                 'point_value': 1,
                 'base_yield': 1,
                 'extends': None,
-                'upgrades': None
+                'upgrades': None,
+                'position_type': 'vertex'
             },
             'city': {
                 'name': 'City',
@@ -145,10 +148,24 @@ game_config = {
                     'ore': 3,
                 },
                 'count': 5,
-                'point_value': 1,
+                'point_value': 2,
                 'base_yield': 2,
                 'extends': None,
-                'upgrades': 'Settlement'
+                'upgrades': 'Settlement',
+                'position_type': 'vertex'
+            },
+            # For Demo
+            'castle': {
+                'name': 'Castle',
+                'cost': {
+                    'ore': 5
+                },
+                'count': 2,
+                'point_value': 3,
+                'base_yield': 3,
+                'extends': None,
+                'upgrades': 'City',
+                'position_type': 'vertex'
             }
         }
     }

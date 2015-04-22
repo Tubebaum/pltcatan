@@ -23,6 +23,11 @@ class Structure(object):
 
         self.owning_player = owning_player
 
+    def augments(self):
+        if self.is_augmenting_structure():
+            return self.upgrades if self.upgrades else self.extends
+        return None
+
     def is_augmenting_structure(self):
         return self.extends or self.upgrades
 

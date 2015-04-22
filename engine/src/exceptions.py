@@ -69,7 +69,7 @@ class NotEnoughDevelopmentCardsException(UserMessageException):
         self.msg = 'No development cards remaining.'
 
 
-class InvalidBaseStructureException(Exception):
+class InvalidBaseStructureException(UserMessageException):
     """Raise when one tries to build an invalid upgrade or extension structure.
 
     Upgrade and extension structures need to be built off an appropriate base
@@ -79,9 +79,9 @@ class InvalidBaseStructureException(Exception):
 
     def __init__(self, base_structure, augmenting_structure):
         self.msg = '{0} must have base structure {1}, but given {2}!'.format(
-            augmenting_structure.__class__.__name__,
-            augmenting_structure.base_structure.__class__.__name__,
-            base_structure.__class__.__name__
+            augmenting_structure.name,
+            augmenting_structure.augments(),
+            base_structure.name
         )
 
 class BoardPositionOccupiedException(UserMessageException):

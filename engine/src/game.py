@@ -1,6 +1,6 @@
 from engine.src.config.config import Config
 from engine.src.lib.utils import Utils
-from engine.src.exceptions import BoardPositionOccupiedException
+from engine.src.exceptions import *
 from engine.src.player import Player
 from engine.src.dice import Dice
 from engine.src.input_manager import InputManager
@@ -72,6 +72,8 @@ class Game(object):
                 valid = True
             except BoardPositionOccupiedException as b:
                 InputManager.input_default(b, None, False)
+            except InvalidBaseStructureException as i:
+                InputManager.input_default(i, None, False)
 
         return x, y, vertex_dir
 
@@ -91,6 +93,8 @@ class Game(object):
                 valid = True
             except BoardPositionOccupiedException as b:
                 InputManager.input_default(b, None, False)
+            except InvalidBaseStructureException as i:
+                InputManager.input_default(i, None, False)
 
         return x, y, edge_dir
 
@@ -104,12 +108,12 @@ class Game(object):
             InputManager.announce_player_turn(player)
 
             # Place settlement
-            InputManager.announce_structure_placement(player, 'settlement')
-            self.place_vertex_structure(player, 'settlement')
+            InputManager.announce_structure_placement(player, 'Settlement')
+            self.place_vertex_structure(player, 'Settlement')
 
             # Place road
-            InputManager.announce_structure_placement(player, 'road')
-            self.place_edge_structure(player, 'road')
+            InputManager.announce_structure_placement(player, 'Road')
+            self.place_edge_structure(player, 'Road')
 
         distributions = Utils.nested_dict()
 
@@ -118,12 +122,12 @@ class Game(object):
             InputManager.announce_player_turn(player)
 
             # Place settlement
-            InputManager.announce_structure_placement(player, 'settlement')
-            x, y, vertex_dir = self.place_vertex_structure(player, 'settlement')
+            InputManager.announce_structure_placement(player, 'Settlement')
+            x, y, vertex_dir = self.place_vertex_structure(player, 'Settlement')
 
             # Place road
-            InputManager.announce_structure_placement(player, 'road')
-            self.place_edge_structure(player, 'road')
+            InputManager.announce_structure_placement(player, 'Road')
+            self.place_edge_structure(player, 'Road')
 
             # Give initial resource cards
             resource_types = filter(

@@ -33,7 +33,7 @@ class InputManager(cmd.Cmd):
         self.has_rolled = False
         self.has_played_card = False
 
-        self.structure_names = Utils.pluck(Config.get('structure'), 'name')
+        self.structure_names = Utils.pluck(Config.get('structure.player_built'), 'name')
 
     def emptyline(self, line):
         """Override default emptyline behavior, which repeats last command."""
@@ -142,11 +142,11 @@ class InputManager(cmd.Cmd):
 
             structure = self.player.get_structure(structure_name)
 
-            if issubclass(structure_name, Edge):
+            if structure.position_type == 'edge':
                 x, y, edge_dir = InputManager.prompt_edge_placement(self.game)
                 self.game.board.place_edge_structure(x, y, edge_dir, structure)
 
-            elif issubclass(structure_name, Vertex):
+            elif structure.position_type == 'vertex':
                 x, y, vertex_dir = \
                     InputManager.prompt_vertex_placement(self.game)
                 self.game.board.place_vertex_structure(x, y,

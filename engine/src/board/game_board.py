@@ -292,8 +292,7 @@ class GameBoard(HexBoard):
 
             # The new value must be an augmenting structure.
             if not new_value.is_augmenting_structure():
-                raise BoardPositionOccupiedException((x, y), old_value,
-                                                     old_value.owning_player)
+                raise InvalidBaseStructureException(old_value, new_value)
 
             # The base structure name of the new value must match
             # the old value name.

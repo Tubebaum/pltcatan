@@ -48,8 +48,8 @@ class Player(TradingEntity):
 
         self.remaining_structure_counts = {}
 
-        for name, structure in Config.get('structure.player_built').iteritems():
-            self.remaining_structure_counts[name] = structure['count']
+        for structure in Config.get('structure.player_built').values():
+            self.remaining_structure_counts[structure['name']] = structure['count']
 
     def get_total_points(self):
         return self.points + self.hidden_points
@@ -70,7 +70,8 @@ class Player(TradingEntity):
         if structure_count > 0:
             self.remaining_structure_counts[structure_name] -= 1
 
-            config_path = 'structure.player_built.' + structure_name
+            # TODO: conversions between underscore and camel case
+            config_path = 'structure.player_built.' + structure_name.lower()
             structure_dict = Config.get(config_path)
 
             return Structure(self, **structure_dict)
