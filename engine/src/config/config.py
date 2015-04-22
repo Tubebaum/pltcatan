@@ -13,9 +13,7 @@ class Config(object):
     @classmethod
     def init_from_config(cls, obj, config_path):
         property_dict = Config.get(config_path)
-
-        dct = { Utils.convert_format(k): v for (k, v) in property_dict}
-
+        dct = { Utils.convert_format(k): v for (k, v) in property_dict.iteritems()}
         Utils.init_from_dict(obj, dct)
 
     @classmethod
@@ -107,6 +105,26 @@ class Config(object):
                 value = {k: value[k] for k in value.keys() if k != 'default'}
 
         return value
+
+    @classmethod
+    def init(cls):
+        Config.convert_keys()
+        Config.coerce_all()
+
+    @classmethod
+    def convert_keys(cls):
+
+        def convert(dct):
+            for k, v in dct.iteritems():
+
+                if type(k) is StringType:
+                    dct.pop(k)
+                    dct[Utils.convert_format(k)] = v
+
+                if type(v) is dict:
+                    convert(v)
+
+        convert(Config.config)
 
     @classmethod
     def coerce_all(cls):

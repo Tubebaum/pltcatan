@@ -15,6 +15,8 @@ class Game(object):
 
     def __init__(self):
 
+        Config.init()
+
         self.dice = Dice()
         self.board = GameBoard(Config.get('board.default_radius'))
 

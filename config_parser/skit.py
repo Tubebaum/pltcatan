@@ -130,8 +130,9 @@ def run(file):
     replaceEngine(Config.config, properties[main_property])
     game = Game()
     skit = skit.get(os.path.splitext(base_file)[0], None)
-    if skit.get('game', None):
-        game.start()
+    # TODO: restore after engine syncs config dict format
+    # if skit.get('game', None):
+    game.start()
 
 if __name__ == '__main__':
     arg_parser = argparse.ArgumentParser(description='Skit compiler')
