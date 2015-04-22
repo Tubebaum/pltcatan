@@ -340,7 +340,7 @@ class GameBoard(HexBoard):
             for structure in adjacent_structures:
                 player = structure.owning_player
                 resource_type = resource_tile.resource_type
-                resource_yield = structure.base_yield()
+                resource_yield = structure.base_yield
 
                 if not distributions[player][resource_type]:
                     distributions[player][resource_type] = 0

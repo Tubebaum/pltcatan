@@ -1,162 +1,9 @@
-from types import MethodType
-from engine.src.exceptions import *
-
+from types import *
 from engine.src.lib.utils import Utils
-from engine.src.resource_type import ResourceType
-
-
-def get_import_value(dot_notation_str, var_name, prefix='engine.src.config.'):
-    mod = __import__(prefix + dot_notation_str, globals(), locals(), [var_name], -1)
-    value = getattr(mod, var_name)
-    return value
-
-config = {
-    # Game
-    'game' : {
-        'points_to_win': 10,
-        'default_player_count': 3
-    },
-    'board' : {
-        'default_tile_count': 19,
-        'default_radius': 3,
-    },
-    # Cards
-    'card' : {
-        # Development Cards
-        'development': {
-            'default': {
-                'count': 0,
-                'name': 'Development Card',
-                'description': 'Development card default description.',
-                'draw_card': Utils.noop,
-                'play_card': Utils.noop,
-                'cost': {
-                    ResourceType.GRAIN: 1,
-                    ResourceType.ORE: 1,
-                    ResourceType.WOOL: 1
-                },
-            },
-            # Non-Progress Cards
-            'knight': {
-                'count': 14,
-                'name': 'Knight Card',
-                'description': ('Move the robber to a new tile. Steal 1 '
-                                'resource from the owner of a structure '
-                                'adjacent to the new tile.'),
-                'draw_card': get_import_value('card.development.knight', 'draw_card'),
-                'play_card': get_import_value('card.development.knight', 'play_card'),
-            },
-            'victory_point': {
-                'count': 5,
-                'name': 'Victory Point Card',
-                'description': ('Gives you one victory point. Must remain '
-                                'hidden until used to win the game.'),
-                'draw_card':
-                    get_import_value('card.development.victory_point', 'draw_card'),
-                'play_card':
-                    get_import_value('card.development.victory_point', 'play_card'),
-            },
-            # Progress Cards
-            'monopoly': {
-                'count': 2,
-                'name': 'Monopoly Card',
-                'description': ('If you play this card, you must name 1 type '
-                                'of resource. All the other players must give '
-                                'you all of the Resource Cards of this type '
-                                'that they have in their hands. If an opponent '
-                                'does not have a Resource Card of the '
-                                'specified type, he does not have to give you '
-                                'anything.'),
-                'draw_card': get_import_value('card.development.monopoly', 'draw_card'),
-                'play_card': get_import_value('card.development.monopoly', 'play_card'),
-            },
-            'road_building': {
-                'count': 2,
-                'name': 'Road Building Card',
-                'description': ('If you play this card, you may immediately '
-                                'place 2 free roads on the board (according to '
-                                'normal building rules)'),
-                'draw_card':
-                    get_import_value('card.development.road_building', 'draw_card'),
-                'play_card':
-                    get_import_value('card.development.road_building', 'play_card'),
-            },
-            'year_of_plenty': {
-                'count': 2,
-                'name': 'Year of Plenty Card',
-                'description': ('If you play this card you may immediately '
-                                'take any 2 Resource Cards from the supply '
-                                'stacks. You may use these cards to build in '
-                                'the same turn.'),
-                'draw_card':
-                    get_import_value('card.development.year_of_plenty', 'draw_card'),
-                'play_card':
-                    get_import_value('card.development.year_of_plenty', 'play_card'),
-            }
-        }
-    },
-    # Structures
-    'structure': {
-        'player_built': {
-            'default': {
-                'name': None,
-                'cost': {
-                    ResourceType.LUMBER: 0,
-                    ResourceType.BRICK: 0,
-                    ResourceType.WOOL: 0,
-                    ResourceType.GRAIN: 0,
-                    ResourceType.ORE: 0
-                },
-                'count': 0,
-                'point_value': 0,
-                'base_yield': 1,
-                # TODO: Rename vars to reflect that they should be structure names?
-                'extends': None,
-                'upgrades': None
-            },
-            # Edge Structures
-            'road': {
-                'name': 'Road',
-                'cost': {
-                    ResourceType.LUMBER: 1,
-                    ResourceType.BRICK: 1,
-                },
-                'count': 15,
-                'point_value': 0,
-                'base_yield': 0,
-                'extends': None,
-                'upgrades': None
-            },
-            # Vertex Structures
-            'settlement': {
-                'name': 'Settlement',
-                'cost': {
-                    ResourceType.LUMBER: 1,
-                    ResourceType.BRICK: 1,
-                    ResourceType.WOOL: 1,
-                    ResourceType.GRAIN: 1
-                },
-                'count': 5,
-                'point_value': 1,
-                'base_yield': 1,
-                'extends': None,
-                'upgrades': None
-            },
-            'city': {
-                'name': 'City',
-                'cost': {
-                    ResourceType.GRAIN: 2,
-                    ResourceType.ORE: 3,
-                },
-                'count': 5,
-                'point_value': 1,
-                'base_yield': 2,
-                'extends': None,
-                'upgrades': 'Settlement'
-            }
-        }
-    }
-}
+from engine.src.config.game_config import game_config
+from engine.src.config.type_config import type_config
+from engine.src.config.type_mapping import type_mapping
+from engine.src.exceptions import *
 
 
 class Config(object):
@@ -164,23 +11,25 @@ class Config(object):
     @classmethod
     def init_from_config(cls, obj, config_path):
         property_dict = Config.get(config_path)
-
         Utils.init_from_dict(obj, property_dict)
 
     @classmethod
     def pluck(cls, config_path, prop):
-
-
         target_dict = Config.get(config_path)
         return Utils.pluck(target_dict, prop, True)
 
     @classmethod
-    def get(cls, dot_notation_str):
+    def get(cls, dot_notation_str, dct=None, coerce_type=True):
         """Get a value from the main config dict given a dot notation string.
 
         E.g. if caller wants config['game']['points_to_win'], they can pass in
         as their dot_notation_str 'game.points_to_win'.
+
+        See coerce() for effect of coerce_type flag.
         """
+
+        if dct is None:
+            dct = Config.config
 
         keys = dot_notation_str.split('.')
 
@@ -205,7 +54,12 @@ class Config(object):
             else:
                 return val
 
-        value = get_recursive(Config.config, keys)
+        value = get_recursive(dct, keys)
+
+        if coerce_type:
+            # print 'Pre-coerce {}'.format(value)
+            value = Config.coerce(value, dot_notation_str)
+            # print 'Post-coerce {}'.format(value)
 
         # Remove default value from dictionary type return value.
         if type(value) is dict:
@@ -213,4 +67,71 @@ class Config(object):
 
         return value
 
-    config = config
+    @classmethod
+    def coerce(cls, value, dot_notation_str):
+        """Coerce the value to the type specified in type_config by given path.
+
+        Sometimes the value stored at the specified path is not the type we
+        need it to be. In this case, we can specify coerce_type = True. This
+        will lead this method to get() the value stored in the config dict, and
+        check if its type matches the type located at the same path in the
+        type_config dict. If the types don't match, it uses a coercion function
+        stored at type_mapping[from_type][to_type].
+        """
+
+        # Closure for coercing type.
+        def coerce_type(value, from_type, to_type):
+            if from_type == to_type:
+                return value
+
+            coercion_func = type_mapping[from_type][to_type]
+            return coercion_func(value)
+
+        result = value
+
+        try:
+            target_type = Config.get(dot_notation_str, Config.type_config, False)
+            curr_type = type(value)
+        except NoConfigValueDefinedException:
+            # If no target type exists, return uncoerced value.
+            return value
+
+        # If target type is a dict, coerce key and value types.
+        if type(target_type) is dict:
+
+            # Structs are dicts but all their keys are not types, so they
+            # shouldn't actually be coerced; they're just part of a path to
+            # specify actual conversions.
+            is_struct = len(filter(
+                lambda key: type(key) == StringType,
+                target_type.keys()
+            )) != 0
+
+            if is_struct:
+                return value
+
+            result = {}
+
+            target_k_type = target_type.keys()[0]
+            target_v_type = target_type.values()[0]
+
+            for k, v in value.iteritems():
+                coerced_k_value = coerce_type(k, type(k), target_k_type)
+                coerced_v_value = coerce_type(v, type(v), target_v_type)
+
+                result[coerced_k_value] = coerced_v_value
+
+        # If target type not a dict, coerce value to target type directly.
+        elif target_type != curr_type:
+            result = coerce_type(value, curr_type, target_type)
+
+        return result
+
+    # The dictionary accessed by Config.get()
+    config = game_config
+
+    # A dictionary telling us what object types we should expect
+    # for values in config.
+    type_config = type_config
+
+    type_mapping = type_mapping

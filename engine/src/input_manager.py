@@ -35,6 +35,10 @@ class InputManager(cmd.Cmd):
 
         self.structure_names = Utils.pluck(Config.get('structure'), 'name')
 
+    def emptyline(self, line):
+        """Override default emptyline behavior, which repeats last command."""
+        self.default(line)
+
     def default(self, line):
         """Print menu of commands when unrecognized command given."""
 
