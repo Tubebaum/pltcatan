@@ -4,6 +4,7 @@
 *.diff
 output
 snippets/
+engine/src/ui
 
 # Mac OS X
 .DS_Store

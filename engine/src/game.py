@@ -1,12 +1,12 @@
 from engine.src.config.config import Config
 from engine.src.lib.utils import Utils
+from engine.src.exceptions import BoardPositionOccupiedException
 from engine.src.player import Player
 from engine.src.dice import Dice
 from engine.src.input_manager import InputManager
 from engine.src.board.game_board import GameBoard
 from engine.src.resource_type import ResourceType
-from engine.src.structure.vertex_structure.settlement import Settlement
-from engine.src.structure.edge_structure.road import Road
+from engine.src.structure.structure import Structure
 from engine.src.calamity.robber import Robber
 
 
@@ -56,26 +56,41 @@ class Game(object):
         for player_name in player_names:
             self.players.append(Player(player_name))
 
-    def place_vertex_structure(self, player, structure_cls):
+    def place_vertex_structure(self, player, structure_name):
 
-        x, y, vertex_dir = \
-            InputManager.prompt_vertex_placement(self)
+        valid = False
 
-        # TODO: Enforce valid.
-        self.board.place_vertex_structure(x, y, vertex_dir,
-                                          player.get_structure(structure_cls))
+        while not valid:
+            try:
+                x, y, vertex_dir = \
+                    InputManager.prompt_vertex_placement(self)
+
+                # TODO: Enforce valid.
+                self.board.place_vertex_structure(
+                    x, y, vertex_dir, player.get_structure(structure_name))
+
+                valid = True
+            except BoardPositionOccupiedException as b:
+                InputManager.input_default(b, None, False)
 
         return x, y, vertex_dir
 
-    # TODO: Consider taking structure_cls and *args.
-    def place_edge_structure(self, player, structure_cls):
+    def place_edge_structure(self, player, structure_name):
 
-        x, y, edge_dir = \
-            InputManager.prompt_edge_placement(self)
+        valid = False
 
-        # TODO: Enforce valid.
-        self.board.place_edge_structure(x, y, edge_dir,
-                                        structure_cls(player))
+        while not valid:
+            try:
+                x, y, edge_dir = \
+                    InputManager.prompt_edge_placement(self)
+
+                # TODO: Enforce valid.
+                self.board.place_edge_structure(
+                    x, y, edge_dir, player.get_structure(structure_name))
+
+                valid = True
+            except BoardPositionOccupiedException as b:
+                InputManager.input_default(b, None, False)
 
         return x, y, edge_dir
 
@@ -89,12 +104,12 @@ class Game(object):
             InputManager.announce_player_turn(player)
 
             # Place settlement
-            InputManager.announce_structure_placement(player, Settlement)
-            self.place_vertex_structure(player, Settlement)
+            InputManager.announce_structure_placement(player, 'settlement')
+            self.place_vertex_structure(player, 'settlement')
 
             # Place road
-            InputManager.announce_structure_placement(player, Road)
-            self.place_edge_structure(player, Road)
+            InputManager.announce_structure_placement(player, 'road')
+            self.place_edge_structure(player, 'road')
 
         distributions = Utils.nested_dict()
 
@@ -103,12 +118,12 @@ class Game(object):
             InputManager.announce_player_turn(player)
 
             # Place settlement
-            InputManager.announce_structure_placement(player, Settlement)
-            x, y, vertex_dir = self.place_vertex_structure(player, Settlement)
+            InputManager.announce_structure_placement(player, 'settlement')
+            x, y, vertex_dir = self.place_vertex_structure(player, 'settlement')
 
             # Place road
-            InputManager.announce_structure_placement(player, Road)
-            self.place_edge_structure(player, Road)
+            InputManager.announce_structure_placement(player, 'road')
+            self.place_edge_structure(player, 'road')
 
             # Give initial resource cards
             resource_types = filter(
@@ -122,7 +137,8 @@ class Game(object):
                 if not distributions[player][resource_type]:
                     distributions[player][resource_type] = 0
 
-                distributions[player][resource_type] += Settlement.base_yield()
+                distributions[player][resource_type] += \
+                    Config.get('structure.player_built.settlement.base_yield')
 
         self.board.distribute_resources(distributions)
         InputManager.announce_resource_distributions(distributions)

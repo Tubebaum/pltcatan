@@ -1,9 +1,7 @@
 from types import MethodType
-import engine.src.config as config
 from engine.src.exceptions import *
 
 from engine.src.lib.utils import Utils
-from engine.src.trading.trade_offer import *
 from engine.src.resource_type import ResourceType
 
 
@@ -32,8 +30,11 @@ config = {
                 'description': 'Development card default description.',
                 'draw_card': Utils.noop,
                 'play_card': Utils.noop,
-                'cost': {ResourceType.GRAIN: 1, ResourceType.ORE: 1,
-                         ResourceType.WOOL: 1},
+                'cost': {
+                    ResourceType.GRAIN: 1,
+                    ResourceType.ORE: 1,
+                    ResourceType.WOOL: 1
+                },
             },
             # Non-Progress Cards
             'knight': {
@@ -93,6 +94,67 @@ config = {
                     get_import_value('card.development.year_of_plenty', 'play_card'),
             }
         }
+    },
+    # Structures
+    'structure': {
+        'player_built': {
+            'default': {
+                'name': None,
+                'cost': {
+                    ResourceType.LUMBER: 0,
+                    ResourceType.BRICK: 0,
+                    ResourceType.WOOL: 0,
+                    ResourceType.GRAIN: 0,
+                    ResourceType.ORE: 0
+                },
+                'count': 0,
+                'point_value': 0,
+                'base_yield': 1,
+                # TODO: Rename vars to reflect that they should be structure names?
+                'extends': None,
+                'upgrades': None
+            },
+            # Edge Structures
+            'road': {
+                'name': 'Road',
+                'cost': {
+                    ResourceType.LUMBER: 1,
+                    ResourceType.BRICK: 1,
+                },
+                'count': 15,
+                'point_value': 0,
+                'base_yield': 0,
+                'extends': None,
+                'upgrades': None
+            },
+            # Vertex Structures
+            'settlement': {
+                'name': 'Settlement',
+                'cost': {
+                    ResourceType.LUMBER: 1,
+                    ResourceType.BRICK: 1,
+                    ResourceType.WOOL: 1,
+                    ResourceType.GRAIN: 1
+                },
+                'count': 5,
+                'point_value': 1,
+                'base_yield': 1,
+                'extends': None,
+                'upgrades': None
+            },
+            'city': {
+                'name': 'City',
+                'cost': {
+                    ResourceType.GRAIN: 2,
+                    ResourceType.ORE: 3,
+                },
+                'count': 5,
+                'point_value': 1,
+                'base_yield': 2,
+                'extends': None,
+                'upgrades': 'Settlement'
+            }
+        }
     }
 }
 
@@ -103,15 +165,22 @@ class Config(object):
     def init_from_config(cls, obj, config_path):
         property_dict = Config.get(config_path)
 
-        for key, val in property_dict.iteritems():
+        Utils.init_from_dict(obj, property_dict)
 
-            if Utils.is_function(val):
-                setattr(obj, key, MethodType(val, obj, obj.__class__))
-            else:
-                setattr(obj, key, val)
+    @classmethod
+    def pluck(cls, config_path, prop):
+
+
+        target_dict = Config.get(config_path)
+        return Utils.pluck(target_dict, prop, True)
 
     @classmethod
     def get(cls, dot_notation_str):
+        """Get a value from the main config dict given a dot notation string.
+
+        E.g. if caller wants config['game']['points_to_win'], they can pass in
+        as their dot_notation_str 'game.points_to_win'.
+        """
 
         keys = dot_notation_str.split('.')
 
@@ -119,37 +188,29 @@ class Config(object):
             key = keys.pop(0)
             val = None
 
+            # Get the value of the key if it's in the dict.
             if key in dct:
                 val = dct.get(key)
             else:
                 raise NoConfigValueDefinedException(dot_notation_str)
 
+            # If we still have keys left, the property we want is nested
+            # somewhere inside the value we fetched.
             if keys:
                 if val:
                     return get_recursive(val, keys)
                 else:
                     raise NoConfigValueDefinedException(dot_notation_str)
+            # If we have no keys left, we've found the target value.
             else:
                 return val
 
         value = get_recursive(Config.config, keys)
 
         # Remove default value from dictionary type return value.
-        # if isinstance(value, dict):
-        #     value.pop('default')
+        if type(value) is dict:
+            value = {k: value[k] for k in value.keys() if k != 'default'}
 
         return value
 
-    #### New config format
     config = config
-
-    #### Old config format for compatibility
-
-    # TradeCriteria
-    TWO_FOR_ONE = TradeCriteria({}, {}, {TradeMetaCriteria.SAME: 2},
-                                  {TradeMetaCriteria.ANY: 1})
-
-    THREE_FOR_ONE = TradeCriteria({}, {}, {TradeMetaCriteria.SAME: 3},
-                                    {TradeMetaCriteria.ANY: 1})
-
-

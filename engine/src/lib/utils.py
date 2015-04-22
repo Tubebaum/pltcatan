@@ -7,17 +7,43 @@ class Utils(object):
     """A general utility class."""
 
     @classmethod
-    def init_from_kwargs(cls, obj, **kwargs):
+    def init_from_dict(cls, obj, dct):
 
-        for key, val in kwargs.iteritems():
+        for key, val in dct.iteritems():
             if Utils.is_function(val):
                 setattr(obj, key, MethodType(val, obj, obj.__class__))
             else:
                 setattr(obj, key, val)
 
     @classmethod
+    def pluck(cls, dct, prop, do_filter=False):
+        """Gets a list of values for the given property.
+
+        Assumes the dct has key-value pairs where values are also dcts. Gets
+        a list of values for the given property by taking them off each such
+        value dct.
+        """
+
+        lst = []
+
+        try:
+            lst = map(lambda key: dct[key][prop], dct)
+
+            if do_filter:
+                lst = filter(lambda value: value is not None, lst)
+
+        except KeyError:
+            lst = []
+
+        return lst
+
+    @classmethod
     def is_function(cls, func):
         return hasattr(func, '__call__')
+
+    @classmethod
+    def is_list(cls, lst):
+        return hasattr(lst,"__iter__")
 
     @classmethod
     def noop(cls, *args, **kwargs):
@@ -64,5 +90,5 @@ class Utils(object):
     @classmethod
     def convert_to_list(cls, e):
         """Convert to a list if not already a list."""
-        return list(e) if not hasattr(e,"__iter__") else e
+        return list(e) if not Utils.is_list(e) else e
 

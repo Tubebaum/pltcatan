@@ -11,7 +11,7 @@ from engine.src.calamity.robber import Robber
 from engine.src.trading.bank import Bank
 from engine.src.direction.edge_vertex_mapping import EdgeVertexMapping
 from engine.src.exceptions import *
-from engine.src.structure import *
+from engine.src.structure.structure import Structure
 
 
 class GameBoard(HexBoard):
@@ -280,28 +280,25 @@ class GameBoard(HexBoard):
 
         self.update_edge(x, y, edge_dir, structure)
 
-    def validate_structure_placement(self, x, y, old_pos_value, new_pos_value):
+    def validate_structure_placement(self, x, y, old_value, new_value):
 
-        # Player cannot place structure if position taken by another player.
-        if isinstance(old_pos_value, Structure) and not \
-                old_pos_value.owning_player != new_pos_value.owning_player:
+        # If the player is replacing an existing structure...
+        if isinstance(old_value, Structure):
 
-            raise BoardPositionOccupiedException((x, y), old_pos_value,
-                                                 old_pos_value.owning_player)
+            # The old structure must be owned by the same player.
+            if old_value.owning_player != new_value.owning_player:
+                raise BoardPositionOccupiedException((x, y), old_value,
+                                                     old_value.owning_player)
 
-        # Player can't replace existing structure with non-augmenting structure.
-        elif (isinstance(old_pos_value, Structure) and not \
-              isinstance(new_pos_value, AugmentingStructure)):
+            # The new value must be an augmenting structure.
+            if not new_value.is_augmenting_structure():
+                raise BoardPositionOccupiedException((x, y), old_value,
+                                                     old_value.owning_player)
 
-            raise BoardPositionOccupiedException((x, y), old_pos_value,
-                                                 old_pos_value.owning_player)
-
-        # Augmenting structures must replace structure of the proper base class.
-        elif (isinstance(new_pos_value, UpgradeStructure) or
-                isinstance(new_pos_value, ExtensionStructure)) and not \
-                isinstance(old_pos_value, new_pos_value.base_structure_cls):
-
-            raise InvalidBaseStructureException(old_pos_value, new_pos_value)
+            # The base structure name of the new value must match
+            # the old value name.
+            if old_value.name != new_value.augments:
+                raise InvalidBaseStructureException(old_value, new_value)
 
     def distribute_resources_for_roll(self, roll_value):
         """Distribute resources to the players based on the given roll value.
