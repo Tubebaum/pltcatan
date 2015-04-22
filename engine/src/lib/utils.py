@@ -97,3 +97,7 @@ class Utils(object):
         """Convert a counter-like dict to a list."""
         return Utils.flatten(map(lambda k: [k] * dct[k], dct))
 
+    @classmethod
+    def convert_format(cls, str):
+        return str.replace('-', '_')
+
