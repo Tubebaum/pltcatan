@@ -7,6 +7,7 @@ import shutil
 import sys
 sys.path.append('..')
 from engine.src.game import Game
+from engine.src.config.config import Config
 
 properties = {}
 
@@ -76,6 +77,21 @@ def extend(skit, parent=None):
                     extension = extendClean(skit, property, value, extension)
             extend(skit[property], extension)
 
+def replaceEngine(engine, skit):
+    if isinstance(engine, dict):
+        for property, value in engine.iteritems():
+            if property == 'game':
+                engine[property]['points_to_win'] = skit['game']['points-to-win']
+            elif property == 'board':
+                engine[property]['default_radius'] = skit['game']['board']['radius']
+            elif property == 'development':
+                for card, props in value.iteritems():
+                    dev_card = skit['game']['cards']['development'].get(card.replace('_', '-'))
+                    if dev_card:
+                        engine[property][card]['count'] = dev_card['max-count']
+                        engine[property][card]['description'] = dev_card['description']
+            replaceEngine(engine[property], skit)
+
 def compile(file, clean=False):
     '''
     Cleans tmp/ directory and reinitializes with compiled skit code
@@ -85,13 +101,12 @@ def compile(file, clean=False):
     if clean:
         shutil.rmtree('tmp/', True)
         compile('default.skit')
-    skit = config.parser.parse(open(file, 'r').read())
+    skit = config.parser.parse(open(file, 'r').read(), lexer=config.lexer)
     main_property = os.path.splitext(base_file)[0]
     extend(skit)
     properties[main_property] = skit.get(main_property)
     if not os.path.isdir('tmp/'):
         os.makedirs('tmp/')
-    print skit
     pickle.dump(skit, open(compile_file, 'wb'))
     return skit
 
@@ -109,6 +124,9 @@ def run(file):
         skit = compile(file)
     else:
         skit = pickle.load(open(compile_file, 'rb'))
+    main_property = os.path.splitext(base_file)[0]
+    properties[main_property] = skit.get(main_property)
+    replaceEngine(Config.config, properties[main_property])
     game = Game()
     skit = skit.get(os.path.splitext(base_file)[0], None)
     if skit.get('game', None):

@@ -89,10 +89,9 @@ def t_NEWLINE(t):
 
 def t_error(t):
     print 'Illegal character "%s"' % t.value[0]
-    t.lexer.skip(1)
 
 # Build the lexer
-lex.lex()
+lexer = lex.lex()
 
 # Parsing rules
 precedence = (
@@ -268,7 +267,7 @@ def p_empty(p):
     """empty :"""
     pass
 
-yacc.yacc(start='topfunc')
+parser = yacc.yacc(start='topfunc')
 
 def parse_string(s):
     """Parses a given string into a Python AST
@@ -279,7 +278,7 @@ def parse_string(s):
     Returns:
         ast.Module. The AST representation of the provided code string
     """
-    return ast.Module([yacc.parse(s)])
+    return ast.Module([parser.parse(s, lexer=lexer)])
 
 def parse_function(s, name='top'):
     """Parses a string representing a Skit function into a first-class Python function
