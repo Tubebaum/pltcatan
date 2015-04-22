@@ -40,7 +40,24 @@ t_STR = r'".*"'
 t_ignore = ' \t'
 
 def t_FUNC(t):
-    r'func[^\}]*}'
+    r'func[^\{]*{'
+    func = t.value
+    bracks = 1
+    pos = t.lexer.lexpos
+    pos2 = t.lexpos
+    lexdata = t.lexer.lexdata[t.lexer.lexpos:]
+    for c in lexdata:
+        t.lexer.lexpos += 1
+        func += c
+        if c == '{':
+            bracks += 1
+        elif c == '}':
+            bracks -= 1
+        elif c == '\n':
+            t.lexer.lineno += 1
+        if not bracks:
+            break
+    t.value = func
     return t
 
 def t_ID(t):
@@ -100,7 +117,8 @@ def p_value_uniform(p):
 
 def p_value_func(p):
     'value : FUNC'
-    p[0] = parse_function(p[1])
+    #p[0] = parse_function(p[1])
+    p[0] = p[1]
 
 def p_structure_properties(p):
     'structure : LCURLY properties RCURLY'

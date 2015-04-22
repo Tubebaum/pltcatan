@@ -1,4 +1,4 @@
-bigger-n-better: {
+bigger-and-better: {
     game: {
         @extend: {
             value: default.game,
