@@ -13,7 +13,10 @@ class Config(object):
     @classmethod
     def init_from_config(cls, obj, config_path):
         property_dict = Config.get(config_path)
-        Utils.init_from_dict(obj, property_dict)
+
+        dct = { Utils.convert_format(k): v for (k, v) in property_dict}
+
+        Utils.init_from_dict(obj, dct)
 
     @classmethod
     def pluck(cls, config_path, prop):

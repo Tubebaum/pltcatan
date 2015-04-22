@@ -78,19 +78,20 @@ def extend(skit, parent=None):
             extend(skit[property], extension)
 
 def replaceEngine(engine, skit):
-    if isinstance(engine, dict):
-        for property, value in engine.iteritems():
-            if property == 'game':
-                engine[property]['points_to_win'] = skit['game']['points-to-win']
-            elif property == 'board':
-                engine[property]['default_radius'] = skit['game']['board']['radius']
-            elif property == 'development':
-                for card, props in value.iteritems():
-                    dev_card = skit['game']['cards']['development'].get(card.replace('_', '-'))
-                    if dev_card:
-                        engine[property][card]['count'] = dev_card['max-count']
-                        engine[property][card]['description'] = dev_card['description']
-            replaceEngine(engine[property], skit)
+    engine['structure'] = skit['structure']
+    # if isinstance(engine, dict):
+    #     for property, value in engine.iteritems():
+    #         if property == 'game':
+    #             engine[property]['points_to_win'] = skit['game']['points-to-win']
+    #         elif property == 'board':
+    #             engine[property]['default_radius'] = skit['game']['board']['radius']
+    #         elif property == 'development':
+    #             for card, props in value.iteritems():
+    #                 dev_card = skit['game']['cards']['development'].get(card.replace('_', '-'))
+    #                 if dev_card:
+    #                     engine[property][card]['count'] = dev_card['max-count']
+    #                     engine[property][card]['description'] = dev_card['description']
+    #         replaceEngine(engine[property], skit)
 
 def compile(file, clean=False):
     '''
