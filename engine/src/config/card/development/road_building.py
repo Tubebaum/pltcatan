@@ -10,6 +10,6 @@ def play_card(self, game, player):
     for _ in range(2):
         x, y, edge_dir = game.input_manager.prompt_edge_placement(game)
         game.board.place_edge_structure(x, y, edge_dir,
-                                        player.get_structure(Road))
+                                        player.get_structure('road'))
 
     self.played = True

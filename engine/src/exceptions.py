@@ -1,16 +1,18 @@
 from engine.src.lib.utils import Utils
 
 
-class CustomException(Exception):
-
-    def __init__(self):
-        self.msg = None
+class UserMessageException(Exception):
+    """
+    A custom exception class that prints self.msg when cast to a string.
+    """
+    def __init__(self, msg):
+        self.msg = msg
 
     def __str__(self):
-        return str(self.msg)
+        return self.msg
 
 
-class NotEnoughResourcesException(CustomException):
+class NotEnoughResourcesException(UserMessageException):
     """Raise when a trader lacks enough resources cards for a transaction.
 
     E.g. when a player doesn't have enough resource cards to buy a structure,
@@ -45,29 +47,29 @@ class NotEnoughResourcesException(CustomException):
             trading_entity.__class__.__name__, resource_type_str)
 
 
-class NotEnoughStructuresException(CustomException):
+class NotEnoughStructuresException(UserMessageException):
     """Raise when a player tries to build a structure despite having none left.
 
     Args:
         player (Player): The player that tried to build a structure.
 
-        structure_cls (class): The class of structure the player attempted to
-          build despite having run out.
+        structure_name (str): The string name of structure the player attempted
+          to build despite having run out.
     """
 
-    def __init__(self, player, structure_cls):
+    def __init__(self, player, structure_name):
         self.msg = '{0} does not have a {1} in stock.'.format(
-            player.name, structure_cls.__name__.lower())
+            player.name, structure_name)
 
 
-class NotEnoughDevelopmentCardsException(CustomException):
+class NotEnoughDevelopmentCardsException(UserMessageException):
     """Raise when a player tries to buy a development card when none left."""
 
     def __init__(self):
         self.msg = 'No development cards remaining.'
 
 
-class InvalidBaseStructureException(CustomException):
+class InvalidBaseStructureException(UserMessageException):
     """Raise when one tries to build an invalid upgrade or extension structure.
 
     Upgrade and extension structures need to be built off an appropriate base
@@ -77,12 +79,12 @@ class InvalidBaseStructureException(CustomException):
 
     def __init__(self, base_structure, augmenting_structure):
         self.msg = '{0} must have base structure {1}, but given {2}!'.format(
-            augmenting_structure.__class__.__name__,
-            augmenting_structure.base_structure.__class__.__name__,
-            base_structure.__class__.__name__
+            augmenting_structure.name,
+            augmenting_structure.augments(),
+            base_structure.name
         )
 
-class BoardPositionOccupiedException(CustomException):
+class BoardPositionOccupiedException(UserMessageException):
     """Raise when a player tries to build on a taken board position.
 
     Players can not place structures on positions taken by other players.
@@ -91,12 +93,12 @@ class BoardPositionOccupiedException(CustomException):
 
     def __init__(self, position, structure, owning_player):
 
-        self.msg = 'Position {0} already has a {1} belonging to {1}'.format(
-            position, structure.__class__.__name__, owning_player.name)
+        self.msg = 'Position {} already has a {} belonging to {}.'.format(
+            position, structure.name, owning_player.name)
 
 
-class NoConfigValueDefinedException(CustomException):
+class NoConfigValueDefinedException(UserMessageException):
 
     def __init__(self, dot_notation_str):
 
-        self.msg = 'No config value defined for {}'.format(dot_notation_str)
+        self.msg = 'No config value defined for {}.'.format(dot_notation_str)

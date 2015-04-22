@@ -24,7 +24,7 @@ class DevelopmentCard(object):
         Config.init_from_config(self, 'card.development.default')
 
         # Overwrite default values with custom values.
-        Utils.init_from_kwargs(self, **kwargs)
+        Utils.init_from_dict(self, kwargs)
 
         self.played = False
         self.is_playable = True

@@ -9,8 +9,6 @@ from engine.src.vertex import Vertex
 from engine.src.edge import Edge
 from engine.src.exceptions import *
 from engine.src.trading.trade_offer import TradeOffer
-import engine.src.structure.vertex_structure as vertex_structure_mod
-import engine.src.structure.edge_structure as edge_structure_mod
 
 
 class InputManager(cmd.Cmd):
@@ -35,8 +33,11 @@ class InputManager(cmd.Cmd):
         self.has_rolled = False
         self.has_played_card = False
 
-        self.structure_classes = vertex_structure_mod.CLASSES + \
-            edge_structure_mod.CLASSES
+        self.structure_names = Utils.pluck(Config.get('structure.player_built'), 'name')
+
+    def emptyline(self, line):
+        """Override default emptyline behavior, which repeats last command."""
+        self.default(line)
 
     def default(self, line):
         """Print menu of commands when unrecognized command given."""
@@ -47,12 +48,14 @@ class InputManager(cmd.Cmd):
     def preloop(self):
         """Announce start of player turn."""
 
-        print "{0}'s turn: ".format(self.player.name)
+        msg = "{0}'s turn: ".format(self.player.name)
+        InputManager.input_default(msg, None, False)
 
     def postloop(self):
         """Announce end of player turn."""
 
-        print "End of {0}'s turn.".format(self.player.name)
+        msg = "End of {0}'s turn.".format(self.player.name)
+        InputManager.input_default(msg, None, False)
 
     def do_roll(self, value):
         """Roll the dice."""
@@ -134,20 +137,16 @@ class InputManager(cmd.Cmd):
             msg = "Please enter the number (e.g. '1') of the structure " + \
                   "you would like to build."
 
-            structure_cls = InputManager.prompt_select_list_value(
-                msg,
-                map(lambda cls: cls.__name__,
-                    self.structure_classes),
-                self.structure_classes
-            )
+            structure_name = InputManager.prompt_select_list_value(
+                msg, self.structure_names)
 
-            structure = self.player.get_structure(structure_cls)
+            structure = self.player.get_structure(structure_name)
 
-            if issubclass(structure_cls, Edge):
+            if structure.position_type == 'edge':
                 x, y, edge_dir = InputManager.prompt_edge_placement(self.game)
                 self.game.board.place_edge_structure(x, y, edge_dir, structure)
 
-            elif issubclass(structure_cls, Vertex):
+            elif structure.position_type == 'vertex':
                 x, y, vertex_dir = \
                     InputManager.prompt_vertex_placement(self.game)
                 self.game.board.place_vertex_structure(x, y,
@@ -494,10 +493,10 @@ class InputManager(cmd.Cmd):
         InputManager.input_default(prompt, None, False)
 
     @staticmethod
-    def announce_structure_placement(player, structure_cls):
+    def announce_structure_placement(player, structure_name):
 
         prompt = "{0}, select where you would like to place your {1}".format(
-            player.name, structure_cls.__name__.lower()
+            player.name, structure_name
         )
         InputManager.input_default(prompt, None, False)
 

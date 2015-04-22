@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+from engine.src.lib.utils import Utils
+from engine.src.config.config import Config
+from engine.src.structure.structure import Structure
 from engine.src.trading.trading_entity import TradingEntity
 from engine.src.exceptions import NotEnoughStructuresException
 
@@ -29,22 +32,29 @@ class Player(TradingEntity):
         self.knights = 0
         self.longest_road_length = 0
 
-        # TODO: move to config
-        # TODO: programatically set these attributes
-        self.remaining_road_count = 15
-        self.remaining_settlement_count = 5
-        self.remaining_city_count = 5
+        self.remaining_structure_counts = {}
+        self.init_structure_counts()
 
     def __hash__(self):
         return hash(self.name)
 
     def __eq__(self, other):
         return self.name == other.name
-    
+
+    def __str__(self):
+        return self.name
+
+    def init_structure_counts(self):
+
+        self.remaining_structure_counts = {}
+
+        for structure in Config.get('structure.player_built').values():
+            self.remaining_structure_counts[structure['name']] = structure['count']
+
     def get_total_points(self):
         return self.points + self.hidden_points
 
-    def get_structure(self, structure_cls):
+    def get_structure(self, structure_name):
         """Get the given structure from the player's stock, if any remains.
 
         Every time a player builds a structure, we need to remove from their
@@ -52,16 +62,18 @@ class Player(TradingEntity):
         process of removal for all structures.
 
         Args:
-            structure_cls (class): Class of structure to build.
+            structure_name (str): Class of structure to build.
         """
 
-        cls_str = structure_cls.__name__.lower()
-        relevant_property = 'remaining_{0}_count'.format(cls_str)
-
-        structure_count = getattr(self, relevant_property)
+        structure_count = self.remaining_structure_counts[structure_name]
 
         if structure_count > 0:
-            setattr(self, relevant_property, structure_count - 1)
-            return structure_cls(self)
+            self.remaining_structure_counts[structure_name] -= 1
+
+            # TODO: conversions between underscore and camel case
+            config_path = 'structure.player_built.' + structure_name.lower()
+            structure_dict = Config.get(config_path)
+
+            return Structure(self, **structure_dict)
         else:
-            raise NotEnoughStructuresException(self, structure_cls)
+            raise NotEnoughStructuresException(self, structure_name)
