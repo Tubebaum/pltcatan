@@ -1,0 +1,8 @@
+To compile Skit code:
+
+From pltcatan/config-parser
+    ./skit.py -c file.skit
+
+To run Skit code:
+From pltcatan/config-parser
+    ./skit.py file.skit

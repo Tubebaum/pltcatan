@@ -10,7 +10,7 @@ Spring 2015
 | Andrew FigPope | aep2158 | Project Manager |
 | Michelle Zhang | mdz2110 | Language Guru |
 | Márcio Paiva | ma3394  | System Architect |
-| Thomas Huzij | tph2109 | Verification and Validation |
+| Thomas Huzij | tph2109 | System Integrator |
 
 #### Introduction
 

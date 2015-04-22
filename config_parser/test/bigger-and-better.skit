@@ -1,0 +1,22 @@
+bigger-n-better: {
+    game: {
+        @extend: {
+            value: default.game,
+            explicit-overwrite-only: true
+        },
+        points-to-win: 15,
+        board: {
+            radius: default.game.board.radius + 1,
+            chits: {
+                values: {
+                    distribution: uniform
+                }
+            },
+            tiles: {
+                resources: {
+                    distribution: uniform
+                }
+            }
+        }
+    }
+}

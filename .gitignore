@@ -13,3 +13,6 @@ engine/src/ui/
 .idea/
 pltcatan.iml
 
+# PLY files
+**/*.out
+**/parsetab.py
