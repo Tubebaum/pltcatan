@@ -23,7 +23,8 @@ tokens = (
 )
 
 reserved = {
-    'uniform': 'UNIFORM'
+    'uniform': 'UNIFORM',
+    'none': 'NONE'
 }
 
 tokens += tuple(reserved.values())
@@ -115,6 +116,10 @@ def p_value_uniform(p):
     'value : UNIFORM'
     p[0] = 'uniform'
 
+def p_value_none(p):
+    'value : NONE'
+    p[0] = None
+
 def p_value_func(p):
     'value : FUNC'
     #p[0] = parse_function(p[1])
@@ -160,6 +165,7 @@ def p_properties_property(p):
     p[0] = p[1]
 
 def p_error(p):
+    print p
     print "Syntax error in input!"
 
 parser = yacc.yacc()
