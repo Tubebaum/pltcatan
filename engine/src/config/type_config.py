@@ -4,7 +4,14 @@ from types import *
 type_config = {
     'structure': {
         'player_built': {
-            'road': {
+            'default': {
+                'cost': {ResourceType: IntType}
+            }
+        }
+    },
+    'card': {
+        'development': {
+            'default': {
                 'cost': {ResourceType: IntType}
             }
         }

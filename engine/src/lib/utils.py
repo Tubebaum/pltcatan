@@ -90,5 +90,10 @@ class Utils(object):
     @classmethod
     def convert_to_list(cls, e):
         """Convert to a list if not already a list."""
-        return list(e) if not Utils.is_list(e) else e
+        return [e] if not Utils.is_list(e) else e
+
+    @classmethod
+    def dict_to_list(cls, dct):
+        """Convert a counter-like dict to a list."""
+        return Utils.flatten(map(lambda k: [k] * dct[k], dct))
 

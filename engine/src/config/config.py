@@ -8,6 +8,8 @@ from engine.src.exceptions import *
 
 class Config(object):
 
+    is_coerced = False
+
     @classmethod
     def init_from_config(cls, obj, config_path):
         property_dict = Config.get(config_path)
@@ -19,7 +21,41 @@ class Config(object):
         return Utils.pluck(target_dict, prop, True)
 
     @classmethod
-    def get(cls, dot_notation_str, dct=None, coerce_type=True):
+    def set(cls, value, dot_notation_str, dct=None):
+
+        if dct is None:
+            dct = Config.config
+
+        keys = dot_notation_str.split('.')
+
+        def set_recursive(dct, keys):
+            if not keys:
+                return dct
+
+            key = keys.pop(0)
+            val = None
+
+            if key in dct:
+                val = dct.get(key)
+            else:
+                raise NoConfigValueDefinedException(dot_notation_str)
+
+            # If we still have keys left, the property we want to set is nested
+            # somewhere inside the value we fetched.
+            if keys:
+                if val:
+                    return set_recursive(val, keys)
+                else:
+                    raise NoConfigValueDefinedException(dot_notation_str)
+            # If we have no keys left, we've found the target value.
+            else:
+                dct[key] = value
+
+        set_recursive(dct, keys)
+
+
+    @classmethod
+    def get(cls, dot_notation_str, dct=None, remove_default=True):
         """Get a value from the main config dict given a dot notation string.
 
         E.g. if caller wants config['game']['points_to_win'], they can pass in
@@ -28,8 +64,14 @@ class Config(object):
         See coerce() for effect of coerce_type flag.
         """
 
+        if not Config.is_coerced:
+            Config.coerce_all()
+
         if dct is None:
             dct = Config.config
+
+        if not dot_notation_str:
+            return dct
 
         keys = dot_notation_str.split('.')
 
@@ -56,76 +98,106 @@ class Config(object):
 
         value = get_recursive(dct, keys)
 
-        if coerce_type:
-            # print 'Pre-coerce {}'.format(value)
-            value = Config.coerce(value, dot_notation_str)
-            # print 'Post-coerce {}'.format(value)
-
-        # Remove default value from dictionary type return value.
-        if type(value) is dict:
-            value = {k: value[k] for k in value.keys() if k != 'default'}
+        if remove_default:
+            # Remove default value from dictionary type return value.
+            if type(value) is dict:
+                value = {k: value[k] for k in value.keys() if k != 'default'}
 
         return value
 
     @classmethod
-    def coerce(cls, value, dot_notation_str):
-        """Coerce the value to the type specified in type_config by given path.
+    def coerce_all(cls):
+        Config.is_coerced = True
+        Config.coerce_recursive('')
 
-        Sometimes the value stored at the specified path is not the type we
-        need it to be. In this case, we can specify coerce_type = True. This
-        will lead this method to get() the value stored in the config dict, and
-        check if its type matches the type located at the same path in the
-        type_config dict. If the types don't match, it uses a coercion function
-        stored at type_mapping[from_type][to_type].
-        """
-
-        # Closure for coercing type.
-        def coerce_type(value, from_type, to_type):
-            if from_type == to_type:
-                return value
-
-            coercion_func = type_mapping[from_type][to_type]
-            return coercion_func(value)
-
-        result = value
+    @classmethod
+    def coerce_recursive(cls, path_so_far):
+        curr_value = Config.get(path_so_far, Config.config, False)
 
         try:
-            target_type = Config.get(dot_notation_str, Config.type_config, False)
-            curr_type = type(value)
+            target_type = Config.get(
+                Config.get_default_path(path_so_far), Config.type_config, False)
         except NoConfigValueDefinedException:
-            # If no target type exists, return uncoerced value.
+            return
+
+        is_struct = len(filter(
+            lambda key: type(key) == StringType,
+            target_type.keys()
+        )) != 0
+
+        if (type(curr_value) is dict) and is_struct:
+            for k, v in curr_value.iteritems():
+                path = k if not path_so_far else '.'.join([path_so_far, k])
+                Config.coerce_recursive(path)
+        else:
+            Config.set(
+                Config.coerce(curr_value, type(curr_value), target_type),
+                path_so_far
+            )
+
+    @classmethod
+    def coerce(cls, value, from_type, to_type):
+
+        # print 'coercing:\n\tvalue {}\n\tfrom {}\n\tto {}'.format(
+        #     value, from_type, to_type
+        # )
+
+        if from_type == to_type:
             return value
 
-        # If target type is a dict, coerce key and value types.
-        if type(target_type) is dict:
-
-            # Structs are dicts but all their keys are not types, so they
-            # shouldn't actually be coerced; they're just part of a path to
-            # specify actual conversions.
-            is_struct = len(filter(
-                lambda key: type(key) == StringType,
-                target_type.keys()
-            )) != 0
-
-            if is_struct:
-                return value
-
+        if from_type is dict:
             result = {}
 
-            target_k_type = target_type.keys()[0]
-            target_v_type = target_type.values()[0]
+            target_k_type = to_type.keys()[0]
+            target_v_type = to_type.values()[0]
 
             for k, v in value.iteritems():
-                coerced_k_value = coerce_type(k, type(k), target_k_type)
-                coerced_v_value = coerce_type(v, type(v), target_v_type)
+                coerced_k_value = Config.coerce(k, type(k), target_k_type)
+                coerced_v_value = Config.coerce(v, type(v), target_v_type)
 
                 result[coerced_k_value] = coerced_v_value
 
-        # If target type not a dict, coerce value to target type directly.
-        elif target_type != curr_type:
-            result = coerce_type(value, curr_type, target_type)
+            return result
+        else:
+            coercion_func = type_mapping[from_type][to_type]
+            return coercion_func(value)
 
-        return result
+    @classmethod
+    def get_default_path(cls, dot_notation_str):
+        # e.g. structure.player_built.road.cost =>
+        #      structure.player_built.default.cost
+        """
+        If last prop is not a dict, replace second to last with default
+        If last prop is a dict, e.g. structure.player_built.road
+            if dict is a struct, replace last with default
+            if dict isn't a struct, replace second to last with default
+        """
+
+        # print 'Given path: {}\n'.format(dot_notation_str)
+
+        value = None
+        path = None
+
+        repl_index = -1
+
+        while True:
+            keys = dot_notation_str.split('.')
+
+            try:
+                keys[repl_index] = 'default'
+                path = '.'.join(keys)
+                # print 'Attempted path: {}\n'.format(path)
+                value = Config.get(path, Config.type_config, False)
+                break
+            except NoConfigValueDefinedException:
+                repl_index -= 1
+            except IndexError:
+                # No defaults; return as is.
+                path = dot_notation_str
+                break
+
+        # print 'Returned path: {}\n'.format(path)
+        return path
 
     # The dictionary accessed by Config.get()
     config = game_config

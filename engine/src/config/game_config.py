@@ -27,11 +27,11 @@ game_config = {
                 'draw_card': Utils.noop,
                 'play_card': Utils.noop,
                 'cost': {
-                    ResourceType.GRAIN: 1,
-                    ResourceType.ORE: 1,
-                    ResourceType.WOOL: 1
+                    'wool': 1,
+                    'grain': 1,
+                    'ore': 1
                 },
-                },
+            },
             # Non-Progress Cards
             'knight': {
                 'count': 14,
@@ -65,7 +65,7 @@ game_config = {
                                 'anything.'),
                 'draw_card': get_import_value('card.development.monopoly', 'draw_card'),
                 'play_card': get_import_value('card.development.monopoly', 'play_card'),
-                },
+            },
             'road_building': {
                 'count': 2,
                 'name': 'Road Building Card',
@@ -76,7 +76,7 @@ game_config = {
                     get_import_value('card.development.road_building', 'draw_card'),
                 'play_card':
                     get_import_value('card.development.road_building', 'play_card'),
-                },
+            },
             'year_of_plenty': {
                 'count': 2,
                 'name': 'Year of Plenty Card',
@@ -88,7 +88,7 @@ game_config = {
                     get_import_value('card.development.year_of_plenty', 'draw_card'),
                 'play_card':
                     get_import_value('card.development.year_of_plenty', 'play_card'),
-                }
+            }
         }
     },
     # Structures
@@ -97,11 +97,11 @@ game_config = {
             'default': {
                 'name': None,
                 'cost': {
-                    ResourceType.LUMBER: 0,
-                    ResourceType.BRICK: 0,
-                    ResourceType.WOOL: 0,
-                    ResourceType.GRAIN: 0,
-                    ResourceType.ORE: 0
+                    'lumber': 0,
+                    'brick': 0,
+                    'wool': 0,
+                    'grain': 0,
+                    'ore': 0
                 },
                 'count': 0,
                 'point_value': 0,
@@ -127,10 +127,10 @@ game_config = {
             'settlement': {
                 'name': 'Settlement',
                 'cost': {
-                    ResourceType.LUMBER: 1,
-                    ResourceType.BRICK: 1,
-                    ResourceType.WOOL: 1,
-                    ResourceType.GRAIN: 1
+                    'lumber': 1,
+                    'brick': 1,
+                    'wool': 1,
+                    'grain': 1
                 },
                 'count': 5,
                 'point_value': 1,
@@ -141,9 +141,9 @@ game_config = {
             'city': {
                 'name': 'City',
                 'cost': {
-                    ResourceType.GRAIN: 2,
-                    ResourceType.ORE: 3,
-                    },
+                    'grain': 2,
+                    'ore': 3,
+                },
                 'count': 5,
                 'point_value': 1,
                 'base_yield': 2,
