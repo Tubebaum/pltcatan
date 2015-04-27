@@ -109,7 +109,7 @@ game_config = {
                 # TODO: Rename vars to reflect that they should be structure names?
                 'extends': None,
                 'upgrades': None,
-                'position_type': None
+                'position_type': 'vertex'
             },
             # Edge Structures
             'road': {

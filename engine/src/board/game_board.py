@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 import random
+import pdb
 
 from engine.src.lib.utils import Utils
 from engine.src.board.hex_board import HexBoard
 from engine.src.tile.game_tile import GameTile
 from engine.src.resource_type import ResourceType
+from engine.src.position_type import PositionType
 from engine.src.calamity.calamity import Calamity
 from engine.src.calamity.calamity import CalamityTilePlacementEffect
 from engine.src.calamity.robber import Robber
@@ -246,7 +248,9 @@ class GameBoard(HexBoard):
             if tile.resource_type != ResourceType.FALLOW:
                 yield tile
 
-    def place_vertex_structure(self, x, y, vertex_dir, structure):
+    def place_vertex_structure(self, x, y, vertex_dir, structure,
+                               must_border_claimed_edge=True, struct_x=None,
+                               struct_y=None, struct_vertex_dir=None):
         """Place a structure of the given type on the specified vertex.
 
         Args:
@@ -267,20 +271,53 @@ class GameBoard(HexBoard):
         tile = self.tiles[x][y]
         old_vertex_val = tile.vertices[vertex_dir]
 
-        self.validate_structure_placement(x, y, old_vertex_val, structure)
+        self.validate_structure_placement(x, y, old_vertex_val, structure,
+                                          vertex_dir, must_border_claimed_edge,
+                                          struct_x, struct_y, struct_vertex_dir)
 
         self.update_vertex(x, y, vertex_dir, structure)
 
-    def place_edge_structure(self, x, y, edge_dir, structure):
+    def place_edge_structure(self, x, y, edge_dir, structure,
+                             must_border_claimed_edge=True, struct_x=None,
+                             struct_y=None, struct_vertex_dir=None):
         tile = self.tiles[x][y]
         vertex_dirs = EdgeVertexMapping.get_vertex_dirs_for_edge_dir(edge_dir)
         old_edge_val = tile.edges[vertex_dirs[0]][vertex_dirs[1]]
 
-        self.validate_structure_placement(x, y, old_edge_val, structure)
+        self.validate_structure_placement(x, y, old_edge_val, structure,
+                                          edge_dir, must_border_claimed_edge,
+                                          struct_x, struct_y, struct_vertex_dir)
 
         self.update_edge(x, y, edge_dir, structure)
 
-    def validate_structure_placement(self, x, y, old_value, new_value):
+    def validate_structure_placement(self, x, y, old_value, new_value,
+                                     placement_dir, must_border_claimed_edge,
+                                     struct_x, struct_y, struct_vertex_dir):
+
+        # A structure can only be placed on a vertex if none of the three
+        # adjacent vertices are occupied aka the Distance Rule.
+        if new_value.position_type == PositionType.VERTEX:
+
+            adjacent_vertex_vals = \
+                self.get_adjacent_vertices_for_vertex(x, y, placement_dir)
+
+            adjacent_structures = filter(
+                lambda vertex_val: isinstance(vertex_val, Structure),
+                adjacent_vertex_vals
+            )
+
+            if len(adjacent_structures):
+                raise InvalidStructurePlacementException()
+
+        # If the struct_x etc. are provided, they specify a vertex the new
+        # edge to place must border e.g. as in initial placement stage.
+        if new_value.position_type == PositionType.EDGE and \
+                        struct_x is not None:
+            allowable_edges = self.get_common_vertex_edges(struct_x, struct_y, struct_vertex_dir)
+            target_edge = self.get_tile_with_coords(x, y).get_edge(placement_dir)
+
+            if target_edge not in allowable_edges:
+                raise InvalidStructurePlacementException()
 
         # If the player is replacing an existing structure...
         if isinstance(old_value, Structure):
@@ -290,14 +327,28 @@ class GameBoard(HexBoard):
                 raise BoardPositionOccupiedException((x, y), old_value,
                                                      old_value.owning_player)
 
-            # The new value must be an augmenting structure.
-            if not new_value.is_augmenting_structure():
+            # The new value must be an augmenting structure whose base structure
+            # matches the existing structure.
+            if (not new_value.is_augmenting_structure()) or \
+                    (new_value.is_augmenting_structure() and \
+                     old_value.name != new_value.augments):
                 raise InvalidBaseStructureException(old_value, new_value)
 
-            # The base structure name of the new value must match
-            # the old value name.
-            if old_value.name != new_value.augments:
-                raise InvalidBaseStructureException(old_value, new_value)
+        # If the player is not replacing an existing structure, make sure it's
+        # neighboring a road, unless overridden e.g. as during initial
+        # structure placement.
+        elif must_border_claimed_edge:
+            edge_vals = self.get_adjacent_edges_to_vertex(x, y, placement_dir)
+
+            claimed_edge_structs = filter(
+                lambda edge_val: isinstance(edge_val, Structure) and
+                                 edge_val.owning_player == new_value.owning_player,
+                edge_vals
+            )
+
+            if not len(claimed_edge_structs):
+                raise InvalidStructurePlacementException()
+
 
     def distribute_resources_for_roll(self, roll_value):
         """Distribute resources to the players based on the given roll value.

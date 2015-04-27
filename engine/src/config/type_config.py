@@ -1,11 +1,13 @@
 from engine.src.resource_type import ResourceType
+from engine.src.position_type import PositionType
 from types import *
 
 type_config = {
     'structure': {
         'player_built': {
             'default': {
-                'cost': {ResourceType: IntType}
+                'cost': {ResourceType: IntType},
+                'position_type': PositionType
             }
         }
     },

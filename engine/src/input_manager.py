@@ -64,6 +64,7 @@ class InputManager(cmd.Cmd):
         self.has_rolled = True
 
     # TODO: Trade with bank, harbor
+    # TODO: Move core logic to game.
     def do_trade(self, line):
         """Trade resources with other players or with the bank."""
 
@@ -140,24 +141,12 @@ class InputManager(cmd.Cmd):
             structure_name = InputManager.prompt_select_list_value(
                 msg, self.structure_names)
 
-            structure = self.player.get_structure(structure_name)
+            self.game.place_structure(self.player, structure_name)
 
-            if structure.position_type == 'edge':
-                x, y, edge_dir = InputManager.prompt_edge_placement(self.game)
-                self.game.board.place_edge_structure(x, y, edge_dir, structure)
-
-            elif structure.position_type == 'vertex':
-                x, y, vertex_dir = \
-                    InputManager.prompt_vertex_placement(self.game)
-                self.game.board.place_vertex_structure(x, y,
-                                                       vertex_dir, structure)
-
-        except NotEnoughStructuresException as n:
-            InputManager.input_default(n, None, False)
-        except BoardPositionOccupiedException as b:
-            InputManager.input_default(b, None, False)
-        except InvalidBaseStructureException as i:
-            InputManager.input_default(i, None, False)
+        except (NotEnoughStructuresException, BoardPositionOccupiedException,
+                InvalidBaseStructureException), e:
+            self.player.restore_structure(structure_name)
+            InputManager.input_default(e, None, False)
 
     # TODO: Enforce can't play card bought during same turn.
     def do_buy_card(self, line):
@@ -220,7 +209,7 @@ class InputManager(cmd.Cmd):
         for tile in self.game.board.iter_tiles():
             print tile
 
-    def do_print_resource_cards(self, line):
+    def do_view_resource_cards(self, line):
         """View your resource cards."""
 
         msg = map(lambda resource_type: str(resource_type),
@@ -472,7 +461,7 @@ class InputManager(cmd.Cmd):
 
         return x, y, edge_dir
 
-    # TODO: Roll announce methods into single method using getattr?
+    # TODO: Roll announce methods into single method? Or programatically set.
 
     @staticmethod
     def announce_roll_value(roll_value):

@@ -4,6 +4,7 @@ from engine.src.config.game_config import game_config
 from engine.src.config.type_config import type_config
 from engine.src.config.type_mapping import type_mapping
 from engine.src.exceptions import *
+import pdb
 
 
 class Config(object):
@@ -141,12 +142,15 @@ class Config(object):
         except NoConfigValueDefinedException:
             return
 
-        is_struct = len(filter(
-            lambda key: type(key) == StringType,
-            target_type.keys()
-        )) != 0
+        is_struct = False
 
-        if (type(curr_value) is dict) and is_struct:
+        if type(curr_value) is dict:
+            is_struct = len(filter(
+                lambda key: type(key) == StringType,
+                target_type.keys()
+            )) != 0
+
+        if is_struct:
             for k, v in curr_value.iteritems():
                 path = k if not path_so_far else '.'.join([path_so_far, k])
                 Config.coerce_recursive(path)

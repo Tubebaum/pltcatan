@@ -6,6 +6,7 @@ from engine.src.dice import Dice
 from engine.src.input_manager import InputManager
 from engine.src.board.game_board import GameBoard
 from engine.src.resource_type import ResourceType
+from engine.src.position_type import PositionType
 from engine.src.structure.structure import Structure
 from engine.src.calamity.robber import Robber
 
@@ -58,49 +59,57 @@ class Game(object):
         for player_name in player_names:
             self.players.append(Player(player_name))
 
-    def place_vertex_structure(self, player, structure_name):
+    def place_structure(self, player, structure_name, must_border_claimed_edge=True,
+                        struct_x=None, struct_y=None, struct_vertex_dir=None):
+        """Place an edge or vertex structure.
+
+        Prompts for placement information and attempts to place on board. Does
+        not do any exception handling.
+        """
+
+        structure = player.get_structure(structure_name)
+
+        if structure.position_type == PositionType.EDGE:
+            prompt_func = InputManager.prompt_edge_placement
+            placement_func = self.board.place_edge_structure
+
+        elif structure.position_type == PositionType.VERTEX:
+            prompt_func = InputManager.prompt_vertex_placement
+            placement_func = self.board.place_vertex_structure
+
+        x, y, struct_dir = prompt_func(self)
+
+        params = [x, y, struct_dir, structure, must_border_claimed_edge]
+
+        if struct_vertex_dir is not None:
+            params.extend([struct_x, struct_y, struct_vertex_dir])
+
+        placement_func(*params)
+
+        return x, y, struct_dir
+
+    def place_init_structure(self, player, structure_name,
+                             must_border_claimed_edge=False,
+                             struct_x=None, struct_y=None,
+                             struct_vertex_dir=None):
 
         valid = False
 
         while not valid:
             try:
-                x, y, vertex_dir = \
-                    InputManager.prompt_vertex_placement(self)
 
-                # TODO: Enforce valid.
-                self.board.place_vertex_structure(
-                    x, y, vertex_dir, player.get_structure(structure_name))
+                x, y, struct_dir = self.place_structure(player, structure_name, must_border_claimed_edge,
+                                     struct_x, struct_y, struct_vertex_dir)
 
                 valid = True
-            except BoardPositionOccupiedException as b:
-                InputManager.input_default(b, None, False)
-            except InvalidBaseStructureException as i:
-                InputManager.input_default(i, None, False)
+            except (BoardPositionOccupiedException,
+                    InvalidBaseStructureException,
+                    InvalidStructurePlacementException), e:
+                player.restore_structure(structure_name)
+                InputManager.input_default(e, None, False)
 
-        return x, y, vertex_dir
+        return x, y, struct_dir
 
-    def place_edge_structure(self, player, structure_name):
-
-        valid = False
-
-        while not valid:
-            try:
-                x, y, edge_dir = \
-                    InputManager.prompt_edge_placement(self)
-
-                # TODO: Enforce valid.
-                self.board.place_edge_structure(
-                    x, y, edge_dir, player.get_structure(structure_name))
-
-                valid = True
-            except BoardPositionOccupiedException as b:
-                InputManager.input_default(b, None, False)
-            except InvalidBaseStructureException as i:
-                InputManager.input_default(i, None, False)
-
-        return x, y, edge_dir
-
-    # TODO: refactoring
     def initial_settlement_and_road_placement(self):
 
         InputManager.announce_initial_structure_placement_stage()
@@ -111,11 +120,13 @@ class Game(object):
 
             # Place settlement
             InputManager.announce_structure_placement(player, 'Settlement')
-            self.place_vertex_structure(player, 'Settlement')
+            x, y, vertex_dir = self.place_init_structure(player, 'Settlement')
+
+            print 'Road must border vertex ({}, {}) {}'.format(x, y, vertex_dir)
 
             # Place road
             InputManager.announce_structure_placement(player, 'Road')
-            self.place_edge_structure(player, 'Road')
+            self.place_init_structure(player, 'Road', False, x, y, vertex_dir)
 
         distributions = Utils.nested_dict()
 
@@ -125,11 +136,11 @@ class Game(object):
 
             # Place settlement
             InputManager.announce_structure_placement(player, 'Settlement')
-            x, y, vertex_dir = self.place_vertex_structure(player, 'Settlement')
+            x, y, vertex_dir = self.place_init_structure(player, 'Settlement')
 
             # Place road
             InputManager.announce_structure_placement(player, 'Road')
-            self.place_edge_structure(player, 'Road')
+            self.place_init_structure(player, 'Road', False, x, y, vertex_dir)
 
             # Give initial resource cards
             resource_types = filter(
@@ -164,6 +175,7 @@ class Game(object):
 
         return max(self.players, key=lambda player: player.points)
 
+    # TODO
     def update_point_counts(self):
 
         # Determine largest army

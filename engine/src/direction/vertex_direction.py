@@ -38,6 +38,26 @@ class VertexDirection(Direction):
         return VertexDirection.find_by_value((x, y, z))
 
     @classmethod
+    def get_neighboring_vertex_dirs(cls, vertex_dir):
+
+        mapping = {
+            VertexDirection.TOP:
+                (VertexDirection.TOP_LEFT, VertexDirection.TOP_RIGHT),
+            VertexDirection.TOP_RIGHT:
+                (VertexDirection.TOP, VertexDirection.BOTTOM_RIGHT),
+            VertexDirection.BOTTOM_RIGHT:
+                (VertexDirection.TOP_RIGHT, VertexDirection.BOTTOM),
+            VertexDirection.BOTTOM:
+                (VertexDirection.BOTTOM_RIGHT, VertexDirection.BOTTOM_LEFT),
+            VertexDirection.BOTTOM_LEFT:
+                (VertexDirection.BOTTOM, VertexDirection.TOP_LEFT),
+            VertexDirection.TOP_LEFT:
+                (VertexDirection.BOTTOM_LEFT, VertexDirection.TOP),
+        }
+
+        return mapping[vertex_dir]
+
+    @classmethod
     def pairs(cls):
         """Returns vertex pairs, each of which constitute an edge of a hex."""
 

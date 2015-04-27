@@ -78,11 +78,14 @@ class InvalidBaseStructureException(UserMessageException):
     """
 
     def __init__(self, base_structure, augmenting_structure):
-        self.msg = '{0} must have base structure {1}, but given {2}!'.format(
-            augmenting_structure.name,
-            augmenting_structure.augments(),
-            base_structure.name
-        )
+        augments = augmenting_structure.augments()
+
+        if augments is None:
+            augments = 'an empty position'
+
+        self.msg = '{} must replace {}, but tried to replace a {}!'.format(
+            augmenting_structure.name, augments, base_structure.name)
+
 
 class BoardPositionOccupiedException(UserMessageException):
     """Raise when a player tries to build on a taken board position.
@@ -102,3 +105,26 @@ class NoConfigValueDefinedException(UserMessageException):
     def __init__(self, dot_notation_str):
 
         self.msg = 'No config value defined for {}.'.format(dot_notation_str)
+
+
+class NoSuchVertexException(UserMessageException):
+
+    def __init__(self, tile, vertex_dir):
+
+        self.msg = 'Tile has no vertex: {}'.format(vertex_dir)
+
+class NoSuchEdgeException(UserMessageException):
+
+    def __init__(self, tile, edge_dir):
+
+        self.msg = 'Tile has no edge: {}'.format(edge_dir)
+
+
+class InvalidStructurePlacementException(UserMessageException):
+    """Raise when a player tries to place a structure somewhere they shouldn't.
+
+    E.g. no neighboring claimed roads, too close to another structure, etc.
+    """
+
+    def __init__(self):
+        self.msg = 'Not a valid position to place the structure.'

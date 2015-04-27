@@ -77,3 +77,6 @@ class Player(TradingEntity):
             return Structure(self, **structure_dict)
         else:
             raise NotEnoughStructuresException(self, structure_name)
+
+    def restore_structure(self, structure_name):
+        self.remaining_structure_counts[structure_name] += 1

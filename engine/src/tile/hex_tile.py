@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from engine.src.exceptions import *
 from .tile import Tile
 from engine.src.vertex import Vertex
 from engine.src.edge import Edge
@@ -143,8 +144,8 @@ class HexTile(Tile):
         self.vertices[vertex_direction] = vertex_value
 
     @classmethod
-    def get_opposite_vertex_dir(cls, vertex_dir, edge_dir):
-        """Get the direction of the vertex opposite to the one given.
+    def get_equivalent_vertex_dir(cls, vertex_dir, edge_dir):
+        """Get the equivalent vertex as the given one, relative to this tile.
 
         Consider two adjacent tiles, one of which we will think of as the
         base_tile, relative to which vertex_dir and edge_dir are defined,
@@ -163,11 +164,35 @@ class HexTile(Tile):
             VertexDirection.
         """
 
+        # Get the vertex directions, relative to this tile, of the vertices
+        # that comprise the endpoints of the given edge_dir. Since edge_dir is
+        # relative to the base_tile, we must find it's opposite to find the
+        # edge_dir relative to this tile.
         opposite_edge_vertices = \
             EdgeVertexMapping.get_vertex_dirs_for_edge_dir(
                 edge_dir.get_opposite_direction())
 
+        # Filter out the vertex that is opposite the given vertex, since that
+        # will not correspond to the same vertex relative to this tile.
         vertex = next(vertex for vertex in opposite_edge_vertices if
                       vertex != vertex_dir.get_opposite_direction())
 
         return vertex
+
+    def get_vertex(self, vertex_dir):
+
+        if vertex_dir in self.vertices:
+            return self.vertices[vertex_dir]
+        else:
+            raise NoSuchVertexException(self, vertex_dir)
+
+    def get_edge(self, edge_dir):
+
+        vert_src_dir, vert_dst_dir = \
+            EdgeVertexMapping.get_vertex_dirs_for_edge_dir(edge_dir)
+
+        if vert_src_dir in self.edges:
+            if vert_dst_dir in self.edges[vert_src_dir]:
+                return self.edges[vert_src_dir][vert_dst_dir]
+
+        raise NoSuchEdgeException(self, edge_dir)
