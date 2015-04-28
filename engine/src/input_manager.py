@@ -63,9 +63,8 @@ class InputManager(cmd.Cmd):
         self.game.roll_dice(value)
         self.has_rolled = True
 
-    # TODO: Trade with bank, harbor
     # TODO: Move core logic to game.
-    def do_trade(self, line):
+    def do_trade_player(self, line):
         """Trade resources with other players or with the bank."""
 
         if not self.has_rolled:
@@ -126,6 +125,15 @@ class InputManager(cmd.Cmd):
             except Exception as e:
                 InputManager.input_default(e, None, False)
 
+    # TODO
+    def do_trade_bank(self, line):
+        print('not yet implemented')
+
+    # TODO
+    # TODO: long term. Refactor to be compatible w/ any trade intermediary.
+    def do_trade_harbor(self, line):
+        print('not yet implemented')
+
     def do_build(self, line):
         """Build structures, including settlements, cities, and roads."""
 
@@ -144,7 +152,8 @@ class InputManager(cmd.Cmd):
             self.game.place_structure(self.player, structure_name)
 
         except (NotEnoughStructuresException, BoardPositionOccupiedException,
-                InvalidBaseStructureException), e:
+                InvalidBaseStructureException,
+                InvalidStructurePlacementException), e:
             self.player.restore_structure(structure_name)
             InputManager.input_default(e, None, False)
 

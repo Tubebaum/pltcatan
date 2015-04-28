@@ -24,10 +24,10 @@ class Direction(Enum):
 
     def __eq__(self, other):
 
-        if not other:
+        if not other or not hasattr(other, '__len__'):
             return False
 
-        if not len(other) == len(self):
+        if len(other) != len(self):
             return False
 
         for index, value in enumerate(self):

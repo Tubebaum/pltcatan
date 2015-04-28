@@ -12,6 +12,8 @@ from engine.src.calamity.calamity import CalamityTilePlacementEffect
 from engine.src.calamity.robber import Robber
 from engine.src.trading.bank import Bank
 from engine.src.direction.edge_vertex_mapping import EdgeVertexMapping
+from engine.src.direction.edge_direction import EdgeDirection
+from engine.src.direction.vertex_direction import VertexDirection
 from engine.src.exceptions import *
 from engine.src.structure.structure import Structure
 
@@ -313,7 +315,7 @@ class GameBoard(HexBoard):
         # edge to place must border e.g. as in initial placement stage.
         if new_value.position_type == PositionType.EDGE and \
                         struct_x is not None:
-            allowable_edges = self.get_common_vertex_edges(struct_x, struct_y, struct_vertex_dir)
+            allowable_edges = self.get_adjacent_edges(struct_x, struct_y, struct_vertex_dir)
             target_edge = self.get_tile_with_coords(x, y).get_edge(placement_dir)
 
             if target_edge not in allowable_edges:
@@ -338,7 +340,10 @@ class GameBoard(HexBoard):
         # neighboring a road, unless overridden e.g. as during initial
         # structure placement.
         elif must_border_claimed_edge:
-            edge_vals = self.get_adjacent_edges_to_vertex(x, y, placement_dir)
+            if placement_dir in EdgeDirection:
+                edge_vals = self.get_adjacent_edges_for_edge(x, y, placement_dir)
+            elif placement_dir in VertexDirection:
+                edge_vals = self.get_adjacent_edges_to_vertex(x, y, placement_dir)
 
             claimed_edge_structs = filter(
                 lambda edge_val: isinstance(edge_val, Structure) and
@@ -347,8 +352,8 @@ class GameBoard(HexBoard):
             )
 
             if not len(claimed_edge_structs):
+                print "No claimed_edge_structs"
                 raise InvalidStructurePlacementException()
-
 
     def distribute_resources_for_roll(self, roll_value):
         """Distribute resources to the players based on the given roll value.

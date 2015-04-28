@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import pdb
 
+from engine.src.lib.utils import Utils
 from engine.src.board.board import Board
 from engine.src.tile.hex_tile import HexTile
 from engine.src.vertex import Vertex
@@ -364,63 +365,146 @@ class HexBoard(Board):
 
         return adjacent_tiles
 
-    def get_common_vertex_edges(self, x, y, vert_or_edge_dir):
+    def get_adjacent_edges(self, x, y, vert_or_edge_dir, return_values=True):
         if vert_or_edge_dir in EdgeDirection:
-            vertex_dirs = EdgeVertexMapping.get_vertex_dirs_for_edge_dir(dir)
-
-            return self.get_adjacent_edges_to_vertex(x, y, vertex_dirs[0]) + \
-                self.get_adjacent_edges_to_vertex(x, y, vertex_dirs[1])
+            if return_values:
+                return self.get_adjacent_edges_for_edge(x, y, vert_or_edge_dir)
+            else:
+                return self._get_adjacent_edges_for_edge(x, y, vert_or_edge_dir)
 
         elif vert_or_edge_dir in VertexDirection:
-            return self.get_adjacent_edges_to_vertex(x, y, vert_or_edge_dir)
+            if return_values:
+                return self.get_adjacent_edges_to_vertex(x, y, vert_or_edge_dir)
+            else:
+                return self._get_adjacent_edges_to_vertex(x, y, vert_or_edge_dir)
 
-    def get_adjacent_edges_to_vertex(self, x, y, vertex_dir):
+    def _get_adjacent_edges_to_vertex(self, x, y, vertex_dir):
 
         tile = self.get_tile_with_coords(x, y)
+
+        edge_vals = []
 
         # Get the directions of edges that both have vertex_dir as an endpoint.
         edge_dirs = EdgeVertexMapping.get_edge_dirs_for_vertex_dir(vertex_dir)
 
-        # Get the edge values relative to the found tile using edge_dirs.
-        edge_vals = map(lambda edge_dir: tile.get_edge(edge_dir), edge_dirs)
+        edge_vals.append( (x, y, edge_dirs[0]) )
+        edge_vals.append( (x, y, edge_dirs[1]) )
 
         # The last edge value won't be available via the current tile's edges,
         # but must be found on its neighbor.
+        neighbor_x = tile.x + edge_dirs[0][0]
+        neighbor_y = tile.y + edge_dirs[0][1]
         neighboring_tile = self.get_neighboring_tile(tile, edge_dirs[0])
         opp_vert_dir = HexTile.get_equivalent_vertex_dir(vertex_dir, edge_dirs[0])
 
         neighbor_edge_dirs = EdgeVertexMapping.get_edge_dirs_for_vertex_dir(opp_vert_dir)
-        neighbor_edge_dir = next(d for d in neighbor_edge_dirs if d != edge_dirs[0])
+        neighbor_edge_dir = next(d for d in neighbor_edge_dirs if d not in \
+            map(lambda edge_val: edge_val[2].get_opposite_direction(), edge_vals))
 
-        neighbor_edge_val = neighboring_tile.get_edge(neighbor_edge_dir)
-
-        edge_vals.append(neighbor_edge_val)
+        edge_vals.append( (neighbor_x, neighbor_y, neighbor_edge_dir) )
 
         return edge_vals
 
-    def get_adjacent_vertices_for_vertex(self, x, y, vertex_dir):
+    def get_adjacent_edges_to_vertex(self, x, y, vertex_dir):
+
+        edge_tuples = self._get_adjacent_edges_to_vertex(x, y, vertex_dir)
+        edge_vals = []
+
+        msg = "Edges adjacent to ({}, {}) {}:\n".format(x, y, vertex_dir)
+
+        for x, y, edge_dir in edge_tuples:
+            tile = self.get_tile_with_coords(x, y)
+            edge_val = tile.get_edge(edge_dir)
+
+            edge_vals.append(edge_val)
+            msg += '\t\t ({}, {}) {}\n'.format(x, y, edge_dir)
+
+        return edge_vals
+
+    def _get_adjacent_edges_for_edge(self, x, y, edge_dir):
+
+        vertex_dirs = EdgeVertexMapping.get_vertex_dirs_for_edge_dir(edge_dir)
+
+        edge_tuples = []
+        edge_tuples.extend(self._get_adjacent_edges_to_vertex(x, y, vertex_dirs[0]) + \
+                           self._get_adjacent_edges_to_vertex(x, y, vertex_dirs[1]))
+
+        edge_tuples = filter(
+            lambda edge_tuple: edge_tuple[2] != edge_dir,
+            edge_tuples
+        )
+
+        return edge_tuples
+
+    def get_adjacent_edges_for_edge(self, x, y, edge_dir):
+
+        edge_tuples = self._get_adjacent_edges_for_edge(x, y, edge_dir)
+        edge_vals = []
+
+        for ex, ey, e_dir in edge_tuples:
+            tile = self.get_tile_with_coords(ex, ey)
+
+            if tile:
+                edge_vals.append(tile.get_edge(e_dir))
+
+        return edge_vals
+
+    def _get_adjacent_vertices_for_vertex(self, x, y, vertex_dir):
+
+        vertex_tuples = []
 
         tile = self.get_tile_with_coords(x, y)
 
         vertex_dirs = VertexDirection.get_neighboring_vertex_dirs(vertex_dir)
 
-        vertex_vals = map(lambda v_dir: tile.get_vertex(v_dir), vertex_dirs)
+        # Two of the closest vertices will lie on this tile
+        for adjacent_vertex_dir in vertex_dirs:
+            vertex_tuple = (x, y, adjacent_vertex_dir)
+            vertex_tuples.append(vertex_tuple)
 
         # The last vertex value won't be available via the current tile's
         # vertices, but must be found on its neighbor.
 
-        # Get the directions of edges that both have vertex_dir as an endpoint.
         edge_dirs = EdgeVertexMapping.get_edge_dirs_for_vertex_dir(vertex_dir)
 
-        neighboring_tile = self.get_neighboring_tile(tile, edge_dirs[0])
-        opp_vert_dir = HexTile.get_equivalent_vertex_dir(vertex_dir, edge_dirs[0])
+        # Pick one edge, arbitrarily, to find the neighbor tile relative to that edge.
+        neighbor_edge_dir = edge_dirs[0]
+        neighboring_tile = self.get_neighboring_tile(tile, neighbor_edge_dir)
+        neighbor_x = tile.x + neighbor_edge_dir[0]
+        neighbor_y = tile.y + neighbor_edge_dir[1]
 
-        neighbor_vertex_dirs = VertexDirection.get_neighboring_vertex_dirs(opp_vert_dir)
-        neighbor_vertex_vals = filter(
-            lambda v_val: v_val not in vertex_vals,
-            map(lambda v_dir: neighboring_tile.get_vertex(v_dir), neighbor_vertex_dirs)
+        # Find the neighbor equivalent of vertex_dir
+        opp_vert_dir = HexTile.get_equivalent_vertex_dir(vertex_dir, neighbor_edge_dir)
+
+        # Vertex and edge direction should be relative to same tile
+        def vertex_already_found(v_dir, neighbor_edge):
+            neighbor_equivalent_v_dir = \
+                HexTile.get_equivalent_vertex_dir(v_dir, neighbor_edge_dir.get_opposite_direction())
+            return neighbor_equivalent_v_dir not in map(lambda v_tup: v_tup[2], vertex_tuples)
+
+        # Find the vertices adjacent to neighbors equivalent of vertex_dir.
+        # One will duplicate a vertex we already have, one will be new.
+        # Filter out the duplicate.
+        last_vertex_dir = filter(
+            lambda v_dir: not vertex_already_found(v_dir, neighbor_edge_dir.get_opposite_direction()),
+            VertexDirection.get_neighboring_vertex_dirs(opp_vert_dir)
         )
 
-        vertex_vals.extend(neighbor_vertex_vals)
+        if len(last_vertex_dir):
+            last_vertex_dir = last_vertex_dir[0]
+            vertex_tuples.append( (neighbor_x, neighbor_y, last_vertex_dir) )
+
+        return vertex_tuples
+
+    def get_adjacent_vertices_for_vertex(self, x, y, vertex_dir):
+
+        vertex_tuples = self._get_adjacent_vertices_for_vertex(x, y, vertex_dir)
+        vertex_vals = []
+
+        for vx, vy, v_dir in vertex_tuples:
+            tile = self.get_tile_with_coords(vx, vy)
+
+            if tile:
+                vertex_vals.append(tile.get_vertex(v_dir))
 
         return vertex_vals

@@ -54,6 +54,7 @@ class Player(TradingEntity):
     def get_total_points(self):
         return self.points + self.hidden_points
 
+    # TODO: pay for placing structure
     def get_structure(self, structure_name):
         """Get the given structure from the player's stock, if any remains.
 
@@ -78,5 +79,6 @@ class Player(TradingEntity):
         else:
             raise NotEnoughStructuresException(self, structure_name)
 
+    # TODO: Restore cost of structure
     def restore_structure(self, structure_name):
         self.remaining_structure_counts[structure_name] += 1
