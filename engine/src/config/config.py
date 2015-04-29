@@ -4,6 +4,7 @@ from engine.src.config.game_config import game_config
 from engine.src.config.type_config import type_config
 from engine.src.config.type_mapping import type_mapping
 from engine.src.exceptions import *
+import pdb
 
 
 class Config(object):
@@ -141,12 +142,15 @@ class Config(object):
         except NoConfigValueDefinedException:
             return
 
-        is_struct = len(filter(
-            lambda key: type(key) == StringType,
-            target_type.keys()
-        )) != 0
+        is_struct = False
 
-        if (type(curr_value) is dict) and is_struct:
+        if type(curr_value) is dict:
+            is_struct = len(filter(
+                lambda key: type(key) == StringType,
+                target_type.keys()
+            )) != 0
+
+        if is_struct:
             for k, v in curr_value.iteritems():
                 path = k if not path_so_far else '.'.join([path_so_far, k])
                 Config.coerce_recursive(path)
@@ -158,10 +162,6 @@ class Config(object):
 
     @classmethod
     def coerce(cls, value, from_type, to_type):
-
-        # print 'coercing:\n\tvalue {}\n\tfrom {}\n\tto {}'.format(
-        #     value, from_type, to_type
-        # )
 
         if from_type == to_type:
             return value
@@ -194,8 +194,6 @@ class Config(object):
             if dict isn't a struct, replace second to last with default
         """
 
-        # print 'Given path: {}\n'.format(dot_notation_str)
-
         value = None
         path = None
 
@@ -207,7 +205,6 @@ class Config(object):
             try:
                 keys[repl_index] = 'default'
                 path = '.'.join(keys)
-                # print 'Attempted path: {}\n'.format(path)
                 value = Config.get(path, Config.type_config, False)
                 break
             except NoConfigValueDefinedException:
@@ -217,7 +214,6 @@ class Config(object):
                 path = dot_notation_str
                 break
 
-        # print 'Returned path: {}\n'.format(path)
         return path
 
     # The dictionary accessed by Config.get()

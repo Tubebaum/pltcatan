@@ -9,6 +9,7 @@ from engine.src.vertex import Vertex
 from engine.src.edge import Edge
 from engine.src.exceptions import *
 from engine.src.trading.trade_offer import TradeOffer
+from engine.src.structure.structure import Structure
 
 
 class InputManager(cmd.Cmd):
@@ -63,8 +64,8 @@ class InputManager(cmd.Cmd):
         self.game.roll_dice(value)
         self.has_rolled = True
 
-    # TODO: Trade with bank, harbor
-    def do_trade(self, line):
+    # TODO: Move core logic to game.
+    def do_trade_player(self, line):
         """Trade resources with other players or with the bank."""
 
         if not self.has_rolled:
@@ -125,6 +126,15 @@ class InputManager(cmd.Cmd):
             except Exception as e:
                 InputManager.input_default(e, None, False)
 
+    # TODO
+    def do_trade_bank(self, line):
+        print('not yet implemented')
+
+    # TODO
+    # TODO: long term. Refactor to be compatible w/ any trade intermediary.
+    def do_trade_harbor(self, line):
+        print('not yet implemented')
+
     def do_build(self, line):
         """Build structures, including settlements, cities, and roads."""
 
@@ -133,31 +143,19 @@ class InputManager(cmd.Cmd):
             return
 
         try:
-
             msg = "Please enter the number (e.g. '1') of the structure " + \
                   "you would like to build."
 
             structure_name = InputManager.prompt_select_list_value(
                 msg, self.structure_names)
 
-            structure = self.player.get_structure(structure_name)
+            self.game.place_structure(self.player, structure_name)
 
-            if structure.position_type == 'edge':
-                x, y, edge_dir = InputManager.prompt_edge_placement(self.game)
-                self.game.board.place_edge_structure(x, y, edge_dir, structure)
-
-            elif structure.position_type == 'vertex':
-                x, y, vertex_dir = \
-                    InputManager.prompt_vertex_placement(self.game)
-                self.game.board.place_vertex_structure(x, y,
-                                                       vertex_dir, structure)
-
-        except NotEnoughStructuresException as n:
-            InputManager.input_default(n, None, False)
-        except BoardPositionOccupiedException as b:
-            InputManager.input_default(b, None, False)
-        except InvalidBaseStructureException as i:
-            InputManager.input_default(i, None, False)
+        except (NotEnoughStructuresException, BoardPositionOccupiedException,
+                InvalidBaseStructureException,
+                InvalidStructurePlacementException), e:
+            self.player.restore_structure(structure_name)
+            InputManager.input_default(e, None, False)
 
     # TODO: Enforce can't play card bought during same turn.
     def do_buy_card(self, line):
@@ -220,11 +218,57 @@ class InputManager(cmd.Cmd):
         for tile in self.game.board.iter_tiles():
             print tile
 
-    def do_print_resource_cards(self, line):
+    def do_view_resource_cards(self, line):
         """View your resource cards."""
 
         msg = map(lambda resource_type: str(resource_type),
                   self.player.get_resource_list())
+
+        InputManager.input_default(msg, None, False)
+
+    # TODO
+    def do_view_structures(self, line):
+        """View your vertex and edge structures."""
+
+        edge_structures = []
+        vertex_structures = []
+
+        for x, y in self.game.board.iter_tile_coords():
+            tile = self.game.board.get_tile_with_coords(x, y)
+
+            if not tile:
+                continue
+
+            for edge_dir in EdgeDirection:
+                edge_val = tile.get_edge(edge_dir)
+
+                if isinstance(edge_val, Structure) and \
+                              edge_val.owning_player == self.player:
+
+                    edge_structures.append( (tile, edge_dir, edge_val) )
+
+            for vertex_dir in VertexDirection:
+                vertex_val = tile.get_vertex(vertex_dir)
+
+                if isinstance(vertex_val, Structure) and \
+                              vertex_val.owning_player == self.player:
+                    vertex_structures.append( (tile, vertex_dir, vertex_val) )
+
+        structures = []
+        tups_to_print = []
+
+        for s in edge_structures:
+            if s[2] not in structures:
+                structures.append(s[2])
+                tups_to_print.append(s)
+
+        for s in vertex_structures:
+            if s[2] not in structures:
+                structures.append(s[2])
+                tups_to_print.append(s)
+
+        msg = '\n' + '\n'.join(map(lambda tup: 'Tile: {}\tDirection: {}\tStructure: {}'.format(
+            tup[0], tup[1], tup[2].name), tups_to_print))
 
         InputManager.input_default(msg, None, False)
 
@@ -472,7 +516,7 @@ class InputManager(cmd.Cmd):
 
         return x, y, edge_dir
 
-    # TODO: Roll announce methods into single method using getattr?
+    # TODO: Roll announce methods into single method? Or programatically set.
 
     @staticmethod
     def announce_roll_value(roll_value):

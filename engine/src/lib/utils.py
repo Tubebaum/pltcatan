@@ -38,6 +38,17 @@ class Utils(object):
         return lst
 
     @classmethod
+    def remove_duplicates(cls, lst):
+
+        result = []
+
+        for e in lst:
+            if e not in result:
+                result.append(e)
+
+        return result
+
+    @classmethod
     def is_function(cls, func):
         return hasattr(func, '__call__')
 
