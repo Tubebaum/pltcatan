@@ -352,7 +352,6 @@ class GameBoard(HexBoard):
             )
 
             if not len(claimed_edge_structs):
-                print "No claimed_edge_structs"
                 raise InvalidStructurePlacementException()
 
     def distribute_resources_for_roll(self, roll_value):

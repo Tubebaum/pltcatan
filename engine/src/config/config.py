@@ -163,10 +163,6 @@ class Config(object):
     @classmethod
     def coerce(cls, value, from_type, to_type):
 
-        # print 'coercing:\n\tvalue {}\n\tfrom {}\n\tto {}'.format(
-        #     value, from_type, to_type
-        # )
-
         if from_type == to_type:
             return value
 
@@ -198,8 +194,6 @@ class Config(object):
             if dict isn't a struct, replace second to last with default
         """
 
-        # print 'Given path: {}\n'.format(dot_notation_str)
-
         value = None
         path = None
 
@@ -211,7 +205,6 @@ class Config(object):
             try:
                 keys[repl_index] = 'default'
                 path = '.'.join(keys)
-                # print 'Attempted path: {}\n'.format(path)
                 value = Config.get(path, Config.type_config, False)
                 break
             except NoConfigValueDefinedException:
@@ -221,7 +214,6 @@ class Config(object):
                 path = dot_notation_str
                 break
 
-        # print 'Returned path: {}\n'.format(path)
         return path
 
     # The dictionary accessed by Config.get()

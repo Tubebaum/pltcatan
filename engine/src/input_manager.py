@@ -9,6 +9,7 @@ from engine.src.vertex import Vertex
 from engine.src.edge import Edge
 from engine.src.exceptions import *
 from engine.src.trading.trade_offer import TradeOffer
+from engine.src.structure.structure import Structure
 
 
 class InputManager(cmd.Cmd):
@@ -142,7 +143,6 @@ class InputManager(cmd.Cmd):
             return
 
         try:
-
             msg = "Please enter the number (e.g. '1') of the structure " + \
                   "you would like to build."
 
@@ -223,6 +223,52 @@ class InputManager(cmd.Cmd):
 
         msg = map(lambda resource_type: str(resource_type),
                   self.player.get_resource_list())
+
+        InputManager.input_default(msg, None, False)
+
+    # TODO
+    def do_view_structures(self, line):
+        """View your vertex and edge structures."""
+
+        edge_structures = []
+        vertex_structures = []
+
+        for x, y in self.game.board.iter_tile_coords():
+            tile = self.game.board.get_tile_with_coords(x, y)
+
+            if not tile:
+                continue
+
+            for edge_dir in EdgeDirection:
+                edge_val = tile.get_edge(edge_dir)
+
+                if isinstance(edge_val, Structure) and \
+                              edge_val.owning_player == self.player:
+
+                    edge_structures.append( (tile, edge_dir, edge_val) )
+
+            for vertex_dir in VertexDirection:
+                vertex_val = tile.get_vertex(vertex_dir)
+
+                if isinstance(vertex_val, Structure) and \
+                              vertex_val.owning_player == self.player:
+                    vertex_structures.append( (tile, vertex_dir, vertex_val) )
+
+        structures = []
+        tups_to_print = []
+
+        for s in edge_structures:
+            if s[2] not in structures:
+                structures.append(s[2])
+                tups_to_print.append(s)
+
+        for s in vertex_structures:
+            if s[2] not in structures:
+                structures.append(s[2])
+                tups_to_print.append(s)
+
+        msg = '\n' + '\n'.join(map(lambda tup: 'Tile: {}\tDirection: {}\tStructure: {}'.format(
+            tup[0], tup[1], tup[2].name), tups_to_print))
 
         InputManager.input_default(msg, None, False)
 

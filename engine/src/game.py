@@ -1,3 +1,4 @@
+import pdb
 from engine.src.config.config import Config
 from engine.src.lib.utils import Utils
 from engine.src.exceptions import *
@@ -9,6 +10,7 @@ from engine.src.resource_type import ResourceType
 from engine.src.position_type import PositionType
 from engine.src.structure.structure import Structure
 from engine.src.calamity.robber import Robber
+from engine.src.longest_road_search import LongestRoadSearch
 
 
 class Game(object):
@@ -66,13 +68,11 @@ class Game(object):
         Prompts for placement information and attempts to place on board. Does
         not do any exception handling.
         """
-
         structure = player.get_structure(structure_name)
 
         if structure.position_type == PositionType.EDGE:
             prompt_func = InputManager.prompt_edge_placement
             placement_func = self.board.place_edge_structure
-
         elif structure.position_type == PositionType.VERTEX:
             prompt_func = InputManager.prompt_vertex_placement
             placement_func = self.board.place_vertex_structure
@@ -121,8 +121,6 @@ class Game(object):
             # Place settlement
             InputManager.announce_structure_placement(player, 'Settlement')
             x, y, vertex_dir = self.place_init_structure(player, 'Settlement')
-
-            print 'Road must border vertex ({}, {}) {}'.format(x, y, vertex_dir)
 
             # Place road
             InputManager.announce_structure_placement(player, 'Road')
@@ -180,6 +178,7 @@ class Game(object):
 
         # Determine largest army
         player_with_largest_army = max(self.players, key=lambda player: player.knights)
+        player_with_longest_road = LongestRoadSearch(self.board).execute()
 
         print('update_point_counts not implemented.')
 

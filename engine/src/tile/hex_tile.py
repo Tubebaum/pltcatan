@@ -118,10 +118,6 @@ class HexTile(Tile):
         self.vertices[start_vertex_dir] = start_vertex
         self.vertices[end_vertex_dir] = end_vertex
 
-        # print "Given tile: {0}\nEdges: {1}\n".format(self, self.edges)
-        # print "Neighbor tile: {0}\nEdges: {1}\n".format(
-        #     neighboring_tile, neighboring_tile.edges)
-
         # Replace this tile's edge with the neighbor's edge.
         self.add_edge(start_vertex_dir, end_vertex_dir,
                       neighboring_tile.edges[start_vertex_dir][end_vertex_dir])
