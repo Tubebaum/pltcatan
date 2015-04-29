@@ -49,7 +49,7 @@ class Game(object):
         # Print out game over message.
         winner = self.get_winning_player()
         print 'Game over. {0} wins with {1} points!\n'\
-            .format(winner.name, winner.victory_point_count)
+            .format(winner.name, winner.get_total_points())
 
     def create_players(self):
         """Create a new batch of players."""

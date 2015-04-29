@@ -163,6 +163,7 @@ class InputManager(cmd.Cmd):
     # TODO
     # TODO: long term. Refactor to be compatible w/ any trade intermediary.
     def do_trade_harbor(self, line):
+        """Trade resources with a harbor."""
         print('not yet implemented')
 
     def do_build(self, line):
@@ -249,6 +250,7 @@ class InputManager(cmd.Cmd):
             print tile
 
     def do_view_points(self, line):
+        """View points per player (not including other players' hidden points)."""
 
         msg = 'Player Point Counts:\n'
 
@@ -257,7 +259,7 @@ class InputManager(cmd.Cmd):
                 else player.get_visible_points()
             msg += '{}:\t{}'.format(player, points)
 
-        InputManager.input_default(msg, None, False)
+        InputManager.output(msg)
 
     def do_view_resource_cards(self, line):
         """View your resource cards."""
