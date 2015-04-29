@@ -139,7 +139,7 @@ class EdgeMeta(object):
 
         return matches_this or matches_neighbor
 
-
+# FIXME: Not correctly finding longest road for roads > length 2
 class LongestRoadSearch(object):
 
     def __init__(self, board):
