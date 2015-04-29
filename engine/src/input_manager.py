@@ -50,13 +50,13 @@ class InputManager(cmd.Cmd):
         """Announce start of player turn."""
 
         msg = "{0}'s turn: ".format(self.player.name)
-        InputManager.input_default(msg, None, False)
+        InputManager.output(msg)
 
     def postloop(self):
         """Announce end of player turn."""
 
         msg = "End of {0}'s turn.".format(self.player.name)
-        InputManager.input_default(msg, None, False)
+        InputManager.output(msg)
 
     def do_roll(self, value):
         """Roll the dice."""
@@ -66,7 +66,7 @@ class InputManager(cmd.Cmd):
 
     # TODO: Move core logic to game.
     def do_trade_player(self, line):
-        """Trade resources with other players or with the bank."""
+        """Trade resources with other players."""
 
         if not self.has_rolled:
             print 'You must roll before you can trade.'
@@ -104,7 +104,7 @@ class InputManager(cmd.Cmd):
 
             if not tradeable_players:
                 msg = 'No players to trade with.'
-                InputManager.input_default(msg, None, False)
+                InputManager.output(msg)
                 return
 
             other_player = InputManager.prompt_select_list_value(
@@ -120,15 +120,45 @@ class InputManager(cmd.Cmd):
                     other_player: offered_resources
                 }
 
-                InputManager.input_default('Trade complete.', None, False)
-
+                InputManager.announce_trade_completed(trade_offer)
             # TODO: Specify explicit possible exceptions.
             except Exception as e:
                 InputManager.input_default(e, None, False)
 
-    # TODO
     def do_trade_bank(self, line):
-        print('not yet implemented')
+        """Trade resources with the bank"""
+
+        if not self.has_rolled:
+            print 'You must roll before you can trade.'
+            return
+        else:
+            # Get list of requested resources
+            msg_offer = "Please enter the number of the resource you want to offer." + \
+                "The bank buys 4 of a given resource, and returns 1 of any other resource."
+
+            offered_resource_type = InputManager.prompt_select_list_value(
+                msg_offer, ResourceType.get_arable_types()
+            )
+
+            msg_request = "Please enter the number of the resource you want to request."
+
+            requested_resource_type = InputManager.prompt_select_list_value(
+                msg_request, ResourceType.get_arable_types())
+
+            offered_resources = {offered_resource_type: 4}
+            requested_resources = {requested_resource_type: 1}
+
+            trade_offer = TradeOffer(offered_resources, requested_resources)
+
+            try:
+                self.game.board.bank.trade(self.player, trade_offer)
+                InputManager.announce_trade_completed(trade_offer)
+
+            # TODO: Specify explicit possible exceptions.
+            except Exception as e:
+                InputManager.output(e)
+
+
 
     # TODO
     # TODO: long term. Refactor to be compatible w/ any trade intermediary.
@@ -163,10 +193,10 @@ class InputManager(cmd.Cmd):
 
         if not self.has_rolled:
             msg = 'You must roll before you can buy a development card.'
-            InputManager.input_default(msg, None, False)
+            InputManager.output(msg)
         elif self.has_played_card:
             msg = 'You may only play one card per turn.'
-            InputManager.input_default(msg, None, False)
+            InputManager.output(msg)
         else:
 
             try:
@@ -186,7 +216,7 @@ class InputManager(cmd.Cmd):
 
         if self.has_played_card:
             msg = 'You may only play one card per turn.'
-            InputManager.input_default(msg, None, False)
+            InputManager.output(msg)
         else:
 
             msg = "Please enter the number (e.g. '1') of the development " + \
@@ -235,7 +265,7 @@ class InputManager(cmd.Cmd):
         msg = map(lambda resource_type: str(resource_type),
                   self.player.get_resource_list())
 
-        InputManager.input_default(msg, None, False)
+        InputManager.output(msg)
 
     # TODO
     def do_view_structures(self, line):
@@ -281,7 +311,7 @@ class InputManager(cmd.Cmd):
         msg = '\n' + '\n'.join(map(lambda tup: 'Tile: {}\tDirection: {}\tStructure: {}'.format(
             tup[0], tup[1], tup[2].name), tups_to_print))
 
-        InputManager.input_default(msg, None, False)
+        InputManager.output(msg)
 
     def do_end_turn(self, line):
         """End your current turn."""
@@ -307,6 +337,11 @@ class InputManager(cmd.Cmd):
 
         for resource_type in ResourceType.get_arable_types():
             self.player.deposit_resources(resource_type, count)
+
+    @staticmethod
+    def output(msg):
+        """Outputs the given message."""
+        InputManager.input_default(msg, None, False)
 
     @staticmethod
     def input_default(msg, default=None, read_result=True):
@@ -354,7 +389,7 @@ class InputManager(cmd.Cmd):
             except ValueError:
                 msg = 'Invalid number of players. Number must be an integer' + \
                     ' greater than zero.'
-                InputManager.input_default(msg, None, False)
+                InputManager.output(msg)
 
         # Shift range by 1 so prompts starting with player 1, not player 0
         for i in range(1, num_players + 1):
@@ -566,7 +601,7 @@ class InputManager(cmd.Cmd):
     def announce_resource_distributions(distributions):
 
         msg = 'Distributing resources.'
-        InputManager.input_default(msg, None, False)
+        InputManager.output(msg)
 
         for player in distributions:
             for resource_type in distributions[player]:
@@ -575,4 +610,23 @@ class InputManager(cmd.Cmd):
                 if count:
                     msg = '{0} received {1} {2} cards.'.format(
                         player.name, count, resource_type)
-                    InputManager.input_default(msg, None, False)
+                    InputManager.output(msg)
+
+    @staticmethod
+    def announce_trade_completed(trade_offer):
+        requested_resources = trade_offer.requested_resources
+        offered_resources = trade_offer.offered_resources
+
+        def generate_resources_readable_str(resources):
+            return ", ".join(map(
+                lambda res: str(resources[res]) + " " + str(res) + "(s)",
+                (res for res in resources if resources[res] != 0)
+            ))
+
+        msg = "Trade completed. You bought " + \
+            generate_resources_readable_str(requested_resources) + " and sold " + \
+            generate_resources_readable_str(offered_resources) + "."
+
+        InputManager.output(msg)
+
+
