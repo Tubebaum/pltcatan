@@ -188,10 +188,9 @@ class InputManager(cmd.Cmd):
 
             self.game.update_point_counts()
 
-        except (NotEnoughStructuresException, BoardPositionOccupiedException,
-                InvalidBaseStructureException,
+        except (NotEnoughStructuresException, NotEnoughResourcesException,
+                BoardPositionOccupiedException, InvalidBaseStructureException,
                 InvalidStructurePlacementException), e:
-            self.player.restore_structure(structure_name)
             InputManager.input_default(e, None, False)
 
     # TODO: Enforce can't play card bought during same turn.
@@ -269,11 +268,13 @@ class InputManager(cmd.Cmd):
 
         InputManager.output(msg)
 
-    def do_view_resource_cards(self, line):
+    def do_view_resources(self, line):
         """View your resource cards."""
 
-        msg = map(lambda resource_type: str(resource_type),
-                  self.player.get_resource_list())
+        msg = '\n' + '\n'.join(map(
+            lambda resource_type: '{}:\t{}'.format(resource_type, self.player.resources[resource_type]),
+            self.player.resources
+        ))
 
         InputManager.output(msg)
 
