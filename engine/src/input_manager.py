@@ -328,6 +328,11 @@ class InputManager(cmd.Cmd):
             self.player.deposit_resources(resource_type, count)
 
     @staticmethod
+    def output(msg):
+        """Outputs the given message."""
+        InputManager.input_default(msg, None, False)
+
+    @staticmethod
     def input_default(msg, default=None, read_result=True):
         """Asks for user data using the format specified below.
 
@@ -347,11 +352,6 @@ class InputManager(cmd.Cmd):
             return result if result else default
         else:
             print prompt
-
-    @staticmethod
-    def output(msg):
-        """Outputs the given message."""
-        InputManager.input_default(msg, None, False)
 
     @staticmethod
     def get_player_names():
@@ -607,20 +607,10 @@ class InputManager(cmd.Cmd):
         offered_resources = trade_offer.offered_resources
 
         def generate_resources_readable_str(resources):
-            readable_str = ""
-
-            # filter out the resources that have count = 0
-            relevant_resources = filter(
-                lambda res_type: resources[res_type] != 0,
-                resources)
-
-            for i, res_type in enumerate(relevant_resources):
-                count = resources[res_type]
-                if i > 0:
-                    readable_str += ", "
-                readable_str += str(count) + " " + str(res_type)+"(s)"
-
-            return readable_str
+            return ", ".join(map(
+                lambda res: str(resources[res]) + " " + str(res) + "(s)",
+                (res for res in resources if resources[res] != 0)
+            ))
 
         msg = "Trade completed. You bought " + \
             generate_resources_readable_str(requested_resources) + " and sold " + \
