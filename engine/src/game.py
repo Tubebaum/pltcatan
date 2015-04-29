@@ -43,9 +43,8 @@ class Game(object):
         while max_point_count < Config.get('game.points_to_win'):
             for player in self.players:
                 InputManager(self, player).cmdloop()
-
-            self.update_point_counts()
-            max_point_count = self.get_winning_player().points
+                self.update_point_counts()
+                max_point_count = self.get_winning_player().get_total_points()
 
         # Print out game over message.
         winner = self.get_winning_player()
@@ -85,6 +84,17 @@ class Game(object):
             params.extend([struct_x, struct_y, struct_vertex_dir])
 
         placement_func(*params)
+
+        player = structure.owning_player
+
+        # Allocate points
+        if structure.augments():
+            # TODO: conversions from camelcase to underscore
+            points = structure.point_value - Config.get('structure.player_built.' + structure_name.lower()).point_value
+        else:
+            points = structure.point_value
+
+        player.points += points
 
         return x, y, struct_dir
 
@@ -173,12 +183,13 @@ class Game(object):
 
         return max(self.players, key=lambda player: player.points)
 
-    # TODO
     def update_point_counts(self):
 
-        # Determine largest army
+        for player in self.players:
+            player.special_points = 0
+
         player_with_largest_army = max(self.players, key=lambda player: player.knights)
+        player_with_largest_army.special_points += 2
+
         player_with_longest_road = LongestRoadSearch(self.board).execute()
-
-        print('update_point_counts not implemented.')
-
+        player_with_longest_road.special_points += 2

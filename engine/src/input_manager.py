@@ -218,6 +218,17 @@ class InputManager(cmd.Cmd):
         for tile in self.game.board.iter_tiles():
             print tile
 
+    def do_view_points(self, line):
+
+        msg = 'Player Point Counts:\n'
+
+        for player in self.game.players:
+            points = player.get_total_points() if player == self.player \
+                else player.get_visible_points()
+            msg += '{}:\t{}'.format(player, points)
+
+        InputManager.input_default(msg, None, False)
+
     def do_view_resource_cards(self, line):
         """View your resource cards."""
 

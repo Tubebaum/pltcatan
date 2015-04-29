@@ -28,6 +28,7 @@ class Player(TradingEntity):
 
         self.points = 0
         self.hidden_points = 0
+        self.special_points = 0
 
         self.knights = 0
         self.longest_road_length = 0
@@ -52,7 +53,7 @@ class Player(TradingEntity):
             self.remaining_structure_counts[structure['name']] = structure['count']
 
     def get_total_points(self):
-        return self.points + self.hidden_points
+        return self.points + self.hidden_points + self.special_points
 
     # TODO: pay for placing structure
     def get_structure(self, structure_name):
