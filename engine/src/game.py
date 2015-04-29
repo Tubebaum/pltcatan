@@ -189,7 +189,19 @@ class Game(object):
             player.special_points = 0
 
         player_with_largest_army = max(self.players, key=lambda player: player.knights)
-        player_with_largest_army.special_points += 2
 
-        player_with_longest_road = LongestRoadSearch(self.board).execute()
-        player_with_longest_road.special_points += 2
+        # TODO: Move thresholds to config
+        if player_with_largest_army.knights >= 3:
+            print 'Largest army given to: {}'.format(player_with_largest_army)
+            player_with_largest_army.special_points += 2
+
+        player_road_len_dict = LongestRoadSearch(self.board).execute()
+
+        for player, road_len in player_road_len_dict.iteritems():
+            player.longest_road_length = road_len
+
+        player_with_longest_road = max(player_road_len_dict)
+
+        if player_with_longest_road.longest_road_length >= 5:
+            print 'Longest road given to: {}'.format(player_with_longest_road)
+            player_with_longest_road.special_points += 2

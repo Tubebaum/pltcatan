@@ -55,6 +55,13 @@ class Player(TradingEntity):
     def get_total_points(self):
         return self.points + self.hidden_points + self.special_points
 
+    def get_unplayed_development_cards(self):
+
+        unplayed_dev_cards = filter(
+            lambda dc: not dc.played, self.development_cards)
+
+        return unplayed_dev_cards
+
     # TODO: pay for placing structure
     def get_structure(self, structure_name):
         """Get the given structure from the player's stock, if any remains.

@@ -1,5 +1,6 @@
 import cmd
 import sys
+import pdb
 
 from engine.src.config.config import Config
 from engine.src.direction.vertex_direction import VertexDirection
@@ -57,6 +58,9 @@ class InputManager(cmd.Cmd):
 
         msg = "End of {0}'s turn.".format(self.player.name)
         InputManager.output(msg)
+
+    def do_debug(self, line):
+        pdb.set_trace()
 
     def do_roll(self, value):
         """Roll the dice."""
@@ -182,6 +186,8 @@ class InputManager(cmd.Cmd):
 
             self.game.place_structure(self.player, structure_name)
 
+            self.game.update_point_counts()
+
         except (NotEnoughStructuresException, BoardPositionOccupiedException,
                 InvalidBaseStructureException,
                 InvalidStructurePlacementException), e:
@@ -202,6 +208,7 @@ class InputManager(cmd.Cmd):
 
             try:
                 dev_card = self.game.board.bank.buy_development_card(self.player)
+                dev_card.draw_card(self.game, self.player)
 
                 success_msg = 'You received a {0}!'.format(str(dev_card))
 
@@ -225,8 +232,8 @@ class InputManager(cmd.Cmd):
 
             dev_card = InputManager.prompt_select_list_value(
                 msg,
-                map(lambda card: card.name, self.player.development_cards),
-                self.player.development_cards
+                map(lambda card: card.name, self.player.get_unplayed_development_cards()),
+                self.player.get_unplayed_development_cards()
             )
 
             if not dev_card:
@@ -237,6 +244,7 @@ class InputManager(cmd.Cmd):
 
             try:
                 dev_card.play_card(self.game, self.player)
+                self.game.update_point_counts()
 
             # TODO: Make clear which exceptions can be caught.
             except Exception as e:

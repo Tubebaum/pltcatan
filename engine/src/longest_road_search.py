@@ -150,7 +150,7 @@ class LongestRoadSearch(object):
         player_claimed_edges_dict = self.find_per_player_claimed_edges()
         player_road_len_dict = self.find_per_player_max_road_lengths(player_claimed_edges_dict)
 
-        return max(player_road_len_dict)
+        return player_road_len_dict
 
     def find_per_player_claimed_edges(self):
 
