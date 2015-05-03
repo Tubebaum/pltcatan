@@ -1,0 +1,8 @@
+@import ./chits as bnb-chits
+@import ./tiles as bnb-tiles
+
+board: {
+    radius: default.game.board.radius + 1,
+    chits: bnb-chits,
+    tiles: bnb-tiles
+}
