@@ -1,5 +1,7 @@
+#import sys
+#sys.path.append('..')
+#from ..engine.src.lib.utils import Utils
 from collections import defaultdict
-from engine.src.lib.utils import Utils
 
 class StateNotFound(Exception):
     """Thrown when a dependency injection tries to inject a variable that isn't part of the declared game state
@@ -50,4 +52,4 @@ class GameOracle(object):
         self.game_state[name] = var
 
 # Access game state through the game oracle
-ORACLE = GameOracle(Utils.nested_dict())
+ORACLE = GameOracle(defaultdict(lambda x: defaultdict(list)))
