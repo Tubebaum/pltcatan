@@ -6,8 +6,15 @@ from engine.src.structure.structure import Structure
 from engine.src.tile.hex_tile import HexTile
 
 
-vertices = Utils.nested_dict()
-edges = Utils.nested_dict()
+global vertices
+global edges
+
+
+def reset_metas():
+    global vertices
+    global edges
+    vertices = Utils.nested_dict()
+    edges = Utils.nested_dict()
 
 
 def find_edge_meta(board, x, y, edge_dir):
@@ -103,7 +110,6 @@ class EdgeMeta(object):
 
         edges[x][y][edge_dir] = self
 
-
         self.board = board
 
         self.x = x
@@ -114,17 +120,16 @@ class EdgeMeta(object):
         self.edge_val = self.tile.get_edge(self.edge_dir)
 
         # Neighbor equivalent edge meta of same edge.
-        self.neighbor = self.find_neighbor()
+        self.neighbor_x = self.tile.x + self.edge_dir[0]
+        self.neighbor_y = self.tile.y + self.edge_dir[1]
+        self.neighbor_edge_dir = self.edge_dir.get_opposite_direction()
 
-    def find_neighbor(self):
-
-        neighbor_x = self.tile.x + self.edge_dir[0]
-        neighbor_y = self.tile.y + self.edge_dir[1]
-        neighbor_edge_dir = self.edge_dir.get_opposite_direction()
-
-        return find_edge_meta(self.board, neighbor_x, neighbor_y, neighbor_edge_dir)
+        edges[self.neighbor_x][self.neighbor_y][self.neighbor_edge_dir] = self
 
     def __str__(self):
+        return '({}, {}) {}'.format(self.x, self.y, self.edge_dir)
+
+    def __repr__(self):
         return '({}, {}) {}'.format(self.x, self.y, self.edge_dir)
 
     def __eq__(self, other):
@@ -133,9 +138,9 @@ class EdgeMeta(object):
                        self.y == other.y and \
                        self.edge_dir == other.edge_dir
 
-        matches_neighbor = self.neighbor.x == other.x and \
-                           self.neighbor.y == other.y and \
-                           self.neighbor.edge_dir == other.edge_dir
+        matches_neighbor = self.neighbor_x == other.x and \
+                           self.neighbor_y == other.y and \
+                           self.neighbor_edge_dir == other.edge_dir
 
         return matches_this or matches_neighbor
 
@@ -146,6 +151,7 @@ class LongestRoadSearch(object):
         self.board = board
 
     def execute(self):
+        reset_metas()
 
         player_claimed_edges_dict = self.find_per_player_claimed_edges()
         player_road_len_dict = self.find_per_player_max_road_lengths(player_claimed_edges_dict)
@@ -158,6 +164,11 @@ class LongestRoadSearch(object):
         checked_edges = Utils.nested_dict()
 
         for x, y in self.board.iter_tile_coords():
+            tile = self.board.get_tile_with_coords(x, y)
+
+            if not tile:
+                continue
+
             for edge_dir in EdgeDirection:
                 if not checked_edges[x][y][edge_dir]:
                     self.add_edge_to_dicts(x, y, edge_dir, player_claimed_edges_dict, checked_edges)
@@ -173,8 +184,7 @@ class LongestRoadSearch(object):
             return
 
         checked_edges[edge_meta.x][edge_meta.y][edge_meta.edge_dir] = True
-        if edge_meta.neighbor:
-            checked_edges[edge_meta.neighbor.x][edge_meta.neighbor.y][edge_meta.neighbor.edge_dir] = True
+        checked_edges[edge_meta.neighbor_x][edge_meta.neighbor_y][edge_meta.neighbor_edge_dir] = True
 
         if isinstance(edge_meta.edge_val, Structure):
             player = edge_meta.edge_val.owning_player
@@ -183,7 +193,6 @@ class LongestRoadSearch(object):
                 player_claimed_edges_dict[player] = []
 
             player_claimed_edges_dict[player].append(edge_meta)
-            # player_claimed_edges_dict[player].append(edge_meta.neighbor)
 
     def find_per_player_max_road_lengths(self, player_claimed_edges_dict):
 
@@ -230,12 +239,6 @@ class LongestRoadSearch(object):
 
         claimed_neighbors = [i for i in neighbor_edge_metas if i in remaining_edges]
 
-        # msg = '{} has claimed neighbors: \n'.format(edge_meta)
-        # for claimed_neighbor in claimed_neighbors:
-        #     msg += '\t{}\n'.format(claimed_neighbor)
-        #
-        # print msg
-
         if claimed_neighbors:
             max_path_len = 0
 
@@ -250,12 +253,6 @@ class LongestRoadSearch(object):
                 )
 
                 next_end_vertex = next(d for d in vertex_metas if d != end_vertex)
-
-                # print 'claimed_neighbor: {}'.format(claimed_neighbor)
-                # print 'remaining_edge_metas {}'.format(remaining_edge_metas)
-                # print 'next_end_vertex {}'.format(next_end_vertex)
-                #
-                # pdb.set_trace()
 
                 path_len = 1 + self.find_max_path_len(remaining_edge_metas, next_end_vertex, claimed_neighbor)
 

@@ -478,13 +478,18 @@ class InputManager(cmd.Cmd):
 
             try:
                 index = int(InputManager.input_default(prompt_msg))
+
+                if index < 1:
+                    raise ValueError
+
                 selected_element = value_list[index - 1]
 
                 valid = True
 
             except (IndexError, ValueError, TypeError):
-                print "Invalid number given. You must give a number " + \
+                msg = "Invalid number given. You must give a number " + \
                       "between 1 and {0}.".format(len(display_list))
+                InputManager.output(msg)
 
         return selected_element
 
@@ -522,8 +527,9 @@ class InputManager(cmd.Cmd):
                     if validate_func is not None else True
 
             except (IndexError, ValueError):
-                print "Invalid number given. All numbers must be " + \
+                msg = "Invalid number given. All numbers must be " + \
                       "between 1 and {0}.".format(len(allowed_values_lst))
+                InputManager.output(msg)
             except NotEnoughResourcesException as n:
                 InputManager.input_default(n, None, False)
 
