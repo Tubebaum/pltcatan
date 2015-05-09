@@ -21,6 +21,29 @@ def gen_access_func(var_name):
     """
     return ast.Call(ast.Attribute(ast.Name('ORACLE', ast.Load()), 'get', ast.Load()), [ast.Str(var_name)], [], None, None)
 
+class RewriteInjected(ast.NodeTransformer):
+    def __init__(self, injected):
+        """Creates a NodeTransformer object to replace calls to injected parameters with calls to a lookup table
+
+        Args:
+            injected (Iterable): An iterable representing the list of injected parameter names
+
+        Returns:
+            An instance of RewriteInjected whose visit method will rewrite the injected nodes
+        """
+        super(RewriteInjected, self).__init__()
+        self.injected = set(injected)
+
+    def visit_Name(self, node):
+        if node.id in self.injected:
+            return ast.copy_location(ast.Subscript(
+                value=ast.Name(id=node.id, ctx=ast.Load()),
+                slice=ast.Index(value=ast.Num(0)),
+                ctx=node.ctx
+            ), node)
+        else:
+            return self.generic_visit(node)
+
 # Automatically build no-op nonterminals
 register = get_registry()
 
@@ -110,9 +133,9 @@ lexer = lex.lex()
 precedence = (
     ('left','+','-'),
     ('left','*','/'),
-    ('left', 'COMPOP'),
     ('left', 'OR'),
     ('left', 'AND'),
+    ('left', 'COMPOP'),
     ('left', 'TO'),
     ('right', 'NOT'),
     ('right','UMINUS'),
@@ -191,10 +214,11 @@ def p_stmt_print(p):
 def p_top_func(p):
     """topfunc : FUNC '(' params ')' '{' opt_newline body '}'"""
     if p[3]:
-        args = ast.arguments(map(lambda x: x[0], p[3]), None, None, [gen_access_func(param[0].id) for param in p[3]])
+        args = ast.arguments([ast.Name('self', ast.Param())] + map(lambda x: x[0], p[3]), None, None, [gen_access_func(param[0].id) for param in p[3]])
     else:
         args = ast.arguments([], None, None, [])
-    p[0] = ast.FunctionDef("top", args, p[7], [])
+    p[7] = [RewriteInjected([param[0].id for param in p[3]]).visit(node) for node in p[7]]
+    p[0] = [ast.FunctionDef("top", args, p[7], [])]
 
 @register('stmt')
 def p_func(p):
@@ -209,7 +233,9 @@ def p_func(p):
 @register('expr')
 def p_funccall(p):
     """funccall : expr '(' expr_list ')'"""
-    p[0] = ast.Call(p[1], p[3], [], None, None)
+    keywords = filter(lambda x: isinstance(x, ast.keyword), p[3])
+    exprs = filter(lambda x: not isinstance(x, ast.keyword), p[3])
+    p[0] = ast.Call(p[1], exprs, keywords, None, None)
 
 @register('expr')
 def p_lambda(p):
@@ -268,31 +294,31 @@ def p_expr_not(p):
 
 @register('stmt')
 def p_if(p):
-    """if : IF expr '{' body '}' opt_else"""
-    p[0] = ast.If(p[2], p[4], p[6])
+    """if : IF expr '{' opt_newline body '}' opt_else"""
+    p[0] = ast.If(p[2], p[5], p[7])
 
 def p_opt_else(p):
-    """opt_else : ELSE '{' body '}'
+    """opt_else : ELSE '{' opt_newline body '}'
                 | empty"""
     if len(p) > 2:
-        p[0] = p[3]
+        p[0] = p[4]
     else:
         p[0] = []
 
 def p_opt_elseif(p):
-    """opt_else : ELSE expr '{' body '}' opt_else"""
-    p[0] = [ast.If(p[2], p[4], p[6])]
+    """opt_else : ELSE expr '{' opt_newline body '}' opt_else"""
+    p[0] = [ast.If(p[2], p[5], p[7])]
 
 # Loops
 @register('stmt')
 def p_while(p):
-    """while : WHILE expr '{' body '}'"""
-    p[0] = ast.While(p[2], p[4], [])
+    """while : WHILE expr '{' opt_newline body '}'"""
+    p[0] = ast.While(p[2], p[5], [])
 
 @register('stmt')
 def p_for(p):
-    """for : FOR ID IN expr '{' body '}'"""
-    p[0] = ast.For(ast.Name(p[2], ast.Store()), p[4], p[6], [])
+    """for : FOR ID IN expr '{' opt_newline body '}'"""
+    p[0] = ast.For(ast.Name(p[2], ast.Store()), p[4], p[7], [])
 
 @register('expr')
 def p_range(p):
@@ -324,6 +350,10 @@ def p_in_params(p):
     p = listify(p)
 
 p_opt_expr = trivial('opt_expr', ['expr', 'empty'])
+
+def p_opt_expr_default(p):
+    """opt_expr : ID '=' expr"""
+    p[0] = ast.keyword(p[1], p[3])
 
 @register('expr')
 def p_list_braces(p):
@@ -378,14 +408,14 @@ COL_OFFSET = 1
 FUNC_STR = ''
 
 def find_column(input, token):
-    """Finds the column of a token given the input it's seen in
+    """Finds the column of a token given the input it's in
 
     Args:
+        input (String) - The input being parsed
+        token (Token) - The token being located
 
-
-    :param input:
-    :param token:
-    :return:
+    Returns:
+        The column the token being located is in
     """
     last_cr = input.rfind('\n',0,token.lexpos)
     if last_cr < 0:
@@ -403,6 +433,10 @@ def p_empty(p):
 test_parser = yacc.yacc(start='stmtlst')
 parser = yacc.yacc(start='topfunc')
 
+class BadParseException(Exception):
+    def __init__(self, *args, **kwargs):
+        super(self, BadParseException).__init__(*args, **kwargs)
+
 def parse_string(s, debug=False, testing=False):
     """Parses a given string into a Python AST
 
@@ -419,7 +453,7 @@ def parse_string(s, debug=False, testing=False):
     if testing:
         body = test_parser.parse(s, debug=debug, lexer=lexer)
     else:
-        body = [parser.parse(s, debug=debug, lexer=lexer)]
+        body = parser.parse(s, debug=debug, lexer=lexer)
     return ast.Module(body)
 
 def parse_function(func_str, name='top', debug=False, line_offset=1, col_offset=1):
@@ -444,7 +478,9 @@ def parse_function(func_str, name='top', debug=False, line_offset=1, col_offset=
     COL_OFFSET = col_offset
     FUNC_STR = func_str
 
-    exec(compile(ast.fix_missing_locations(parse_string(func_str, debug=debug)), filename='<ast>', mode='exec'))
+    func_ast = ast.fix_missing_locations(parse_string(func_str, debug=debug))
+
+    exec(compile(func_ast, filename='<ast>', mode='exec'))
     locals()[name].__name__ = locals()[name].func_name = name
     return locals()[name]
 

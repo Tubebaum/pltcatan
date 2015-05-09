@@ -2,7 +2,8 @@ import unittest
 import ast
 
 #TODO fix relative import
-from ..parser import parse_string
+from ..parser import parse_string, parse_function
+from ..oracle import ORACLE
 
 class ParsingASTTests(unittest.TestCase):
     def assertSameParse(self, python, skit):
@@ -79,6 +80,12 @@ class ParsingASTTests(unittest.TestCase):
     def test_funccall_params(self):
         self.assertSameParse("test(1,2)", "test(1,2)")
 
+    def test_funccall_keyword_param(self):
+        self.assertSameParse("test(one=1)", "test(one=1)")
+
+    def test_funccall_keyword_params(self):
+        self.assertSameParse("test(one=1,two=2)", "test(one=1,two=2)")
+
     def test_cond_eq(self):
         self.assertSameParse("1 == 1", "1 == 1")
 
@@ -133,6 +140,12 @@ class ParsingASTTests(unittest.TestCase):
     def test_and_or_and_chain(self):
         self.assertSameParse("True and False or True and False", "True and False or True and False")
 
+    def test_and_compop(self):
+        self.assertSameParse("1 >= 2 and 3 <= 4", "1 >= 2 and 3 <= 4")
+
+    def test_or_compop(self):
+        self.assertSameParse("1 >= 2 or 3 <= 4", "1 >= 2 or 3 <= 4")
+
     def test_not(self):
         self.assertSameParse("not False", "not False")
 
@@ -171,6 +184,11 @@ class ParsingASTTests(unittest.TestCase):
     def test_if_elseif_chain_else(self):
         self.assertSameParse("if 1:\n  pass\nelif 2:\n  pass\nelif 3:\n  pass\nelse:\n  pass",
                              "if 1 { } else 2 { } else 3 { } else { }")
+
+    #TODO Add ternary operator
+    #def test_ternary(self):
+    #    self.assertSameParse("1 if True else 2",
+    #                         "True ? 1 : 2")
 
     def test_while(self):
         self.assertSameParse("while 1: pass",
@@ -212,14 +230,21 @@ class ParsingASTTests(unittest.TestCase):
     def test_uminus(self):
         self.assertSameParse("-1", "-1")
 
-    # TODO add augmented assignment
-
 class ParsingBehaviorTests(unittest.TestCase):
     def assertSameParse(self, skit1, skit2):
         self.assertEqual(
             ast.dump(parse_string(skit1)),
             ast.dump(parse_string(skit2))
         )
+
+    def compileFunc(self, func):
+        return parse_function(func)
+
+    def assertResult(self, func, result, eq=True):
+        if eq:
+            self.assertEqual(result, func({}))
+        else:
+            self.assertNotEqual(result, func({}))
 
     def test_group_same_as_regular(self):
         self.assertSameParse("1 + 2", "(1 + 2)")
@@ -230,6 +255,17 @@ class ParsingBehaviorTests(unittest.TestCase):
     def test_range(self):
         self.assertSameParse("range(1,2)", "1 to 2")
 
-    #TODO topfunc testing
     def test_top_func(self):
-        pass
+        test = []
+        ORACLE.set('test', test)
+
+        func = self.compileFunc("func(test) { return test }")
+        test.append(1)
+
+        self.assertResult(func, test)
+
+        test.pop()
+        self.assertResult(func, test)
+
+        test = [1,2,3]
+        self.assertResult(func, test, eq=False)
