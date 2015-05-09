@@ -269,3 +269,6 @@ class ParsingBehaviorTests(unittest.TestCase):
 
         test = [1,2,3]
         self.assertResult(func, test, eq=False)
+
+        ORACLE.set('test', test)
+        self.assertResult(func, test)
