@@ -206,7 +206,7 @@ def run(file):
         skit = pickle.load(open(compile_file, 'rb'))
     main_property = os.path.splitext(base_file)[0]
     properties[main_property] = skit.get(main_property)
-    replace_engine(Config.config, properties[main_property])
+    #replace_engine(Config.config, properties[main_property])
     game = Game()
     skit = skit.get(os.path.splitext(base_file)[0], None)
     # TODO: restore after engine syncs config dict format
