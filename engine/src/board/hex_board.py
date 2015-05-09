@@ -292,9 +292,9 @@ class HexBoard(Board):
 
         # Perimeter tiles will not have neighbors along certain edges.
         if neighbor_tile:
-            neighbor_tile.add_edge(HexTile.get_equivalent_vertex_dir(vertex_dirs[0], edge_dir.get_opposite_direction()),
-                                   HexTile.get_equivalent_vertex_dir(vertex_dirs[1], edge_dir.get_opposite_direction()),
-                                   edge_val)
+            nv_dir_1 = HexTile.get_equivalent_vertex_dir(vertex_dirs[0], edge_dir)
+            nv_dir_2 = HexTile.get_equivalent_vertex_dir(vertex_dirs[1], edge_dir)
+            neighbor_tile.add_edge(nv_dir_1, nv_dir_2, edge_val)
 
     def update_vertex(self, x, y, vertex_dir, vertex_val):
         """Update the value at the specified vertex location.
