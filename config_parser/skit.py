@@ -211,6 +211,7 @@ def run(file):
         main_property = os.path.splitext(base_file)[0]
         properties[main_property] = skit.get(main_property)
         Config.config = properties[main_property]
+        Config.init()
         game = Game()
         skit = skit.get(os.path.splitext(base_file)[0], None)
         # TODO: restore after engine syncs config dict format
