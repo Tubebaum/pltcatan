@@ -95,8 +95,13 @@ reserved = {k: k.upper() for k in [
     'for',
     'to'
 ]}
-tokens = ['ID', 'NUM', 'COMPOP', 'AUGASSIGN', 'NEWLINE', 'IN'] + list(reserved.values())
-literals = ['=', '+', '-', '*', '/', '(', ')', '{', '}', '[', ',', ']', '.', '"', '\'', '@']
+tokens = ['ID', 'NUM', 'COMPOP', 'AUGASSIGN', 'NEWLINE', 'IN', 'STRING'] + list(reserved.values())
+literals = ['=', '+', '-', '*', '/', '(', ')', '{', '}', '[', ',', ']', '.', '@']
+
+def t_STRING(t):
+    r'\"(\\.|[^"])*\"|\'(\\.|[^"])*\''
+    t.value = t.value.strip('"').strip("'")
+    return t
 
 def t_ID(t):
     r'[a-zA-Z_][a-zA-Z0-9_]*'
@@ -181,9 +186,8 @@ def p_expr_group(p):
 
 @register('expr')
 def p_str(p):
-    """str : '"' ID '"'
-           | \"'\" ID \"'\""""
-    p[0] = ast.Str(p[2])
+    """str : STRING"""
+    p[0] = ast.Str(p[1])
 
 # Statements
 

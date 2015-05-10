@@ -75,8 +75,8 @@ default: {
                         game.input_manager.announce_development_card_played(player, self)
                         resource_type = game.input_manager.prompt_select_resource_type()
                 
-                        for game_player in game.players:
-                                if player != game_player:
+                        for game_player := game.players {
+                                if player != game_player {
                                         count = player.resources[resource_type]
                 
                                         game_player.transfer_resources(player, resource_type, count)
@@ -85,8 +85,9 @@ default: {
                                                 player.name, count, resource_type, game_player.name)
                 
                                         game.input_manager.input_default(msg, None, False)
-                
-                        # Announce finished collecting resources.
+                                }
+                        }
+
                         msg = "Done monopolizing resources."
                         game.input_manager.input_default(msg, None, False)
                 
