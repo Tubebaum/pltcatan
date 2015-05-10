@@ -65,10 +65,10 @@ class Bank(TradingEntity):
     def buy_development_card(self, player):
         """Let the given player purchase a development card from the bank."""
 
-        card = self.development_cards.pop()
-
-        if not card:
+        if not self.development_cards:
             raise NotEnoughDevelopmentCardsException
+
+        card = self.development_cards.pop()
 
         # Create a trade offer where there are no requested resources,
         # just offered resources (cost of development card).
