@@ -1,0 +1,5 @@
+@import ./game/ as bnb-game
+
+bigger-n-better: {
+    game: bnb-game
+}

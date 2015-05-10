@@ -1,8 +1,16 @@
 To compile Skit code:
 
 From pltcatan/config-parser
-    ./skit.py -c file.skit
+    ./skit -c file.skit
 
 To run Skit code:
 From pltcatan/config-parser
-    ./skit.py file.skit
+    ./skit file.skit
+
+If you'd prefer to use skit like a traditional binary,
+make sure to add it to your PATH environment variable.
+
+If you're using a bash shell:
+export PATH=$PATH:/path/to/skit
+
+Otherwise, consult your shell's documentation.
