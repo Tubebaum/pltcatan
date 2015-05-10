@@ -49,7 +49,7 @@ class Player(TradingEntity):
 
         self.remaining_structure_counts = {}
 
-        for structure in Config.get('structure.player_built').values():
+        for structure in Config.get('game.structure.player_built').values():
             self.remaining_structure_counts[structure['name']] = structure['count']
 
     def get_total_points(self):

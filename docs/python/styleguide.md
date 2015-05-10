@@ -4,7 +4,7 @@
 
 ### 1) Indentation
 
-* Python heavily inforces indentation and as such we should have consistent
+* Python heavily enforces indentation and as such we should have consistent
 indentation throughout the entire project.
 * Only use soft tabs, with each tab being equivalent to 4 spaces.
 * Do not use hard tabs ('\\t' characters). For example in vim this can be
@@ -122,11 +122,7 @@ class StringBuilder:
         print self.built_string
 ```
 
-### 5) Documentation
-
-TODO
-
-### 6) Shebangs
+### 5) Shebangs
 
 * If a file is meant to be executable, the first line should be:
 

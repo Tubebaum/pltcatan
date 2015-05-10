@@ -2,397 +2,162 @@ default: {
     game: {
         points-to-win: 10,
         board: {
-            radius: 3,
-            chits: {
-                types: [2, 3, 4, 5, 6, 8, 9, 10, 11, 12],
-                distribution: uniform
-            },
-            tiles: {
-                types: [{
-                    name: "hills",
-                    resource: {
-                        card: game.cards.resource.brick,
-                        count: 1
-                    },
-                    allow-exchange: {
-                        sell: {
-                            card: game.cards.resource.*,
-                            count: 4
-                        },
-                        buy: {
-                            card: game.cards.resource.*,
-                            count: 1
-                        }
-                    }
-                },
-                {
-                    name: "forest",
-                    resource: {
-                        card: game.cards.resource.lumber,
-                        count: 1
-                    },
-                    allow-exchange: {
-                        sell: {
-                            card: game.cards.resource.*,
-                            count: 4
-                        },
-                        buy: {
-                            card: game.cards.resource.*,
-                            count: 1
-                        }
-                    }
-                },
-                {
-                    name: "mountains",
-                    resource: {
-                        card: game.cards.resource.ore,
-                        count: 1
-                    },
-                    allow-exchange: {
-                        sell: {
-                            card: game.cards.resource.*,
-                            count: 4
-                        },
-                        buy: {
-                            card: game.cards.resource.*,
-                            count: 1
-                        }
-                    }
-                },
-                {
-                    name: "fields",
-                    resource: {
-                        card: game.cards.resource.grain,
-                        count: 1
-                    },
-                    allow-exchange: {
-                        sell: {
-                            card: game.cards.resource.*,
-                            count: 4
-                        },
-                        buy: {
-                            card: game.cards.resource.*,
-                            count: 1
-                        }
-                    }
-                },
-                {
-                    name: "pasture",
-                    resource: {
-                        card: game.cards.resource.wool,
-                        count: 1
-                    },
-                    allow-exchange: {
-                        sell: {
-                            card: game.cards.resource.*,
-                            count: 4
-                        },
-                        buy: {
-                            card: game.cards.resource.*,
-                            count: 1
-                        }
-                    }
-                },
-                {
-                    name: "desert"
-                },
-                {
-                    name: "ocean"
-                },
-                {
-                    name: "brick-harbor",
-                    max-on-board: 1,
-                    allow-exchange: {
-                        sell: {
-                            card: game.cards.resource.brick,
-                            count: 2
-                        },
-                        buy: {
-                            card: game.cards.resource.*,
-                            count: 1
-                        }
-                    }
-                },
-                {
-                    name: "lumber-harbor",
-                    max-on-board: 1,
-                    allow-exchange: {
-                        sell: {
-                            card: game.cards.resource.lumber,
-                            count: 2
-                        },
-                        buy: {
-                            card: game.cards.resource.*,
-                            count: 1
-                        }
-                    }
-                },
-                {
-                    name: "ore-harbor",
-                    max-on-board: 1,
-                    allow-exchange: {
-                        sell: {
-                            card: game.cards.resource.ore,
-                            count: 2
-                        },
-                        buy: {
-                            card: game.cards.resource.*,
-                            count: 1
-                        }
-                    }
-                },
-                {
-                    name: "grain-harbor",
-                    max-on-board: 1,
-                    allow-exchange: {
-                        sell: {
-                            card: game.cards.resource.grain,
-                            count: 2
-                        },
-                        buy: {
-                            card: game.cards.resource.*,
-                            count: 1
-                        }
-                    }
-                },
-                {
-                    name: "wool-harbor",
-                    max-on-board: 1,
-                    allow-exchange: {
-                        sell: {
-                            card: game.cards.resource.wool,
-                            count: 2
-                        },
-                        buy: {
-                            card: game.cards.resource.*,
-                            count: 1
-                        }
-                    }
-                },
-                {
-                    name: "any-harbor",
-                    max-on-board: 4,
-                    allow-exchange: {
-                        sell: {
-                            card: game.cards.resource.*,
-                            count: 3
-                        },
-                        buy: {
-                            card: game.cards.resource.*,
-                            count: 1
-                        }
-                    }
-                }],
-                distribution: uniform
-            }
+            radius: 3
         },
-        cards: {
+        card: {
             development: {
+                default: {
+                    'default': {
+                        'count': 0,
+                        'name': 'Development Card',
+                        'description': 'Development card default description.',
+                        'draw_card': None,
+                        'play_card': None,
+                        'cost': {
+                            'wool': 1,
+                            'grain': 1,
+                            'ore': 1
+                        },
+                    },
+                },
                 knight: {
+                    name: "Knight Card",
                     description: "Move the robber. Steal 1 resource from the owner of a settlement or city adjacent to that robber's new hex.",
-                    max-count: 14,
-                    effect: {
-                        when-played: func(board, player) {
-                            player.cards.ongoing.development.knight += 1
-                            position = player.prompt_for_tile()
-                            board.move_robber(position)
-                            target = player.prompt_choose_one(map(filter(board.get_structures(position), @(x) x.type == "settlement" or x.type == "city"), @(x) x.owner))
-                            resource = random.choice(map(filter(target.cards.hand.resource.iteritems(), @(x) x[1] != 0), @(x) x[0]))
-                            player.cards.hand.resource[resource] += 1
-                            player.cards.hand.resource[resource] -= 1
-                        }
-                    }
+                    count: 14,
+                    play-card: func(game, player) {
+                        game.input_manager.announce_development_card_played(player, self)
+                        robber = game.board.find_robber()
+                        robber.outside_trigger_effect(game, player)
+                        player.knights += 1
+                        self.played = True
+                    },
                 },
                 victory-point: {
-                    description: "1 Victory Point!\nReveal this card on your turn if, with it, you reach the number of points required for victory.",
-                    max-count: 5,
-                    point-reward: 1
+                    name: "Victory Point Card",
+                    description: "1 Victory Point!\n Reveal this card on your turn if, with it, you reach the number of points required for victory.",
+                    count: 5,
+                    draw-card: func(game, player) {
+                        player.hidden_points += 1
+                    },
                 },
                 road-building: {
-                    description: "Place 2 new roads as if you have just built them.",
-                    max-count: 2,
-                    effect: {
-                        when-played: func(board, player) {
-                            positions = [player.prompt_for_edge(), player.prompt_for_edge()]
-                            for position in positions {
-                                board.place_structure(main.game.structures.player-built.road, player, position)
-                            }
-                        }
+                    name: "Road Building Card",
+                    description: "Place 2 new roads as if you has just built them.",
+                    count: 2,
+                    play-card: func(game, player) {
+                        game.input_manager.announce_development_card_played(player, self)
+                
+                        for _ in range(2):
+                                x, y, edge_dir = game.input_manager.prompt_edge_placement(game)
+                                game.board.place_edge_structure(x, y, edge_dir,
+                                                                                                player.get_structure('road'))
+                
+                        self.played = True
                     }
                 },
                 year-of-plenty: {
+                    name: "Year of Plenty Card",
                     description: "Take any 2 resources from the bank, add them in your hand. They can be 2 of the same resource or 2 different resources",
-                    max-count: 2,
-                    effect: {
-                        when-played: func(bank, player) {
-                            resources = [player.prompt_for_resource(), player.prompt_for_resource()]
-                            for resource in resources {
-                                player.cards.hand.resource[resource] += 1
-                                bank.resource[resource] -= 1
-                            }
-                        }
+                    count: 2,
+                    play-card: func(game, player) {
+                        game.input_manager.announce_development_card_played(player, self)
+                        resource_type = game.input_manager.prompt_select_resource_type()
+                        game.board.bank.transfer_resources(player, resource_type, 2)
+                        self.played = True
                     }
                 },
                 monopoly: {
+                    name: "Monopoly Card",
                     description: "When you play this card, announce 1 type of resource. All other players must give you all of their resources of that type.",
-                    max-count: 2,
-                    effect: {
-                        when-played: func(players, player) {
-                            resource = player.prompt_for_resource()
-                            for target_player in players {
-                                player.cards.hand.resource[resource] += target_player.cards.hand.resource[resource]
-                                target_player.cards.hand.resource[resource] = 0
-                            }
-                        }
+                    count: 2,
+                    play-card: func(game, player) {
+                        game.input_manager.announce_development_card_played(player, self)
+                        resource_type = game.input_manager.prompt_select_resource_type()
+                
+                        for game_player in game.players:
+                                if player != game_player:
+                                        count = player.resources[resource_type]
+                
+                                        game_player.transfer_resources(player, resource_type, count)
+                
+                                        msg = '{0} received {1} {2} from {3}'.format(
+                                                player.name, count, resource_type, game_player.name)
+                
+                                        game.input_manager.input_default(msg, None, False)
+                
+                        # Announce finished collecting resources.
+                        msg = 'Done monopolizing resources.'
+                        game.input_manager.input_default(msg, None, False)
+                
+                        self.played = True
                     }
                 }
-            },
-            development-cost: [{
-                card: main.game.cards.resource.ore,
-                count: 1
-            },
-            {
-                card: main.game.cards.resource.wool,
-                count: 1
-            },
-            {
-                card: main.game.cards.resource.grain,
-                count: 1
-            }],
-            special: {
-                longest-road: {
-                    description: "2 Victory Points!\nThis card goes to the player with the longest road of at least 5 segments. Another player who builds a longer road takes this card.",
-                    max-count: 1,
-                    criteria: func(players) {
-                        longest_road = None
-                        for player in players {
-                            for road in player.structures.placed.road {
-                                \\ TODO figure out algorithm for longest road
-                            }
-                        }
-                    },
-                    point-reward: 2
-                },
-                largest-army: {
-                    description: "2 Victory Points!\nThe first player to play 3 knight cards gets this card. Another player who plays more knight cards takes this card.",
-                    max-count: 1,
-                    criteria: func(players) {
-                        return sort(players, key=@(x) x.cards.ongoing.development.knight)
-                    },
-                    point-reward: 2
-                }
-            },
-            resource: [{
-                name: "brick",
-                count: 19
-            },
-            {
-                name: "lumber",
-                count: 19
-            },
-            {
-                name: "ore",
-                count: 19
-            },
-            {
-                name: "wool",
-                count: 19
-            },
-            {
-                name: "grain",
-                count: 19
-            }]
+            }
         },
-        structures: {
+        structure: {
             player-built: {
-                road: {
-                    building-cost: [{
-                        card: main.game.cards.resource.brick,
-                        count: 1
+                default: {
+                    name: None,
+                    cost: {
+                        lumber: 0,
+                        brick: 0,
+                        wool: 0,
+                        grain: 0,
+                        ore: 0
                     },
-                    {
-                        card: main.game.cards.resource.lumber,
-                        count: 1
-                    }],
-                    max-count-per-player: 15,
-                    constraints: {
-                        placement-type: "edge",
-                        adjacent-to: [
-                            main.game.structures.player-built.road,
-                            main.game.structures.player-built.settlement,
-                            main.game.structures.player-built.city
-                        ]
-                    }
+                    count: 0,
+                    point-value: 0,
+                    base-yield: 1,
+                    extends: None,
+                    upgrades: None,
+                    position-type: None
+                },
+                road: {
+                    name: "Road",
+                    cost: {
+                        lumber: 1,
+                        brick: 1
+                    },
+                    count: 15,
+                    point-value: 0,
+                    base-yield: 0,
+                    position-type: "edge"
                 },
                 settlement: {
-                    building-cost: [{
-                        card: main.game.cards.resource.brick,
-                        count: 1
+                    name: "Settlement",
+                    cost: {
+                        lumber: 1,
+                        brick: 1,
+                        wool: 1,
+                        grain: 1
                     },
-                    {
-                        card: main.game.cards.resource.lumber,
-                        count: 1
-                    },
-                    {
-                        card: main.game.cards.resource.wool,
-                        count: 1
-                    },
-                    {
-                        card: main.game.cards.resource.grain,
-                        count: 1
-                    }],
-                    victory-point-value: 1,
-                    max-count-per-player: 5,
-                    constraints: {
-                        placement-type: "corner",
-                        adjacent-to: [
-                            main.game.structures.player-built.road
-                        ],
-                        not-adjacent-to: [
-                            main.game.structures.player-built.city
-                        ]
-                    },
-                    effects: {
-                        on-roll: func(dice_value, placementTiles, player) {
-                            for placement in placementTiles {
-                                if placement.chit == dice_value {
-                                    player.cards.hand.resource[placement.resource.name] += placement.baseYield
-                                }
-                            }
-                        }
-                    }
+                    count: 5,
+                    point-value: 1,
+                    base-yield: 1,
+                    position-type: "vertex"
                 },
                 city: {
-                    building-cost: [{
-                        card: main.game.cards.resource.ore,
-                        count: 3
+                    name: "City",
+                    cost: {
+                        grain: 2,
+                        ore: 3
                     },
-                    {
-                        card: main.game.cards.resource.grain,
-                        count: 2
-                    }],
-                    upgrade-of: main.game.structures.player-built.settlement,
-                    victory-point-value: 2,
-                    max-count-per-player: 4,
-                    constraints: {
-                        placement-type: "corner",
-                        adjacent-to: [
-                            main.game.structures.player-built.road
-                        ],
-                        not-adjacent-to: [
-                            main.game.structures.player-built.settlement,
-                            main.game.structures.player-built.city
-                        ]
+                    count: 5,
+                    point-value: 2,
+                    base-yield: 2,
+                    upgrades: "Settlement",
+                    position-type: "vertex"
+                },
+                castle: {
+                    name: "Castle",
+                    cost: {
+                        ore: 5
                     },
-                    effects: {
-                        on-roll: func(dice_value, placementTiles, player) {
-                            for placement in placementTiles {
-                                if placement.chit == dice_value {
-                                    player.cards.hand.resource[placement.resource.name] += placement.baseYield * 2
-                                }
-                            }
-                        }
-                    }
+                    count: 2,
+                    point-value: 3,
+                    base-yield: 3,
+                    upgrades: "City",
+                    position-type: "vertex"
                 }
             }
         }

@@ -10,12 +10,12 @@ game_config = {
     # Game
     'game' : {
         'points_to_win': 10,
-        'default_player_count': 3
+        'player_count': 3
     },
     'board' : {
-        'default_tile_count': 19,
-        'default_radius': 3,
-        },
+        'tile_count': 19,
+        'radius': 3,
+    },
     # Cards
     'card' : {
         # Development Cards

@@ -14,7 +14,9 @@ type_config = {
     'card': {
         'development': {
             'default': {
-                'cost': {ResourceType: IntType}
+                'cost': {ResourceType: IntType},
+                'draw_card': MethodType,
+                'play_card': MethodType
             }
         }
     }
