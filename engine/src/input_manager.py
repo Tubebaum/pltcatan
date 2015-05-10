@@ -6,8 +6,6 @@ from engine.src.config.config import Config
 from engine.src.direction.vertex_direction import VertexDirection
 from engine.src.direction.edge_direction import EdgeDirection
 from engine.src.resource_type import ResourceType
-from engine.src.vertex import Vertex
-from engine.src.edge import Edge
 from engine.src.exceptions import *
 from engine.src.trading.trade_offer import TradeOffer
 from engine.src.structure.structure import Structure
@@ -168,7 +166,15 @@ class InputManager(cmd.Cmd):
     # TODO: long term. Refactor to be compatible w/ any trade intermediary.
     def do_trade_harbor(self, line):
         """Trade resources with a harbor."""
-        print('not yet implemented')
+        if not self.has_rolled:
+            InputManager.output('You must roll before you can trade.')
+            return
+        else:
+            # Offer options of 3:1 and 2:1 if available
+            # Select requesting type, offering type
+            # Execute trade
+            pass
+
 
     def do_build(self, line):
         """Build structures, including settlements, cities, and roads."""

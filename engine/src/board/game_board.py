@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import random
 import pdb
+import itertools
 
 from engine.src.lib.utils import Utils
 from engine.src.board.hex_board import HexBoard
@@ -16,6 +17,7 @@ from engine.src.direction.edge_direction import EdgeDirection
 from engine.src.direction.vertex_direction import VertexDirection
 from engine.src.exceptions import *
 from engine.src.structure.structure import Structure
+from engine.src.trading.harbor import Harbor
 
 
 class GameBoard(HexBoard):
@@ -30,6 +32,8 @@ class GameBoard(HexBoard):
 
         bank (Bank): Bank of resources the board will interact with.
 
+        harbors (list of Harbor): Contains all of the harbors in the game.
+
     Args:
         radius (int): See HexBoard.
     """
@@ -42,6 +46,8 @@ class GameBoard(HexBoard):
         # Here we assign resource types and chit values.
         self.assign_tile_resources()
         self.assign_tile_chit_values()
+
+        self.harbors = []
         self.assign_tile_harbors()
 
         self.bank = Bank(len(list(self.iter_tiles())))
@@ -235,13 +241,53 @@ class GameBoard(HexBoard):
     def assign_tile_harbors(self):
         """Assign harbors to this board.
 
-        TODO: Officially, harbors seem to be placed after every
-              3rd then 3rd then 4th edge. This is a pain to program given that
-              it only _seems_ that way.
+        Harbors are placed after every
+              3rd then 3rd then 4th edge. This is not an official rule,
+              but does get the usual distribution for the default board
+              size. We keep placing them until we circle the board, making
+              sure to leave at least one free road between the first placed
+              harbor and the last
         """
+        steps = [3,3,4]
+        remaining = 12*3 - 6 #Number of sea-facing edges
+        distance = itertools.cycle(steps)
 
-        # TODO
-        pass
+        # Calculates number of harbors to be placed on the board
+        n_to_place = 1
+        while True:
+            remaining -= distance.next()
+            if remaining < 2:
+                break
+            n_to_place += 1
+
+        # Decides which kind of harbors will be distributed:
+        #  One 2:1 for each type if there is enough space.
+        #  The rest will be general 3:1
+
+        # harbor = Harbor(self.bank, "todo 2:1")
+        for resource in ResourceType.get_arable_types()[:n_to_place]:
+            self.harbors.append(Harbor(self.bank, "todo 2:1 resource"))
+
+        n_remaining = n_to_place - len(self.harbors)
+        for _ in range(n_remaining):
+            self.harbors.append(Harbor(self.bank, "todo 3:1 any"))
+
+        random.shuffle(self.harbors)
+
+        # Place the harbors
+        distance = itertools.cycle(steps)
+        border_edges = list(self.iter_border_edges())
+        pos = 0
+        while pos <= len(border_edges):
+            self.harbors.location = border_edges[pos]
+            pos += distance.next()
+
+        # For radius r, there are 12*r - 6 edges in contact with the ocean.
+        # If r = 2, we have 18: 3, 3, 4, 3, 3 last dist = 2
+        # If r = 3, we have 30: 3, 3, 4, 3, 3, 4, 3, 3 last dist = 4
+        # If r = 4, we have 42: 3, 3, 4, 3, 3, 4, 3, 3, 4, 3, 3, last dist = 4
+
+
 
     def iter_arable_tiles(self):
         """Iterate over this board's non-fallow i.e. arable tiles."""

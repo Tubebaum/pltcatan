@@ -263,6 +263,9 @@ class HexBoard(Board):
             x -= 1
             y += 1
 
+    def iter_border_edges(self):
+        pass
+
     def update_edge(self, x, y, edge_dir, edge_val):
         """Update the specified edge.
 
