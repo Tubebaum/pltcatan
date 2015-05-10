@@ -155,6 +155,15 @@ def p_store_id(p):
     """store_id : ID"""
     p[0] = ast.Name(p[1], ast.Store())
 
+def p_assign_id(p):
+    """assign_id : assign_lst"""
+    p[0] = ast.Tuple(p[1], ast.Store()) if len(p[1]) > 1 else p[1][0]
+
+def p_assign_lst(p):
+    """assign_lst : store_id ',' assign_lst
+                  | store_id"""
+    p = listify(p)
+
 p_store_other = trivial('store_id', ['property', 'getitem'])
 
 @register('expr')
@@ -183,7 +192,7 @@ def p_stmt_expr(p):
     p[0] = ast.Expr(p[1])
 
 def p_stmt_assignment(p):
-    """stmt : store_id '=' expr"""
+    """stmt : assign_id '=' expr"""
     p[0] = ast.Assign([p[1]], p[3])
 
 def p_stmt_aug_assignment(p):
