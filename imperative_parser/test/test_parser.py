@@ -265,6 +265,7 @@ class ParsingBehaviorTests(unittest.TestCase):
         func = self.compileFunc("func(test) { return test }")
         test.append(1)
 
+
         self.assertResult(func, test)
 
         test.pop()

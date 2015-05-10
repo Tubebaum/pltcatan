@@ -49,9 +49,7 @@ class GameOracle(object):
             name (String): A string representing the name to store the variable under
             var (Any): The value to store for the variable
         """
-        if self.game_state[name]:
-            self.game_state[name].pop()
-        self.game_state[name].append(var)
+        self.game_state[name] = var
 
 # Access game state through the game oracle
 ORACLE = GameOracle(defaultdict(list))

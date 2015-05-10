@@ -10,17 +10,6 @@ from utils import flatten, find_column
 # Allow dependency injection using the predefined GameOracle
 from oracle import ORACLE
 
-def gen_access_func(var_name):
-    """Generates an AST to access the given variable using the GameOracle
-
-    Args:
-        name (String): A string representing the variable name
-
-    Returns:
-        ast.Call. An AST representing a call to the GameOracle for the given variable
-    """
-    return ast.Call(ast.Attribute(ast.Name('ORACLE', ast.Load()), 'get', ast.Load()), [ast.Str(var_name)], [], None, None)
-
 class RewriteInjected(ast.NodeTransformer):
     def __init__(self, injected):
         """Creates a NodeTransformer object to replace calls to injected parameters with calls to a lookup table
@@ -36,11 +25,11 @@ class RewriteInjected(ast.NodeTransformer):
 
     def visit_Name(self, node):
         if node.id in self.injected:
-            return ast.copy_location(ast.Subscript(
-                value=ast.Name(id=node.id, ctx=ast.Load()),
-                slice=ast.Index(value=ast.Num(0)),
-                ctx=node.ctx
-            ), node)
+            return ast.copy_location(ast.Call(
+                ast.Attribute(
+                    ast.Name('ORACLE', ast.Load()),
+                             'get', ast.Load()
+                ), [ast.Str(node.id)], [], None, None), node)
         else:
             return self.generic_visit(node)
 
@@ -227,7 +216,7 @@ def p_stmt_print(p):
 def p_top_func(p):
     """topfunc : FUNC '(' params ')' '{' opt_newline body '}'"""
     if p[3]:
-        args = ast.arguments([ast.Name('self', ast.Param())] + map(lambda x: x[0], p[3]), None, None, [gen_access_func(param[0].id) for param in p[3]])
+        args = ast.arguments([ast.Name('self', ast.Param())], None, None, [])
     else:
         args = ast.arguments([], None, None, [])
     p[7] = [RewriteInjected([param[0].id for param in p[3]]).visit(node) for node in p[7]]

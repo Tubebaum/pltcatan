@@ -209,7 +209,7 @@ class InputManager(cmd.Cmd):
 
             try:
                 dev_card = self.game.board.bank.buy_development_card(self.player)
-                dev_card.draw_card(self.game, self.player)
+                dev_card.draw_card()
 
                 success_msg = 'You received a {0}!'.format(str(dev_card))
 
@@ -244,7 +244,7 @@ class InputManager(cmd.Cmd):
                 return
 
             try:
-                dev_card.play_card(self.game, self.player)
+                dev_card.play_card()
                 self.game.update_point_counts()
 
             # TODO: Make clear which exceptions can be caught.
