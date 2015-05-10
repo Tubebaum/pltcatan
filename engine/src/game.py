@@ -24,7 +24,6 @@ class Game(object):
         ORACLE.set('game', self)
 
         self.dice = Dice()
-        pdb.set_trace()
         self.board = GameBoard(Config.get('game.board.radius'))
         ORACLE.set('board', self.board)
 
