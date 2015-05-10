@@ -1,3 +1,6 @@
+#import sys
+#sys.path.append('..')
+#from ..engine.src.lib.utils import Utils
 from collections import defaultdict
 
 class StateNotFound(Exception):
@@ -22,11 +25,11 @@ class GameOracle(object):
         """
         self.game_state = state
 
-    def get(self, var):
+    def get(self, name):
         """Get a variable from the GameOracle's state
 
         Args:
-            var (String): A string representing the name of the variable to retrieve
+            name (String): A string representing the name of the variable to retrieve
 
         Returns:
             Any. The value of the variable being retrieved
@@ -35,9 +38,9 @@ class GameOracle(object):
             StateNotFound -- when a state being accessed isn't present in the state dict
         """
         try:
-            return self.game_state[var]
+            return self.game_state[name]
         except KeyError:
-            raise StateNotFound("Variable \"%s\" not present in game state" % var)
+            raise StateNotFound("Variable \"%s\" not present in game state" % name)
 
     def set(self, name, var):
         """Set a particular variable in the state dict to a particular value
@@ -46,9 +49,9 @@ class GameOracle(object):
             name (String): A string representing the name to store the variable under
             var (Any): The value to store for the variable
         """
-        self.game_state[name] = var
+        if self.game_state[name]:
+            self.game_state[name].pop()
+        self.game_state[name].append(var)
 
 # Access game state through the game oracle
-ORACLE = GameOracle({
-    'game': defaultdict(list)
-})
+ORACLE = GameOracle(defaultdict(list))

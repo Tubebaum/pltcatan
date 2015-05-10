@@ -196,8 +196,8 @@ default: {
                             player.cards.ongoing.development.knight += 1
                             position = player.prompt_for_tile()
                             board.move_robber(position)
-                            target = player.prompt_choose_one(map(filter(board.get_structures(position), @(x) x.type == "settlement" or x.type == "city"), @(x) x.owner))
-                            resource = random.choice(map(filter(target.cards.hand.resource.iteritems(), @(x) x[1] != 0), @(x) x[0]))
+                            target = player.prompt_choose_one(map(@(x) x.owner, filter(@(x) x.type == "settlement" or x.type == "city", board.get_structures(position))))
+                            resource = random.choice(map(@(x) x[0], filter(@(x) x[1] != 0, target.cards.hand.resource.iteritems())))
                             player.cards.hand.resource[resource] += 1
                             player.cards.hand.resource[resource] -= 1
                         }
@@ -214,7 +214,7 @@ default: {
                     effect: {
                         when-played: func(board, player) {
                             positions = [player.prompt_for_edge(), player.prompt_for_edge()]
-                            for position in positions {
+                            for position := positions {
                                 board.place_structure(main.game.structures.player-built.road, player, position)
                             }
                         }
@@ -226,7 +226,7 @@ default: {
                     effect: {
                         when-played: func(bank, player) {
                             resources = [player.prompt_for_resource(), player.prompt_for_resource()]
-                            for resource in resources {
+                            for resource := resources {
                                 player.cards.hand.resource[resource] += 1
                                 bank.resource[resource] -= 1
                             }
@@ -239,7 +239,7 @@ default: {
                     effect: {
                         when-played: func(players, player) {
                             resource = player.prompt_for_resource()
-                            for target_player in players {
+                            for target_player := players {
                                 player.cards.hand.resource[resource] += target_player.cards.hand.resource[resource]
                                 target_player.cards.hand.resource[resource] = 0
                             }
@@ -265,9 +265,8 @@ default: {
                     max-count: 1,
                     criteria: func(players) {
                         longest_road = None
-                        for player in players {
-                            for road in player.structures.placed.road {
-                                \\ TODO figure out algorithm for longest road
+                        for player := players {
+                            for road := player.structures.placed.road {
                             }
                         }
                     },
@@ -354,7 +353,7 @@ default: {
                     },
                     effects: {
                         on-roll: func(dice_value, placementTiles, player) {
-                            for placement in placementTiles {
+                            for placement := placementTiles {
                                 if placement.chit == dice_value {
                                     player.cards.hand.resource[placement.resource.name] += placement.baseYield
                                 }
@@ -386,7 +385,7 @@ default: {
                     },
                     effects: {
                         on-roll: func(dice_value, placementTiles, player) {
-                            for placement in placementTiles {
+                            for placement := placementTiles {
                                 if placement.chit == dice_value {
                                     player.cards.hand.resource[placement.resource.name] += placement.baseYield * 2
                                 }
