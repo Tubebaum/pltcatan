@@ -95,8 +95,13 @@ reserved = {k: k.upper() for k in [
     'for',
     'to'
 ]}
-tokens = ['ID', 'NUM', 'COMPOP', 'AUGASSIGN', 'NEWLINE', 'IN'] + list(reserved.values())
-literals = ['=', '+', '-', '*', '/', '(', ')', '{', '}', '[', ',', ']', '.', '"', '\'', '@']
+tokens = ['ID', 'NUM', 'COMPOP', 'AUGASSIGN', 'NEWLINE', 'IN', 'STRING'] + list(reserved.values())
+literals = ['=', '+', '-', '*', '/', '(', ')', '{', '}', '[', ',', ']', '.', '@']
+
+def t_STRING(t):
+    r'\"(\\.|[^"])*\"|\'(\\.|[^"])*\''
+    t.value = t.value.strip('"').strip("'")
+    return t
 
 def t_ID(t):
     r'[a-zA-Z_][a-zA-Z0-9_]*'
@@ -155,6 +160,15 @@ def p_store_id(p):
     """store_id : ID"""
     p[0] = ast.Name(p[1], ast.Store())
 
+def p_assign_id(p):
+    """assign_id : assign_lst"""
+    p[0] = ast.Tuple(p[1], ast.Store()) if len(p[1]) > 1 else p[1][0]
+
+def p_assign_lst(p):
+    """assign_lst : store_id ',' assign_lst
+                  | store_id"""
+    p = listify(p)
+
 p_store_other = trivial('store_id', ['property', 'getitem'])
 
 @register('expr')
@@ -172,9 +186,8 @@ def p_expr_group(p):
 
 @register('expr')
 def p_str(p):
-    """str : '"' ID '"'
-           | \"'\" ID \"'\""""
-    p[0] = ast.Str(p[2])
+    """str : STRING"""
+    p[0] = ast.Str(p[1])
 
 # Statements
 
@@ -183,7 +196,7 @@ def p_stmt_expr(p):
     p[0] = ast.Expr(p[1])
 
 def p_stmt_assignment(p):
-    """stmt : store_id '=' expr"""
+    """stmt : assign_id '=' expr"""
     p[0] = ast.Assign([p[1]], p[3])
 
 def p_stmt_aug_assignment(p):
@@ -232,9 +245,9 @@ def p_func(p):
 
 @register('expr')
 def p_funccall(p):
-    """funccall : expr '(' expr_list ')'"""
-    keywords = filter(lambda x: isinstance(x, ast.keyword), p[3])
-    exprs = filter(lambda x: not isinstance(x, ast.keyword), p[3])
+    """funccall : expr '(' opt_newline expr_list ')'"""
+    keywords = filter(lambda x: isinstance(x, ast.keyword), p[4])
+    exprs = filter(lambda x: not isinstance(x, ast.keyword), p[4])
     p[0] = ast.Call(p[1], exprs, keywords, None, None)
 
 @register('expr')
@@ -328,9 +341,9 @@ def p_range(p):
 # Lists
 
 def p_params(p):
-    """params : param ',' params
+    """params : param ',' opt_newline params
               | param"""
-    p = listify(p)
+    p = listify(p, list_pos=4)
 
 def p_param(p):
     """param : ID
@@ -345,9 +358,9 @@ def p_stmtlst(p):
     p = listify(p, size_check=3)
 
 def p_in_params(p):
-    """expr_list : opt_expr ',' expr_list
+    """expr_list : opt_expr ',' opt_newline expr_list
                  | opt_expr"""
-    p = listify(p)
+    p = listify(p, list_pos=4)
 
 p_opt_expr = trivial('opt_expr', ['expr', 'empty'])
 
