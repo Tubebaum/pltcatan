@@ -21,6 +21,7 @@ class Game(object):
     def __init__(self):
 
         Config.init()
+        ORACLE.set('game', self)
 
         self.dice = Dice()
         pdb.set_trace()
