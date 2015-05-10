@@ -1,6 +1,7 @@
 default: {
     game: {
         points-to-win: 10,
+        player-count: 3,
         board: {
             radius: 3,
             tile-count: 19
@@ -112,7 +113,7 @@ default: {
                     base-yield: 1,
                     extends: None,
                     upgrades: None,
-                    position-type: None
+                    position-type: "vertex"
                 },
                 road: {
                     name: "Road",
