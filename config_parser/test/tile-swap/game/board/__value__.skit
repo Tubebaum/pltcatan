@@ -1,0 +1,4 @@
+board: {
+    @extend: default.game.board,
+    radius: 4
+}

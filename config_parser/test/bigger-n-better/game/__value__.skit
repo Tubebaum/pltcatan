@@ -1,0 +1,7 @@
+@import ./board as bnb-board
+
+game: {
+    @extend: default.game,
+    points-to-win: 15,
+    board: bnb-board
+}
