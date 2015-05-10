@@ -144,7 +144,6 @@ class EdgeMeta(object):
 
         return matches_this or matches_neighbor
 
-# FIXME: Not correctly finding longest road for roads > length 2
 class LongestRoadSearch(object):
 
     def __init__(self, board):
@@ -229,7 +228,6 @@ class LongestRoadSearch(object):
 
         return max_road_len
 
-    # TODO
     def find_max_path_len(self, remaining_edges, end_vertex, edge_meta):
 
         neighbor_edge_metas = map(

@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import config
+import pdb
 import argparse
 import dill as pickle
 import os
@@ -116,7 +117,9 @@ def extend(skit, parent=None):
             extend(skit[property])
 
 def replaceEngine(engine, skit):
-    engine['structure'] = skit['structure']
+    engine = skit['game']
+    pdb.set_trace()
+    # engine['structure'] = skit['structure']
     # if isinstance(engine, dict):
     #     for property, value in engine.iteritems():
     #         if property == 'game':
@@ -206,6 +209,8 @@ def run(file):
         skit = pickle.load(open(compile_file, 'rb'))
     main_property = os.path.splitext(base_file)[0]
     properties[main_property] = skit.get(main_property)
+    Config.config = properties[main_property]
+    pdb.set_trace()
     game = Game()
     skit = skit.get(os.path.splitext(base_file)[0], None)
     # TODO: restore after engine syncs config dict format

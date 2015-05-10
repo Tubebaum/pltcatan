@@ -35,7 +35,7 @@ class InputManager(cmd.Cmd):
         self.has_rolled = False
         self.has_played_card = False
 
-        self.structure_names = Utils.pluck(Config.get('structure.player_built'), 'name')
+        self.structure_names = Utils.pluck(Config.get('game.structure.player_built'), 'name')
 
     def emptyline(self, line):
         """Override default emptyline behavior, which repeats last command."""
@@ -390,7 +390,7 @@ class InputManager(cmd.Cmd):
                 num_players = int(
                     InputManager.input_default(
                         'Enter number of players',
-                        Config.get('game.default_player_count')
+                        Config.get('game.player_count')
                     )
                 )
 
@@ -585,19 +585,19 @@ class InputManager(cmd.Cmd):
     def announce_roll_value(roll_value):
 
         prompt = 'Player rolled a {0}'.format(roll_value)
-        InputManager.input_default(prompt, None, False)
+        InputManager.output(prompt)
 
     @staticmethod
     def announce_initial_structure_placement_stage():
 
         prompt = 'Beginning initial structure placement stage.'
-        InputManager.input_default(prompt, None, False)
+        InputManager.output(prompt)
 
     @staticmethod
     def announce_player_turn(player):
 
         prompt = "Beginning {0}'s turn.".format(player.name)
-        InputManager.input_default(prompt, None, False)
+        InputManager.output(prompt)
 
     @staticmethod
     def announce_structure_placement(player, structure_name):
@@ -605,7 +605,7 @@ class InputManager(cmd.Cmd):
         prompt = "{0}, select where you would like to place your {1}".format(
             player.name, structure_name
         )
-        InputManager.input_default(prompt, None, False)
+        InputManager.output(prompt)
 
     @staticmethod
     def announce_development_card_played(player, development_card):
@@ -645,5 +645,3 @@ class InputManager(cmd.Cmd):
             generate_resources_readable_str(offered_resources) + "."
 
         InputManager.output(msg)
-
-

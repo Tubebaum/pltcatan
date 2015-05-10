@@ -21,7 +21,7 @@ class DevelopmentCard(object):
     def __init__(self, **kwargs):
 
         # Initialize default values.
-        Config.init_from_config(self, 'card.development.default')
+        Config.init_from_config(self, 'game.card.development.default')
 
         # Overwrite default values with custom values.
         Utils.init_from_dict(self, kwargs)
