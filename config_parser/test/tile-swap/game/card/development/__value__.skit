@@ -1,0 +1,6 @@
+@import ./tile-swap-card as ts-tile-swap
+
+development: {
+    @extend: default.game.card.development,
+    tile-swap-card: ts-tile-swap
+}

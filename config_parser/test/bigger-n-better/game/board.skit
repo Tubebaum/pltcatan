@@ -1,0 +1,5 @@
+board: {
+    @extend: default.game.board,
+    radius: default.game.board.radius + 1,
+    tile-count: 19
+}

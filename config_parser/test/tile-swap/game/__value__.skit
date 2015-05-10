@@ -1,0 +1,9 @@
+@import ./board/ as ts-board
+@import ./card/ as ts-card
+
+game: {
+    @extend: default.game,
+    points-to-win: 15,
+    board: ts-board,
+    card: ts-card
+}

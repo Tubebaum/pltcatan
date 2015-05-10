@@ -1,0 +1,5 @@
+@import ./development/ as ts-development
+
+card: {
+    development: ts-development
+}
