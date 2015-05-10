@@ -80,7 +80,7 @@ class Player(TradingEntity):
             self.remaining_structure_counts[structure_name] -= 1
 
             # TODO: conversions between underscore and camel case
-            config_path = 'structure.player_built.' + structure_name.lower()
+            config_path = 'game.structure.player_built.' + structure_name.lower()
             structure_dict = Config.get(config_path)
 
             return Structure(self, **structure_dict)

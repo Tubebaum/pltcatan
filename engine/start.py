@@ -19,6 +19,9 @@ signal.signal(signal.SIGINT, signal_handler)
 
 # Run main game loop.
 from engine.src.game import Game
+from engine.src.config.config import Config
 
-g = Game()
-g.start()
+print Config.get('game.board.tile_count')
+
+# g = Game()
+# g.start()

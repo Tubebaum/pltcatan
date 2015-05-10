@@ -2,23 +2,24 @@ default: {
     game: {
         points-to-win: 10,
         board: {
-            radius: 3
+            radius: 3,
+            tile-count: 19
         },
         card: {
             development: {
                 default: {
-                    'default': {
-                        'count': 0,
-                        'name': 'Development Card',
-                        'description': 'Development card default description.',
-                        'draw_card': None,
-                        'play_card': None,
-                        'cost': {
-                            'wool': 1,
-                            'grain': 1,
-                            'ore': 1
-                        },
-                    },
+                    default: {
+                        count: 0,
+                        name: "Development Card",
+                        description: "Development card default description.",
+                        draw-card: None,
+                        play-card: None,
+                        cost: {
+                            wool: 1,
+                            grain: 1,
+                            ore: 1
+                        }
+                    }
                 },
                 knight: {
                     name: "Knight Card",
@@ -30,7 +31,7 @@ default: {
                         robber.outside_trigger_effect(game, player)
                         player.knights += 1
                         self.played = True
-                    },
+                    }
                 },
                 victory-point: {
                     name: "Victory Point Card",
@@ -38,7 +39,7 @@ default: {
                     count: 5,
                     draw-card: func(game, player) {
                         player.hidden_points += 1
-                    },
+                    }
                 },
                 road-building: {
                     name: "Road Building Card",
@@ -49,7 +50,7 @@ default: {
                 
                         for _ in range(2):
                                 x, y, edge_dir = game.input_manager.prompt_edge_placement(game)
-                                game.board.place_edge_structure(x, y, edge_dir, player.get_structure('road'))
+                                game.board.place_edge_structure(x, y, edge_dir, player.get_structure("road"))
                 
                         self.played = True
 
@@ -80,13 +81,13 @@ default: {
                 
                                         game_player.transfer_resources(player, resource_type, count)
                 
-                                        msg = '{0} received {1} {2} from {3}'.format(
+                                        msg = "{0} received {1} {2} from {3}".format(
                                                 player.name, count, resource_type, game_player.name)
                 
                                         game.input_manager.input_default(msg, None, False)
                 
                         # Announce finished collecting resources.
-                        msg = 'Done monopolizing resources.'
+                        msg = "Done monopolizing resources."
                         game.input_manager.input_default(msg, None, False)
                 
                         self.played = True

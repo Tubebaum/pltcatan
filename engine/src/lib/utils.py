@@ -2,6 +2,8 @@
 import collections
 from types import MethodType
 
+def noop(cls, *args, **kwargs):
+    pass
 
 class Utils(object):
     """A general utility class."""

@@ -1,4 +1,4 @@
-from engine.src.lib.utils import Utils
+import engine.src.lib.utils as utils
 from engine.src.resource_type import ResourceType
 from engine.src.position_type import PositionType
 from types import *
@@ -10,6 +10,7 @@ type_mapping = { # from_type => to_type => conversion function
         PositionType: lambda st: PositionType.find_by_value(st)
     },
     NoneType: {
-        MethodType: Utils.noop
+        FunctionType: utils.noop,
+        MethodType: utils.Utils.noop,
     }
 }

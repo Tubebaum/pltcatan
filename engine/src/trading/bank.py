@@ -21,7 +21,9 @@ class Bank(TradingEntity):
           with.
     """
 
-    def __init__(self, tile_count=Config.get('game.board.tile_count')):
+    def __init__(self, tile_count=None):
+        if tile_count is None:
+            tile_count = Config.get('game.board.tile_count')
 
         super(Bank, self).__init__()
 
