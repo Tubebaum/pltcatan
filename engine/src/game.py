@@ -155,7 +155,7 @@ class Game(object):
                     InvalidBaseStructureException,
                     InvalidStructurePlacementException), e:
                 player.restore_structure(structure_name)
-                InputManager.input_default(e, None, False)
+                InputManager.output(e)
 
         return x, y, struct_dir
 

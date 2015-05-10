@@ -1,0 +1,5 @@
+# makefile
+
+.PHONY: clean
+clean:
+	find . -name "*.pyc" -exec rm -rf {} \;
