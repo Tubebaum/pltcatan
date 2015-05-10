@@ -1,5 +1,6 @@
 import cmd
 import sys
+import pdb
 
 from engine.src.config.config import Config
 from engine.src.direction.vertex_direction import VertexDirection
@@ -57,6 +58,9 @@ class InputManager(cmd.Cmd):
 
         msg = "End of {0}'s turn.".format(self.player.name)
         InputManager.output(msg)
+
+    def do_debug(self, line):
+        pdb.set_trace()
 
     def do_roll(self, value):
         """Roll the dice."""
@@ -163,6 +167,7 @@ class InputManager(cmd.Cmd):
     # TODO
     # TODO: long term. Refactor to be compatible w/ any trade intermediary.
     def do_trade_harbor(self, line):
+        """Trade resources with a harbor."""
         print('not yet implemented')
 
     def do_build(self, line):
@@ -181,10 +186,11 @@ class InputManager(cmd.Cmd):
 
             self.game.place_structure(self.player, structure_name)
 
-        except (NotEnoughStructuresException, BoardPositionOccupiedException,
-                InvalidBaseStructureException,
+            self.game.update_point_counts()
+
+        except (NotEnoughStructuresException, NotEnoughResourcesException,
+                BoardPositionOccupiedException, InvalidBaseStructureException,
                 InvalidStructurePlacementException), e:
-            self.player.restore_structure(structure_name)
             InputManager.input_default(e, None, False)
 
     # TODO: Enforce can't play card bought during same turn.
@@ -201,6 +207,7 @@ class InputManager(cmd.Cmd):
 
             try:
                 dev_card = self.game.board.bank.buy_development_card(self.player)
+                dev_card.draw_card(self.game, self.player)
 
                 success_msg = 'You received a {0}!'.format(str(dev_card))
 
@@ -224,8 +231,8 @@ class InputManager(cmd.Cmd):
 
             dev_card = InputManager.prompt_select_list_value(
                 msg,
-                map(lambda card: card.name, self.player.development_cards),
-                self.player.development_cards
+                map(lambda card: card.name, self.player.get_unplayed_development_cards()),
+                self.player.get_unplayed_development_cards()
             )
 
             if not dev_card:
@@ -236,6 +243,7 @@ class InputManager(cmd.Cmd):
 
             try:
                 dev_card.play_card(self.game, self.player)
+                self.game.update_point_counts()
 
             # TODO: Make clear which exceptions can be caught.
             except Exception as e:
@@ -248,11 +256,25 @@ class InputManager(cmd.Cmd):
         for tile in self.game.board.iter_tiles():
             print tile
 
-    def do_view_resource_cards(self, line):
+    def do_view_points(self, line):
+        """View points per player (not including other players' hidden points)."""
+
+        msg = 'Player Point Counts:\n'
+
+        for player in self.game.players:
+            points = player.get_total_points() if player == self.player \
+                else player.get_visible_points()
+            msg += '{}:\t{}'.format(player, points)
+
+        InputManager.output(msg)
+
+    def do_view_resources(self, line):
         """View your resource cards."""
 
-        msg = map(lambda resource_type: str(resource_type),
-                  self.player.get_resource_list())
+        msg = '\n' + '\n'.join(map(
+            lambda resource_type: '{}:\t{}'.format(resource_type, self.player.resources[resource_type]),
+            self.player.resources
+        ))
 
         InputManager.output(msg)
 
@@ -456,13 +478,18 @@ class InputManager(cmd.Cmd):
 
             try:
                 index = int(InputManager.input_default(prompt_msg))
+
+                if index < 1:
+                    raise ValueError
+
                 selected_element = value_list[index - 1]
 
                 valid = True
 
             except (IndexError, ValueError, TypeError):
-                print "Invalid number given. You must give a number " + \
+                msg = "Invalid number given. You must give a number " + \
                       "between 1 and {0}.".format(len(display_list))
+                InputManager.output(msg)
 
         return selected_element
 
@@ -500,8 +527,9 @@ class InputManager(cmd.Cmd):
                     if validate_func is not None else True
 
             except (IndexError, ValueError):
-                print "Invalid number given. All numbers must be " + \
+                msg = "Invalid number given. All numbers must be " + \
                       "between 1 and {0}.".format(len(allowed_values_lst))
+                InputManager.output(msg)
             except NotEnoughResourcesException as n:
                 InputManager.input_default(n, None, False)
 

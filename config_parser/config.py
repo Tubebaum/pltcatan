@@ -122,7 +122,7 @@ def p_value_none(p):
 
 def p_value_func(p):
     'value : FUNC'
-    #p[0] = parse_function(p[1])
+    #p[0] = parse_function(p[1], line_offset=p.linepos(1), col_offset=p.lexpos(1))
     p[0] = p[1]
 
 def p_structure_properties(p):

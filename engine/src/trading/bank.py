@@ -84,4 +84,4 @@ class Bank(TradingEntity):
         # Otherwise, return the development card to the deck.
         else:
             self.development_cards.append(card)
-            raise NotEnoughResourcesException(player, obstructing_resource_type)
+            raise NotEnoughResourcesException(obstructing_entity, obstructing_resource_type)

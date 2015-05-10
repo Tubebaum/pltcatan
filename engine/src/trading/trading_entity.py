@@ -116,6 +116,11 @@ class TradingEntity(object):
 
         return resource_type
 
+    def deposit_multiple_resources(self, resource_type_count_dict):
+
+        for resource_type, count in resource_type_count_dict.iteritems():
+            self.deposit_resources(resource_type, count)
+
     def deposit_resources(self, resource_type, resource_count):
         """Deposit the specified number of resources from the entity.
 
