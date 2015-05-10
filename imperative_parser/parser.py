@@ -5,7 +5,7 @@ import ply.lex as lex
 import ply.yacc as yacc
 
 from grammar_utils import get_registry, trivial_from_registry, trivial, gen_grammar
-from utils import flatten
+from utils import flatten, find_column
 
 # Allow dependency injection using the predefined GameOracle
 from oracle import ORACLE
@@ -124,7 +124,7 @@ t_IN = r':='
 t_ignore = " \t"
 
 def t_NEWLINE(t):
-    r'\n+'
+    r'\n\s+'
     t.lexer.lineno += t.value.count('\n')
     return t
 
@@ -419,22 +419,6 @@ p_stmt_reg = gen_function('stmt')
 LINE_OFFSET = 1
 COL_OFFSET = 1
 FUNC_STR = ''
-
-def find_column(input, token):
-    """Finds the column of a token given the input it's in
-
-    Args:
-        input (String) - The input being parsed
-        token (Token) - The token being located
-
-    Returns:
-        The column the token being located is in
-    """
-    last_cr = input.rfind('\n',0,token.lexpos)
-    if last_cr < 0:
-        last_cr = 0
-    column = (token.lexpos - last_cr) + 1
-    return column
 
 def p_error(p):
     print '[%d:%d] Syntax error at "%s"' % (p.lineno + LINE_OFFSET - 1, find_column(FUNC_STR, p) + COL_OFFSET - 2, p.value)

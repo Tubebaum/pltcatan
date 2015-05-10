@@ -37,3 +37,20 @@ def flatten(values):
         List. A list containing the nested objects in values
     """
     return chain.from_iterable(imap(one_or_many, values))
+
+def find_column(input, token=None, lexpos=None):
+    """Finds the column of a token given the input it's in
+
+    Args:
+        input (String) - The input being parsed
+        token (Token) - The token being located
+
+    Returns:
+        The column the token being located is in
+    """
+    lexpos = lexpos or token.lexpos
+    last_cr = input.rfind('\n',0,lexpos)
+    if last_cr < 0:
+        last_cr = 0
+    column = (lexpos - last_cr) + 1
+    return column
