@@ -448,9 +448,9 @@ def parse_string(s, debug=False, testing=False):
         ast.Module. The AST representation of the provided code string
     """
     if testing:
-        body = test_parser.parse(s, debug=debug, lexer=lexer)
+        body = test_parser.parse(s.strip(), debug=debug, lexer=lexer)
     else:
-        body = parser.parse(s, debug=debug, lexer=lexer)
+        body = parser.parse(s.strip(), debug=debug, lexer=lexer)
     return ast.Module(body)
 
 def parse_function(func_str, name='top', debug=False, line_offset=1, col_offset=1):
