@@ -116,7 +116,7 @@ def extend(skit, parent=None):
                     extension = extend_clean(skit, property, value, extension)
             extend(skit[property])
 
-def replaceEngine(engine, skit):
+def replace_engine(engine, skit):
     engine = skit['game']
     pdb.set_trace()
     # engine['structure'] = skit['structure']
@@ -132,7 +132,7 @@ def replaceEngine(engine, skit):
     #                 if dev_card:
     #                     engine[property][card]['count'] = dev_card['max-count']
     #                     engine[property][card]['description'] = dev_card['description']
-    #         replaceEngine(engine[property], skit)
+    #         replace_engine(engine[property], skit)
 
 def imports(full_file, file):
     imports = file.split('\n')
