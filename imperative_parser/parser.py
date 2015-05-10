@@ -245,9 +245,9 @@ def p_func(p):
 
 @register('expr')
 def p_funccall(p):
-    """funccall : expr '(' expr_list ')'"""
-    keywords = filter(lambda x: isinstance(x, ast.keyword), p[3])
-    exprs = filter(lambda x: not isinstance(x, ast.keyword), p[3])
+    """funccall : expr '(' opt_newline expr_list ')'"""
+    keywords = filter(lambda x: isinstance(x, ast.keyword), p[4])
+    exprs = filter(lambda x: not isinstance(x, ast.keyword), p[4])
     p[0] = ast.Call(p[1], exprs, keywords, None, None)
 
 @register('expr')
@@ -341,9 +341,9 @@ def p_range(p):
 # Lists
 
 def p_params(p):
-    """params : param ',' params
+    """params : param ',' opt_newline params
               | param"""
-    p = listify(p)
+    p = listify(p, list_pos=4)
 
 def p_param(p):
     """param : ID
@@ -358,9 +358,9 @@ def p_stmtlst(p):
     p = listify(p, size_check=3)
 
 def p_in_params(p):
-    """expr_list : opt_expr ',' expr_list
+    """expr_list : opt_expr ',' opt_newline expr_list
                  | opt_expr"""
-    p = listify(p)
+    p = listify(p, list_pos=4)
 
 p_opt_expr = trivial('opt_expr', ['expr', 'empty'])
 
