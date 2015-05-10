@@ -1,0 +1,3 @@
+board: {
+    radius: default.game.board.radius + 1
+}

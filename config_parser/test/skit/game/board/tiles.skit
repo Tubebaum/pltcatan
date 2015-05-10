@@ -1,5 +1,0 @@
-tiles: {
-    resources: {
-        distribution: uniform
-    }
-}

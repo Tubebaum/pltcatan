@@ -61,6 +61,8 @@ def extend_clean(skit, property, value, extension):
 
 def needs_extending(skit):
     children_structures = False
+    if isinstance(skit, dict):
+        return True
     for property, value in skit.iteritems():
         if isinstance(value, dict):
             children_structures = True
