@@ -115,7 +115,7 @@ def extend(skit, parent=None):
                     extension = extend_clean(skit, property, value, extension)
             extend(skit[property])
 
-def replace_engine(engine, skit):
+def replaceEngine(engine, skit):
     engine['structure'] = skit['structure']
     # if isinstance(engine, dict):
     #     for property, value in engine.iteritems():
@@ -129,7 +129,7 @@ def replace_engine(engine, skit):
     #                 if dev_card:
     #                     engine[property][card]['count'] = dev_card['max-count']
     #                     engine[property][card]['description'] = dev_card['description']
-    #         replace_engine(engine[property], skit)
+    #         replaceEngine(engine[property], skit)
 
 def imports(full_file, file):
     imports = file.split('\n')
@@ -206,7 +206,6 @@ def run(file):
         skit = pickle.load(open(compile_file, 'rb'))
     main_property = os.path.splitext(base_file)[0]
     properties[main_property] = skit.get(main_property)
-    #replace_engine(Config.config, properties[main_property])
     game = Game()
     skit = skit.get(os.path.splitext(base_file)[0], None)
     # TODO: restore after engine syncs config dict format
