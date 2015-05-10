@@ -1,0 +1,23 @@
+bigcity: {
+    @extend: default,
+    game: {
+        @extend: default.game,
+        structure: {
+            @extend: default.game.structure,
+            player-built: {
+                @extend: default.game.structure.player-built,
+                bigcity: {
+                    name: "Big City",
+                    cost: {
+                        ore: 5
+                    },
+                    count: 2,
+                    point-value: 3,
+                    base-yield: 3,
+                    upgrades: "City",
+                    position-type: "vertex"
+                }
+            }
+        }
+    }
+}
