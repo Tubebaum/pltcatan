@@ -129,7 +129,7 @@ class InputManager(cmd.Cmd):
                 InputManager.announce_trade_completed(trade_offer)
             # TODO: Specify explicit possible exceptions.
             except Exception as e:
-                InputManager.input_default(e, None, False)
+                InputManager.output(e)
 
     def do_trade_bank(self, line):
         """Trade resources with the bank"""
@@ -193,7 +193,7 @@ class InputManager(cmd.Cmd):
         except (NotEnoughStructuresException, NotEnoughResourcesException,
                 BoardPositionOccupiedException, InvalidBaseStructureException,
                 InvalidStructurePlacementException), e:
-            InputManager.input_default(e, None, False)
+            InputManager.output(e)
 
     # TODO: Enforce can't play card bought during same turn.
     def do_buy_card(self, line):
@@ -209,16 +209,14 @@ class InputManager(cmd.Cmd):
 
             try:
                 dev_card = self.game.board.bank.buy_development_card(self.player)
-                dev_card.draw_card(self.game, self.player)
+                dev_card.draw_card()
 
                 success_msg = 'You received a {0}!'.format(str(dev_card))
 
                 InputManager.input_default(success_msg, None, False)
 
-            except NotEnoughDevelopmentCardsException as n:
-                InputManager.input_default(n, None, False)
-            except NotEnoughResourcesException as n:
-                InputManager.input_default(n, None, False)
+            except (NotEnoughDevelopmentCardsException, NotEnoughResourcesException) as e:
+                InputManager.output(e)
 
     def do_play_card(self, line):
         """Play a development card."""
@@ -244,12 +242,12 @@ class InputManager(cmd.Cmd):
                 return
 
             try:
-                dev_card.play_card(self.game, self.player)
+                dev_card.play_card()
                 self.game.update_point_counts()
 
             # TODO: Make clear which exceptions can be caught.
             except Exception as e:
-                InputManager.input_default(e, None, False)
+                InputManager.output(e)
 
     # TODO: Improve.
     def do_print_board(self, line):
@@ -445,7 +443,7 @@ class InputManager(cmd.Cmd):
                     raise ValueError
             except Exception:
                 error_msg = "Invalid coordinates. Please try again."
-                InputManager.input_default(error_msg, None, False)
+                InputManager.output(error_msg)
 
         return x, y
 
@@ -533,7 +531,7 @@ class InputManager(cmd.Cmd):
                       "between 1 and {0}.".format(len(allowed_values_lst))
                 InputManager.output(msg)
             except NotEnoughResourcesException as n:
-                InputManager.input_default(n, None, False)
+                InputManager.output(n)
 
         return resource_count_dict
 
@@ -614,7 +612,7 @@ class InputManager(cmd.Cmd):
 
         prompt = "{0} played a development card: {1}".format(
             player.name, str(development_card))
-        InputManager.input_default(prompt, None, False)
+        InputManager.output(prompt)
 
     @staticmethod
     def announce_resource_distributions(distributions):

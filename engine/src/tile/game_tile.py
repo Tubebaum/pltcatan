@@ -18,7 +18,7 @@ class GameTile(HexTile):
     """
 
     def __init__(self, x, y,
-                 resource_type=ResourceType.FALLOW, chit_value=None):
+                 resource_type=ResourceType.FALLOW, chit_value=0):
 
         super(GameTile, self).__init__(x, y)
 
@@ -29,6 +29,9 @@ class GameTile(HexTile):
     def __str__(self):
         return '({0}, {1}) {2} {3}'.format(self.x, self.y,
                                            self.resource_type, self.chit_value)
+
+    def __repr__(self):
+        return self.__str__()
 
     def get_adjacent_vertex_structures(self):
         """Return any vertices that are structures."""

@@ -155,7 +155,7 @@ class Game(object):
                     InvalidBaseStructureException,
                     InvalidStructurePlacementException), e:
                 player.restore_structure(structure_name)
-                InputManager.input_default(e, None, False)
+                InputManager.output(e)
 
         return x, y, struct_dir
 
@@ -189,11 +189,13 @@ class Game(object):
             InputManager.announce_structure_placement(player, 'Road')
             self.place_init_structure(player, 'Road', False, x, y, vertex_dir)
 
+            neighboring_tiles = filter(
+                bool, self.board.get_adjacent_tiles_to_vertex(x, y, vertex_dir))
+
             # Give initial resource cards
             resource_types = filter(
                 lambda resource_type: resource_type != ResourceType.FALLOW,
-                map(lambda tile: tile.resource_type,
-                    self.board.get_adjacent_tiles_to_vertex(x, y, vertex_dir))
+                map(lambda tile: tile.resource_type, neighboring_tiles)
             )
 
             for resource_type in resource_types:

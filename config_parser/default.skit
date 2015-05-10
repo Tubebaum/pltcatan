@@ -36,7 +36,7 @@ default: {
                     name: "Victory Point Card",
                     description: "1 Victory Point!\n Reveal this card on your turn if, with it, you reach the number of points required for victory.",
                     count: 5,
-                    draw-card: func(game, player) {
+                    draw-card: func(player) {
                         player.hidden_points += 1
                     }
                 },
@@ -88,7 +88,7 @@ default: {
                         }
 
                         msg = "Done monopolizing resources."
-                        game.input_manager.input_default(msg, None, False)
+                        game.input_manager.output(msg)
                 
                         self.played = True
                     }

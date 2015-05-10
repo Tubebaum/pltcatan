@@ -33,6 +33,12 @@ class ParsingASTTests(unittest.TestCase):
     def test_multi_stmt_assignment(self):
         self.assertSameParse("a, b = tpl", "a, b = tpl")
 
+    def test_stmt_assign_property(self):
+        self.assertSameParse("a.b.c = 1", "a.b.c = 1")
+
+    def test_stmt_assign_getitem(self):
+        self.assertSameParse("a['b']['c'] = 1", 'a["b"]["c"] = 1')
+
     def test_stmt_aug_assign_add(self):
         self.assertSameParse("test += 1", "test += 1")
 
