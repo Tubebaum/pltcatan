@@ -84,8 +84,11 @@ class Config(object):
             # Get the value of the key if it's in the dict.
             if key in dct:
                 val = dct.get(key)
+            elif key.replace('_', '-') in dct:
+                val = dct.get(key.replace('_', '-'))
             else:
                 print "loc: {}\ndct: {}\nkey: {}".format(dot_notation_str, dct, key)
+                print Config.config
                 raise NoConfigValueDefinedException(dot_notation_str)
 
             # If we still have keys left, the property we want is nested
