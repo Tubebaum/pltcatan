@@ -10,7 +10,7 @@ type_mapping = { # from_type => to_type => conversion function
         PositionType: lambda st: PositionType.find_by_value(st)
     },
     NoneType: {
-        FunctionType: utils.noop,
-        MethodType: utils.Utils.noop
+        FunctionType: lambda _: utils.noop,
+        MethodType: lambda _: utils.Utils.noop
     }
 }

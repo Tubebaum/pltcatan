@@ -37,8 +37,10 @@ class InputManager(cmd.Cmd):
 
         self.structure_names = Utils.pluck(Config.get('game.structure.player_built'), 'name')
 
-    def emptyline(self, line):
+    def emptyline(self, line=None):
         """Override default emptyline behavior, which repeats last command."""
+        if line is None:
+            return
         self.default(line)
 
     def default(self, line):

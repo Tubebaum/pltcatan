@@ -87,8 +87,8 @@ class Config(object):
             elif key.replace('_', '-') in dct:
                 val = dct.get(key.replace('_', '-'))
             else:
-                print "loc: {}\ndct: {}\nkey: {}".format(dot_notation_str, dct, key)
-                print Config.config
+                # print "loc: {}\ndct: {}\nkey: {}".format(dot_notation_str, dct, key)
+                # print Config.config
                 raise NoConfigValueDefinedException(dot_notation_str)
 
             # If we still have keys left, the property we want is nested
@@ -159,9 +159,9 @@ class Config(object):
                 path = k if not path_so_far else '.'.join([path_so_far, k])
                 Config.coerce_recursive(path)
         else:
-            print "Beginning coercion, path: {}".format(path_so_far)
-            print "Current type: {}".format(type(curr_value))
-            print "Target type: {}".format(target_type)
+            # print "Beginning coercion, path: {}".format(path_so_far)
+            # print "Current type: {}".format(type(curr_value))
+            # print "Target type: {}".format(target_type)
             Config.set(
                 Config.coerce(curr_value, type(curr_value), target_type),
                 path_so_far
