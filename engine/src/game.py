@@ -13,6 +13,7 @@ from engine.src.structure.structure import Structure
 from engine.src.calamity.robber import Robber
 from engine.src.longest_road_search import LongestRoadSearch
 
+from imperative_parser.oracle import ORACLE
 
 class Game(object):
     """A game of Settlers of Catan."""
@@ -23,6 +24,7 @@ class Game(object):
 
         self.dice = Dice()
         self.board = GameBoard(Config.get('game.board.radius'))
+        ORACLE.set('board', self.board)
 
         # Place the robber on a fallow tile.
         self.robber = Robber()
@@ -43,6 +45,7 @@ class Game(object):
 
         while max_point_count < Config.get('game.points_to_win'):
             for player in self.players:
+                ORACLE.set('player', player)
                 InputManager(self, player).cmdloop()
                 self.update_point_counts()
                 max_point_count = self.get_winning_player().get_total_points()
@@ -60,6 +63,8 @@ class Game(object):
 
         for player_name in player_names:
             self.players.append(Player(player_name))
+
+        ORACLE.set('players', self.players)
 
     def place_structure(self, player, structure_name, must_border_claimed_edge=True,
                         struct_x=None, struct_y=None, struct_vertex_dir=None, free_to_build=False):
@@ -205,6 +210,7 @@ class Game(object):
 
         roll_value = self.dice.roll()
         InputManager.announce_roll_value(roll_value)
+        ORACLE.set('dice_value', roll_value)
 
         # If a calamity value, handle calamity
         distributions = self.board.distribute_resources_for_roll(roll_value)

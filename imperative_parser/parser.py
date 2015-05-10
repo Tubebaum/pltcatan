@@ -21,6 +21,29 @@ def gen_access_func(var_name):
     """
     return ast.Call(ast.Attribute(ast.Name('ORACLE', ast.Load()), 'get', ast.Load()), [ast.Str(var_name)], [], None, None)
 
+class RewriteInjected(ast.NodeTransformer):
+    def __init__(self, injected):
+        """Creates a NodeTransformer object to replace calls to injected parameters with calls to a lookup table
+
+        Args:
+            injected (Iterable): An iterable representing the list of injected parameter names
+
+        Returns:
+            An instance of RewriteInjected whose visit method will rewrite the injected nodes
+        """
+        super(RewriteInjected, self).__init__()
+        self.injected = set(injected)
+
+    def visit_Name(self, node):
+        if node.id in self.injected:
+            return ast.copy_location(ast.Subscript(
+                value=ast.Name(id=node.id, ctx=ast.Load()),
+                slice=ast.Index(value=ast.Num(0)),
+                ctx=node.ctx
+            ), node)
+        else:
+            return self.generic_visit(node)
+
 # Automatically build no-op nonterminals
 register = get_registry()
 
@@ -51,19 +74,28 @@ def listify(p, item_pos=1, list_pos=3, size_check=2):
     Returns:
         List. The parse p, with p[0] set to the list of items
     """
-    p[0] = [p[item_pos]] if p[item_pos] else None
+    p[0] = [p[item_pos]] if p[item_pos] else []
     if len(p) > size_check:
         p[0].extend(p[list_pos])
     return p
 
 # Token declarations
 
-reserved = {
-    'func': 'FUNC_DECL',
-    'return': 'RETURN',
-    'print': 'PRINT'
-}
-tokens = ['ID', 'NUM', 'NEWLINE'] + list(reserved.values())
+# TODO allow reserved words in strings
+reserved = {k: k.upper() for k in [
+    'func',
+    'return',
+    'print',
+    'if',
+    'else',
+    'or',
+    'and',
+    'not',
+    'while',
+    'for',
+    'to'
+]}
+tokens = ['ID', 'NUM', 'COMPOP', 'AUGASSIGN', 'NEWLINE', 'IN'] + list(reserved.values())
 literals = ['=', '+', '-', '*', '/', '(', ')', '{', '}', '[', ',', ']', '.', '"', '\'', '@']
 
 def t_ID(t):
@@ -79,6 +111,10 @@ def t_NUM(t):
         print 'Integer value too large', t.value
         t.value = 0
     return t
+
+t_COMPOP = r'==|<=|>=|<|>|!='
+t_AUGASSIGN = r'\+=|-=|\*=|/='
+t_IN = r':='
 
 t_ignore = " \t"
 
@@ -97,7 +133,15 @@ lexer = lex.lex()
 precedence = (
     ('left','+','-'),
     ('left','*','/'),
+    ('left', 'OR'),
+    ('left', 'AND'),
+    ('left', 'COMPOP'),
+    ('left', 'TO'),
+    ('right', 'NOT'),
     ('right','UMINUS'),
+    ('right', '('),
+    ('left', '['),
+    ('left', '.')
 )
 
 # Simple expressions
@@ -106,6 +150,12 @@ precedence = (
 def p_id(p):
     """id : ID"""
     p[0] = ast.Name(p[1], ast.Load())
+
+def p_store_id(p):
+    """store_id : ID"""
+    p[0] = ast.Name(p[1], ast.Store())
+
+p_store_other = trivial('store_id', ['property', 'getitem'])
 
 @register('expr')
 def p_num(p):
@@ -133,8 +183,18 @@ def p_stmt_expr(p):
     p[0] = ast.Expr(p[1])
 
 def p_stmt_assignment(p):
-    """stmt : ID '=' expr"""
-    p[0] = ast.Assign([ast.Name(p[1], ast.Store())], p[3])
+    """stmt : store_id '=' expr"""
+    p[0] = ast.Assign([p[1]], p[3])
+
+def p_stmt_aug_assignment(p):
+    """stmt : store_id AUGASSIGN expr"""
+    symbol_conversions = {
+        '+=': ast.Add,
+        '-=': ast.Sub,
+        '*=': ast.Mult,
+        '/=': ast.Div
+    }
+    p[0] = ast.AugAssign(p[1], symbol_conversions[p[2]](), p[3])
 
 def p_stmt_return(p):
     """stmt : RETURN expr
@@ -142,7 +202,7 @@ def p_stmt_return(p):
     if len(p) > 2:
         p[0] = ast.Return(p[2])
     else:
-        p[0] = ast.Return()
+        p[0] = ast.Return(None)
 
 def p_stmt_print(p):
     """stmt : PRINT expr"""
@@ -152,19 +212,20 @@ def p_stmt_print(p):
 
 @register('stmt')
 def p_top_func(p):
-    """topfunc : FUNC_DECL '(' params ')' '{' opt_newline body '}'"""
+    """topfunc : FUNC '(' params ')' '{' opt_newline body '}'"""
     if p[3]:
-        args = ast.arguments(p[3], None, None, [gen_access_func(param.id) for param in p[3]])
+        args = ast.arguments([ast.Name('self', ast.Param())] + map(lambda x: x[0], p[3]), None, None, [gen_access_func(param[0].id) for param in p[3]])
     else:
         args = ast.arguments([], None, None, [])
-    p[0] = ast.FunctionDef("top", args, p[7], [])
+    p[7] = [RewriteInjected([param[0].id for param in p[3]]).visit(node) for node in p[7]]
+    p[0] = [ast.FunctionDef("top", args, p[7], [])]
 
 @register('stmt')
 def p_func(p):
-    """func : FUNC_DECL ID '(' params ')' '{' opt_newline body '}'"""
+    """func : FUNC ID '(' params ')' '{' opt_newline body '}'"""
     if p[4]:
         arg_names, defaults = tuple([filter(lambda x: x is not None, item) for item in zip(*p[4])])
-        args = ast.arguments(arg_names, None, None, defaults)
+        args = ast.arguments(list(arg_names), None, None, list(defaults))
     else:
         args = ast.arguments([], None, None, [])
     p[0] = ast.FunctionDef(p[2], args, p[8], [])
@@ -172,27 +233,97 @@ def p_func(p):
 @register('expr')
 def p_funccall(p):
     """funccall : expr '(' expr_list ')'"""
-    p[0] = ast.Call(p[1], p[3], [], None, None)
+    keywords = filter(lambda x: isinstance(x, ast.keyword), p[3])
+    exprs = filter(lambda x: not isinstance(x, ast.keyword), p[3])
+    p[0] = ast.Call(p[1], exprs, keywords, None, None)
 
-#@register('expr')
+@register('expr')
 def p_lambda(p):
-    """lamdba : '@' '(' params ')' stmt"""
+    """lambda : '@' '(' params ')' expr"""
     if p[3]:
         arg_names, defaults = tuple([filter(lambda x: x is not None, item) for item in zip(*p[3])])
-        args = ast.arguments(arg_names, None, None, defaults)
+        args = ast.arguments(list(arg_names), None, None, list(defaults))
     else:
         args = ast.arguments([], None, None, [])
-    p[0] = ast.Lambda(args, p[6])
+    p[0] = ast.Lambda(args, p[5])
 
 def p_body(p):
     """body : stmtlst
             | empty"""
-    if len(p) > 2:
+    if p[1]:
         p[0] = p[1]
     else:
         p[0] = [ast.Pass()]
 
 p_opt_newline = trivial('opt_newline', ['NEWLINE', 'empty'])
+
+# Boolean logic
+
+@register('expr')
+def p_compare(p):
+    """compare : expr COMPOP expr"""
+    symbol_conversions = {
+        '==': ast.Eq,
+        '!=': ast.NotEq,
+        '<=': ast.LtE,
+        '>=': ast.GtE,
+        '<': ast.Lt,
+        '>': ast.Gt
+    }
+
+    p[0] = ast.Compare(p[1], [symbol_conversions[p[2]]()], [p[3]])
+
+def p_bool_expr(p):
+    """expr : expr AND expr
+            | expr OR expr"""
+    symbol_conversion = {
+        'and': ast.And,
+        'or': ast.Or
+    }
+    if isinstance(p[1], ast.BoolOp) and isinstance(p[1].op, symbol_conversion[p[2]]):
+        p[1].values.append(p[3])
+        p[0] = p[1]
+    else:
+        p[0] = ast.BoolOp(symbol_conversion[p[2]](), [p[1], p[3]])
+
+def p_expr_not(p):
+    """expr : NOT expr %prec NOT"""
+    p[0] = ast.UnaryOp(ast.Not(), p[2])
+
+# Conditionals
+
+@register('stmt')
+def p_if(p):
+    """if : IF expr '{' opt_newline body '}' opt_else"""
+    p[0] = ast.If(p[2], p[5], p[7])
+
+def p_opt_else(p):
+    """opt_else : ELSE '{' opt_newline body '}'
+                | empty"""
+    if len(p) > 2:
+        p[0] = p[4]
+    else:
+        p[0] = []
+
+def p_opt_elseif(p):
+    """opt_else : ELSE expr '{' opt_newline body '}' opt_else"""
+    p[0] = [ast.If(p[2], p[5], p[7])]
+
+# Loops
+@register('stmt')
+def p_while(p):
+    """while : WHILE expr '{' opt_newline body '}'"""
+    p[0] = ast.While(p[2], p[5], [])
+
+@register('stmt')
+def p_for(p):
+    """for : FOR ID IN expr '{' opt_newline body '}'"""
+    p[0] = ast.For(ast.Name(p[2], ast.Store()), p[4], p[7], [])
+
+@register('expr')
+def p_range(p):
+    """to : expr TO expr"""
+    p[0] = ast.Call(ast.Name('range', ast.Load()), [p[1], p[3]], [], None, None)
 
 # Lists
 
@@ -220,6 +351,10 @@ def p_in_params(p):
 
 p_opt_expr = trivial('opt_expr', ['expr', 'empty'])
 
+def p_opt_expr_default(p):
+    """opt_expr : ID '=' expr"""
+    p[0] = ast.keyword(p[1], p[3])
+
 @register('expr')
 def p_list_braces(p):
     """list : '[' expr_list ']'"""
@@ -233,9 +368,10 @@ def p_expr_property(p):
 
    p[0] = ast.Attribute(p[1], p[3], ast.Load())
 
+@register('expr')
 def p_expr_getitem(p):
-    """expr : ID '[' expr ']'"""
-    p[0] = ast.Subscript(ast.Name(p[1], ast.Load()), ast.Index(p[3]), ast.Load())
+    """getitem : expr '[' expr ']'"""
+    p[0] = ast.Subscript(p[1], ast.Index(p[3]), ast.Load())
 
 # Arithmetic
 
@@ -251,7 +387,11 @@ def p_expr_binop(p):
 
 def p_expr_uminus(p):
     """expr : '-' expr %prec UMINUS"""
-    p[0] = ast.BinOp(p[2], ast.Mult(), ast.Num(-1))
+    if isinstance(p[2], ast.Num):
+        p[2].n *= -1
+        p[0] = p[2]
+    else:
+        p[0] = ast.UnaryOp(ast.USub(), p[2])
 
 # Terminal registration
 
@@ -260,39 +400,87 @@ p_stmt_reg = gen_function('stmt')
 
 # Meta terminals
 
+# Globals for communicating with p_error
+# This is a code smell, but I don't think there's any easy way of
+# communicating this otherwise
+LINE_OFFSET = 1
+COL_OFFSET = 1
+FUNC_STR = ''
+
+def find_column(input, token):
+    """Finds the column of a token given the input it's in
+
+    Args:
+        input (String) - The input being parsed
+        token (Token) - The token being located
+
+    Returns:
+        The column the token being located is in
+    """
+    last_cr = input.rfind('\n',0,token.lexpos)
+    if last_cr < 0:
+        last_cr = 0
+    column = (token.lexpos - last_cr) + 1
+    return column
+
 def p_error(p):
-    print 'Syntax error at "%s"' % p.value
+    print '[%d:%d] Syntax error at "%s"' % (p.lineno + LINE_OFFSET - 1, find_column(FUNC_STR, p) + COL_OFFSET - 2, p.value)
 
 def p_empty(p):
     """empty :"""
     pass
 
+test_parser = yacc.yacc(start='stmtlst')
 parser = yacc.yacc(start='topfunc')
 
-def parse_string(s):
+class BadParseException(Exception):
+    def __init__(self, *args, **kwargs):
+        super(self, BadParseException).__init__(*args, **kwargs)
+
+def parse_string(s, debug=False, testing=False):
     """Parses a given string into a Python AST
 
     Args:
         s (String): The string to parse into an AST
 
+    Named Args:
+        debug (Bool): False -- A boolean representing whether to print debug info
+        testing (Bool): False -- A boolean representing whether to use 'stmtlst' or 'topfunc' as the starting symbol
+
     Returns:
         ast.Module. The AST representation of the provided code string
     """
-    return ast.Module([parser.parse(s, lexer=lexer)])
+    if testing:
+        body = test_parser.parse(s, debug=debug, lexer=lexer)
+    else:
+        body = parser.parse(s, debug=debug, lexer=lexer)
+    return ast.Module(body)
 
-def parse_function(s, name='top'):
+def parse_function(func_str, name='top', debug=False, line_offset=1, col_offset=1):
     """Parses a string representing a Skit function into a first-class Python function
 
     Args:
-        s (String): The string representing a Skit function to parse into a Python function
+        func_str (String): The string representing a Skit function to parse into a Python function
 
     Named Args:
         name (String): 'top' -- A string representing the name to give the function being parsed
+        debug (Bool): False -- A boolean representing whether to print debug info
+        line_offset (Int): 0 -- An int representing the line offset at which the function was found
+        col_offset (Int): 0 -- An int representing the column offset at which the function was found
 
     Returns:
         Func. A first-class Python function that performs the actions of the Skit function provided
     """
-    exec(compile(ast.fix_missing_locations(parse_string(s)), filename='<ast>', mode='exec'))
+    global LINE_OFFSET
+    global COL_OFFSET
+    global FUNC_STR
+    LINE_OFFSET = line_offset
+    COL_OFFSET = col_offset
+    FUNC_STR = func_str
+
+    func_ast = ast.fix_missing_locations(parse_string(func_str, debug=debug))
+
+    exec(compile(func_ast, filename='<ast>', mode='exec'))
     locals()[name].__name__ = locals()[name].func_name = name
     return locals()[name]
 
