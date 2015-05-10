@@ -4,18 +4,25 @@ tile-swap-card: {
     description: "Swap the resource type of two tiles on the board.",
     play-card: func(game, player) {
         prompt = "Choose a location of the {} tile"
+
         game.input_manager.output(prompt.format("first"))
         x1, y1 = game.input_manager.prompt_tile_coordinates(game)
+
         game.input_manager.output(prompt.format("second"))
         x2, y2 = game.input_manager.prompt_tile_coordinates(game)
+
         tile1 = game.board.get_tile_with_coords(x1, y1)
         tile2 = game.board.get_tile_with_coords(x2, y2)
+
         resource1 = tile1.resource_type
-        resource1 = tile1.resource_type
+        resource2 = tile2.resource_type
+
         tile1.resource_type = resource2
         tile2.resource_type = resource1
+
         msg = "Successfully swapped resources of tiles {} {}".format(tile1, tile2)
         game.input_manager.output(msg)
+
         self.played = True
     }
 }
