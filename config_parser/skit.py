@@ -207,7 +207,7 @@ def run(file):
         skit = None
         if not os.path.isfile(compile_file) or\
             os.path.getmtime(file) > os.path.getmtime(compile_file):
-            skit = compile(file)
+            skit = compile(file)[0]
         else:
             skit = pickle.load(open(compile_file, 'rb'))
         main_property = os.path.splitext(base_file)[0]
