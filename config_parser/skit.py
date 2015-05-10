@@ -59,6 +59,9 @@ def extend_clean(skit, property, value, extension):
     return extension
 
 def needs_extending(skit):
+    '''
+    Checks to see if a structure needs to be extended
+    '''
     children_structures = False
     if isinstance(skit, dict):
         return True
@@ -68,10 +71,16 @@ def needs_extending(skit):
     return children_structures
 
 def make_extend(extension, extended_property, explicit):
+    '''
+    Coerce the structure to look like a verbose extension
+    '''
     return {'value': '%s.%s' % (extension, extended_property),
             'explicit-overwrite-only': explicit}
 
 def replace(value):
+    '''
+    Replace an import alias with its actual value
+    '''
     if '+' in value:
         terms = value.split('+')
         sum = 0
@@ -117,24 +126,11 @@ def extend(skit, parent=None):
                     extension = extend_clean(skit, property, value, extension)
             extend(skit[property])
 
-def replace_engine(engine, skit):
-    engine = skit['game']
-    # engine['structure'] = skit['structure']
-    # if isinstance(engine, dict):
-    #     for property, value in engine.iteritems():
-    #         if property == 'game':
-    #             engine[property]['points_to_win'] = skit['game']['points-to-win']
-    #         elif property == 'board':
-    #             engine[property]['default_radius'] = skit['game']['board']['radius']
-    #         elif property == 'development':
-    #             for card, props in value.iteritems():
-    #                 dev_card = skit['game']['cards']['development'].get(card.replace('_', '-'))
-    #                 if dev_card:
-    #                     engine[property][card]['count'] = dev_card['max-count']
-    #                     engine[property][card]['description'] = dev_card['description']
-    #         replace_engine(engine[property], skit)
-
 def imports(full_file, file):
+    '''
+    Compiles every skit structure that is imported in addition to
+    the top-level structure
+    '''
     imports = file.split('\n')
     line_no = 0
     chars_read = 0
