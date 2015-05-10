@@ -1,6 +1,7 @@
 default: {
     game: {
         points-to-win: 10,
+        player-count: 3,
         board: {
             radius: 3,
             tile-count: 19
@@ -8,17 +9,15 @@ default: {
         card: {
             development: {
                 default: {
-                    default: {
-                        count: 0,
-                        name: "Development Card",
-                        description: "Development card default description.",
-                        draw-card: None,
-                        play-card: None,
-                        cost: {
-                            wool: 1,
-                            grain: 1,
-                            ore: 1
-                        }
+                    count: 0,
+                    name: "Development Card",
+                    description: "Development card default description.",
+                    draw-card: None,
+                    play-card: None,
+                    cost: {
+                        wool: 1,
+                        grain: 1,
+                        ore: 1
                     }
                 },
                 knight: {
@@ -112,7 +111,7 @@ default: {
                     base-yield: 1,
                     extends: None,
                     upgrades: None,
-                    position-type: None
+                    position-type: "vertex"
                 },
                 road: {
                     name: "Road",

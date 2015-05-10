@@ -1,4 +1,4 @@
-@import ./board/ as bnb-board
+@import ./board as bnb-board
 
 game: {
     @extend: {

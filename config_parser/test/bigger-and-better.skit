@@ -6,17 +6,7 @@ bigger-and-better: {
         },
         points-to-win: 15,
         board: {
-            radius: default.game.board.radius + 1,
-            chits: {
-                values: {
-                    distribution: uniform
-                }
-            },
-            tiles: {
-                resources: {
-                    distribution: uniform
-                }
-            }
+            radius: default.game.board.radius + 1
         }
     }
 }

@@ -4,19 +4,7 @@ bigger-n-better: {
         points-to-win: 15,
         board: {
             @extend: default.game.board,
-            radius: default.game.board.radius + 1,
-            chits: {
-                @extend: default.game.board.chits,
-                values: {
-                    distribution: uniform
-                }
-            },
-            tiles: {
-                @extend: default.game.board.tiles,
-                resources: {
-                    distribution: uniform
-                }
-            }
+            radius: default.game.board.radius + 1
         }
     }
 }

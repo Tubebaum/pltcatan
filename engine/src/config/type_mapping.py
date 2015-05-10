@@ -11,6 +11,6 @@ type_mapping = { # from_type => to_type => conversion function
     },
     NoneType: {
         FunctionType: utils.noop,
-        MethodType: utils.Utils.noop,
+        MethodType: utils.Utils.noop
     }
 }

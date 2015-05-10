@@ -25,7 +25,7 @@ tokens = (
 
 reserved = {
     'uniform': 'UNIFORM',
-    'none': 'NONE'
+    'None': 'NONE'
 }
 
 tokens += tuple(reserved.values())
