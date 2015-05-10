@@ -169,8 +169,8 @@ class GameBoard(HexBoard):
 
         chit_values = frozenset(range(start, end + 1)).intersection(exclude)
 
-        for chit_value, tile in zip(chit_values, self.iter_tiles()):
-            tile.chit_value = chit_value
+        for tile in self.iter_tiles():
+            tile.chit_value = random.choice(chit_values)
 
     def _default_assign_tile_chit_values(self, start=2, end=12,
                                          exclude=Calamity.DEFAULT_ROLL_VALUES):

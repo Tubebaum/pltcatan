@@ -23,7 +23,8 @@ class Game(object):
         Config.init()
 
         self.dice = Dice()
-        self.board = GameBoard(Config.get('board.default_radius'))
+        pdb.set_trace()
+        self.board = GameBoard(Config.get('game.board.radius'))
         ORACLE.set('board', self.board)
 
         # Place the robber on a fallow tile.
@@ -110,7 +111,7 @@ class Game(object):
             # Allocate points
             if structure.augments():
                 # TODO: conversions from camelcase to underscore
-                points = structure.point_value - Config.get('structure.player_built.' + structure_name.lower()).point_value
+                points = structure.point_value - Config.get('game.structure.player_built.' + structure_name.lower()).point_value
             else:
                 points = structure.point_value
 
@@ -201,7 +202,7 @@ class Game(object):
                     distributions[player][resource_type] = 0
 
                 distributions[player][resource_type] += \
-                    Config.get('structure.player_built.settlement.base_yield')
+                    Config.get('game.structure.player_built.settlement.base_yield')
 
         self.board.distribute_resources(distributions)
         InputManager.announce_resource_distributions(distributions)

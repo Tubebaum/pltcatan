@@ -85,6 +85,7 @@ class Config(object):
             if key in dct:
                 val = dct.get(key)
             else:
+                print "loc: {}\ndct: {}\nkey: {}".format(dot_notation_str, dct, key)
                 raise NoConfigValueDefinedException(dot_notation_str)
 
             # If we still have keys left, the property we want is nested
@@ -155,6 +156,9 @@ class Config(object):
                 path = k if not path_so_far else '.'.join([path_so_far, k])
                 Config.coerce_recursive(path)
         else:
+            print "Beginning coercion, path: {}".format(path_so_far)
+            print "Current type: {}".format(type(curr_value))
+            print "Target type: {}".format(target_type)
             Config.set(
                 Config.coerce(curr_value, type(curr_value), target_type),
                 path_so_far
@@ -217,7 +221,7 @@ class Config(object):
         return path
 
     # The dictionary accessed by Config.get()
-    config = game_config
+    config = {}
 
     # A dictionary telling us what object types we should expect
     # for values in config.

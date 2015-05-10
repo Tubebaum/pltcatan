@@ -16,7 +16,7 @@ class Structure(object):
     def __init__(self, owning_player, **kwargs):
 
         # Initialize default values.
-        Config.init_from_config(self, 'structure.player_built.default')
+        Config.init_from_config(self, 'game.structure.player_built.default')
 
         # Overwrite default values with custom values.
         Utils.init_from_dict(self, kwargs)

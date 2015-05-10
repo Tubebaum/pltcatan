@@ -21,7 +21,9 @@ class Bank(TradingEntity):
           with.
     """
 
-    def __init__(self, tile_count=Config.get('board.default_tile_count')):
+    def __init__(self, tile_count=None):
+        if tile_count is None:
+            tile_count = Config.get('game.board.tile_count')
 
         super(Bank, self).__init__()
 
@@ -51,7 +53,7 @@ class Bank(TradingEntity):
     def _default_init_development_cards(self):
         """Add a configured number of each development card type to the bank."""
 
-        dev_card_dict = Config.get('card.development')
+        dev_card_dict = Config.get('game.card.development')
 
         for name, card in dev_card_dict.iteritems():
             for _ in range(card['count']):
