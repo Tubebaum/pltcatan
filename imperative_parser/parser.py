@@ -158,7 +158,15 @@ def p_assign_lst(p):
                   | store_id"""
     p = listify(p)
 
-p_store_other = trivial('store_id', ['property', 'getitem'])
+def p_store_property(p):
+    """store_id : property"""
+    p[1].ctx = ast.Store()
+    p[0] = p[1]
+
+def p_store_getitem(p):
+    """store_id : getitem"""
+    p[1].ctx = ast.Store()
+    p[0] = p[1]
 
 @register('expr')
 def p_num(p):

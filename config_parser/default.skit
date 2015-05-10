@@ -35,8 +35,8 @@ default: {
                 victory-point: {
                     name: "Victory Point Card",
                     description: "1 Victory Point!\n Reveal this card on your turn if, with it, you reach the number of points required for victory.",
-                    count: 2,
-                    draw-card: func(game, player) {
+                    count: 5,
+                    draw-card: func(player) {
                         player.hidden_points += 1
                     }
                 },
