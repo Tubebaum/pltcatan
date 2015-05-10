@@ -54,7 +54,6 @@ default: {
                         }
                 
                         self.played = True
-
                     }
                 },
                 year-of-plenty: {

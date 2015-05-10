@@ -150,17 +150,17 @@ def imports(full_file, file):
                     return None
                 if line[1][-1] == '/':
                     if line[1][0] == '.':
-                        properties[line[3]] = compile(full_file + line[1] +\
+                        properties[line[3]], success = compile(full_file + line[1] +\
                                 '__value__.skit', as_name=line[3])
                     elif line[1][0] == '/':
-                        properties[line[3]] = compile(line[1] +\
+                        properties[line[3]], success = compile(line[1] +\
                                 '__value__.skit', as_name=line[3])
                 else:
                     if line[1][0] == '.':
-                        properties[line[3]] = compile(full_file + line[1] +\
+                        properties[line[3]], success = compile(full_file + line[1] +\
                                 '.skit')
                     elif line[1][0] == '/':
-                        properties[line[3]] = compile(line[1] + '.skit')
+                        properties[line[3]], success = compile(line[1] + '.skit')
 
             else:
                 break
@@ -182,7 +182,7 @@ def compile(file, clean=False, as_name=None):
         compile('default.skit')
     file = open(file, 'r').read()
     file = imports(full_file, file)
-    skit = config.parser.parse(file, lexer=config.lexer)
+    skit, succeeded = config.parse(file)
     main_property = os.path.splitext(base_file)[0]
     extend(skit)
     if as_name:
@@ -193,31 +193,35 @@ def compile(file, clean=False, as_name=None):
     if not os.path.isdir('tmp/'):
         os.makedirs('tmp/')
     pickle.dump(skit, open(compile_file, 'wb'))
-    return properties[main_property]
+    return properties[main_property], succeeded
 
 def run(file):
     '''
     Runs skit game
     Recompiles skit code only if code has been changed
     '''
-    compile('default.skit')
-    base_file = os.path.basename(file)
-    compile_file = 'tmp/' + base_file
-    skit = None
-    if not os.path.isfile(compile_file) or\
-        os.path.getmtime(file) > os.path.getmtime(compile_file):
-        skit = compile(file)
+    _, success = compile('default.skit')
+    if success:
+        base_file = os.path.basename(file)
+        compile_file = 'tmp/' + base_file
+        skit = None
+        if not os.path.isfile(compile_file) or\
+            os.path.getmtime(file) > os.path.getmtime(compile_file):
+            skit = compile(file)
+        else:
+            skit = pickle.load(open(compile_file, 'rb'))
+        main_property = os.path.splitext(base_file)[0]
+        properties[main_property] = skit.get(main_property)
+        Config.config = properties[main_property]
+        pdb.set_trace()
+        game = Game()
+        skit = skit.get(os.path.splitext(base_file)[0], None)
+        # TODO: restore after engine syncs config dict format
+        # if skit.get('game', None):
+        game.start()
     else:
-        skit = pickle.load(open(compile_file, 'rb'))
-    main_property = os.path.splitext(base_file)[0]
-    properties[main_property] = skit.get(main_property)
-    Config.config = properties[main_property]
-    pdb.set_trace()
-    game = Game()
-    skit = skit.get(os.path.splitext(base_file)[0], None)
-    # TODO: restore after engine syncs config dict format
-    # if skit.get('game', None):
-    game.start()
+        print "Build failed, check the log for errors"
+        sys.exit(1)
 
 if __name__ == '__main__':
     arg_parser = argparse.ArgumentParser(description='Skit compiler')

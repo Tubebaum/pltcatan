@@ -4,6 +4,7 @@ import sys
 import os
 sys.path.append('..')
 from imperative_parser.parser import parse_function
+from imperative_parser.utils import find_column
 
 tokens = (
     'COLON',
@@ -84,6 +85,10 @@ def t_error(t):
 
 lexer = lex.lex()
 
+# Error Handling
+SUCCEEDED = True
+PARSED_STRING = ""
+
 def p_property_value(p):
     'property : ID COLON value'
     p[0] = {p[1]: p[3]}
@@ -122,8 +127,12 @@ def p_value_none(p):
 
 def p_value_func(p):
     'value : FUNC'
-    #p[0] = parse_function(p[1], line_offset=p.lineno(1), col_offset=p.lexpos(1))
-    p[0] = p[1]
+    global SUCCEEDED
+    try:
+        p[0] = parse_function(p[1], line_offset=p.lineno(1), col_offset=find_column(PARSED_STRING, lexpos=p.lexpos(1)))
+    except:
+        SUCCEEDED = False
+        p[0] = p[1]
 
 def p_structure_properties(p):
     'structure : LCURLY properties RCURLY'
@@ -169,3 +178,9 @@ def p_error(p):
     print "Syntax error in input!"
 
 parser = yacc.yacc()
+
+def parse(s):
+    global SUCCEEDED
+    global PARSED_STRING
+    PARSED_STRING = s
+    return parser.parse(s, lexer=lexer), SUCCEEDED
