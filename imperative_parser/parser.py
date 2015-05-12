@@ -424,8 +424,8 @@ def p_empty(p):
     """empty :"""
     pass
 
-test_parser = yacc.yacc(start='stmtlst')
-parser = yacc.yacc(start='topfunc')
+test_parser = yacc.yacc(start='stmtlst', errorlog=yacc.NullLogger())
+parser = yacc.yacc(start='topfunc', errorlog=yacc.NullLogger())
 
 class BadParseException(Exception):
     def __init__(self, *args, **kwargs):
