@@ -55,6 +55,9 @@ class Player(TradingEntity):
     def get_total_points(self):
         return self.points + self.hidden_points + self.special_points
 
+    def get_visible_points(self):
+        return self.points + self.special_points
+
     def get_unplayed_development_cards(self):
 
         unplayed_dev_cards = filter(

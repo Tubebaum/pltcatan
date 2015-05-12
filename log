@@ -1,0 +1,1460 @@
+commit f17ed839974bfd144086c5a58fe8ae67633d7d56
+Merge: d117773 1721f46
+Author: Michelle Z <mdz2110@barnard.edu>
+Date:   Sun May 10 19:36:42 2015 -0400
+
+    Merge pull request #35 from marcioapaiva/engine_hot_fix
+    
+    Fixed bug in tile swap card play card logic
+
+commit 1721f46c4d416163a8719ea6ee5495018b75ed6d
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Sun May 10 19:34:18 2015 -0400
+
+    Fixed bug in tile swap card play card logic
+
+commit d117773ea4a29abc358c29c557679731e0903a24
+Merge: d55cae0 55e6ae0
+Author: Márcio Paiva <marcioapf@gmail.com>
+Date:   Sun May 10 19:25:18 2015 -0400
+
+    Merge pull request #34 from marcioapaiva/engine_hot_fix
+    
+    Engine hot fix
+
+commit 55e6ae0a0fbbc8353d630154d07d18aff8d9955d
+Merge: 324905a 8d4a733
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Sun May 10 19:18:59 2015 -0400
+
+    Merging with oracle_fix
+
+commit 324905aecb98f70f9604215dcb5e83b317469d9e
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Sun May 10 18:47:49 2015 -0400
+
+    Small fixes
+
+commit 8d4a73387b1091f7be9141aa2b18a2ab00fd04b4
+Author: Andrew FigPope <drewii2ii@gmail.com>
+Date:   Sun May 10 18:35:05 2015 -0400
+
+    Fixed getitem and property assignment
+
+commit f8864dcc9cf08310f2411eb6dc860d77286637d5
+Merge: 4e406a1 d55cae0
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Sun May 10 18:26:26 2015 -0400
+
+    Merge https://github.com/marcioapaiva/pltcatan into engine_hot_fix
+
+commit d55cae0e3f459d2b0eed08462e1ee3e7c9906001
+Merge: 3a11c9f 6ad9d21
+Author: Thomas Huzij <tubebaum@gmail.com>
+Date:   Sun May 10 18:26:07 2015 -0400
+
+    Merge pull request #33 from marcioapaiva/config-parser
+    
+    Implement working examples from Tutorial and create test suite
+
+commit 6ad9d2107c51750b46a2c03ed2e1739efad0d992
+Merge: 12e7634 3a11c9f
+Author: Tubebaum <tubebaum@gmail.com>
+Date:   Sun May 10 18:23:16 2015 -0400
+
+    Merge branch 'master' into config-parser
+
+commit 12e763441bb8aa1c2862073c6f2412626f9261e3
+Author: Tubebaum <tubebaum@gmail.com>
+Date:   Sun May 10 18:22:02 2015 -0400
+
+    Create localized test suite for the configuration parser
+
+commit 4e406a11e2a265c35e62683a98dcaccf7de3cbb7
+Merge: fa57dab 7c44221
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Sun May 10 18:02:42 2015 -0400
+
+    Merge remote-tracking branch 'mainrepo/oracle_fix' into engine_hot_fix
+
+commit fa57dabbb96d06fc8db3d4ea4f971185ec9533b7
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Sun May 10 18:01:12 2015 -0400
+
+    Fixed issue with reaching end of development card stack
+
+commit ef2887fbaf21c6cf46b9de0ccdb9c3d6a37bd44e
+Merge: 03d70f2 3a11c9f
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Sun May 10 18:00:05 2015 -0400
+
+    Merge https://github.com/marcioapaiva/pltcatan into engine_hot_fix
+
+commit 7c44221ffa836598b9bf4451165b57e0abecfcb5
+Author: Andrew FigPope <drewii2ii@gmail.com>
+Date:   Sun May 10 17:51:48 2015 -0400
+
+    Fixed parameter passing in engine, made everything local to imperative_parser to maintain state
+
+commit 03d70f2622dbbef9dfaeef5ccce9930f32ae622f
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Sun May 10 17:36:03 2015 -0400
+
+    Fixed issue with collecting resources from board edge settlements during initial phase
+
+commit ab8850e41a117df07ec662b6393fc117068355a7
+Author: Tubebaum <tubebaum@gmail.com>
+Date:   Sun May 10 16:51:31 2015 -0400
+
+    Support every example in the Tutorial
+
+commit fd3ca4af08229064dbb94e088dfaebd577d87c19
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Sun May 10 15:25:32 2015 -0400
+
+    Victory point cards throwing error; need Andres to fix; disabling otherwise
+
+commit 3a11c9fe1dd6cb291647c6f08faa1a0e9a3f9021
+Merge: 6f4eed0 8f90e12
+Author: Márcio Paiva <marcioapf@gmail.com>
+Date:   Sun May 10 15:07:37 2015 -0400
+
+    Merge pull request #31 from marcioapaiva/engine_hot_fix
+    
+    Engine fixes
+
+commit 8f90e1264b8db01ff9f8e196780bc328967b5b6e
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Sun May 10 15:06:18 2015 -0400
+
+    Fixed empty line issue for input manager
+    Finished none type issue for dev cards
+
+commit 6f4eed0d74a9f754234467fe45cb591539a11d42
+Merge: 072bf95 a2d998f
+Author: Thomas Huzij <tubebaum@gmail.com>
+Date:   Sun May 10 14:17:12 2015 -0400
+
+    Merge pull request #30 from marcioapaiva/config-parser
+    
+    Seemingly functional skit
+
+commit a2d998f357550b48bdc67e593da433cc1f2f6792
+Author: Tubebaum <tubebaum@gmail.com>
+Date:   Sun May 10 14:16:57 2015 -0400
+
+    Fix development default structure
+
+commit 358f56bb6e250d327619fa528f649a5d2c37baeb
+Author: Tubebaum <tubebaum@gmail.com>
+Date:   Sun May 10 13:56:19 2015 -0400
+
+    replace any instance of "_" with an instane of "-"
+
+commit 556d81cc79e43c63d93366e838784776b3bd3b3d
+Author: Tubebaum <tubebaum@gmail.com>
+Date:   Sun May 10 13:29:27 2015 -0400
+
+    Add player count to default.skit and make default structure position type vertex
+
+commit b53864c2550f7e9d4346a5a754e9eb42a8817a37
+Merge: d23c2f1 072bf95
+Author: Tubebaum <tubebaum@gmail.com>
+Date:   Sun May 10 10:40:38 2015 -0400
+
+    Merge branch 'master' into config-parser
+
+commit d23c2f11d49f345c1155ca20aff4857ef42e7331
+Author: Tubebaum <tubebaum@gmail.com>
+Date:   Sun May 10 10:40:24 2015 -0400
+
+    get actual dict from tuple returned by compile
+
+commit 072bf959636a03808340da739b8465571c9bd447
+Merge: 22a1133 6048cad
+Author: Andrew FigPope <drewii2ii@gmail.com>
+Date:   Sun May 10 10:38:59 2015 -0400
+
+    Merge pull request #28 from marcioapaiva/parser_fixes
+    
+    Added support for trailing whitespace
+
+commit 6786e7b5756e7419ad1a1a6116868e4b63bb1aa2
+Merge: 0b469ec 22a1133
+Author: Tubebaum <tubebaum@gmail.com>
+Date:   Sun May 10 10:10:29 2015 -0400
+
+    Merge branch 'master' into config-parser
+
+commit 22a1133d86e5c0ae363f98eb5f525955434873f1
+Merge: 48980fc eb2e806
+Author: Thomas Huzij <tubebaum@gmail.com>
+Date:   Sun May 10 10:10:16 2015 -0400
+
+    Merge pull request #29 from marcioapaiva/config_parser_fies
+    
+    Fix whitespace issue, config parser error handling
+
+commit eb2e806e90cc6ae1a9a63df453c38a2e1593af9e
+Author: Andrew FigPope <drewii2ii@gmail.com>
+Date:   Sun May 10 10:07:37 2015 -0400
+
+    Fix whitespace issue, config parser error handling
+
+commit 0b469ecd9706510e1888fd3ac7af7b9747798d5f
+Author: Tubebaum <tubebaum@gmail.com>
+Date:   Sun May 10 10:04:43 2015 -0400
+
+    update example 3a to match the capabilites of the current engine
+
+commit 48980fced794167436552452def720eacad7a981
+Merge: 3bbffd7 51d4188
+Author: Thomas Huzij <tubebaum@gmail.com>
+Date:   Sun May 10 09:32:43 2015 -0400
+
+    Merge pull request #23 from marcioapaiva/config-parser
+    
+    Implement multiple-file skit compilation
+
+commit 51d4188903bc7c92f15d62bdf0e1b59d62a4fbc2
+Author: Tubebaum <tubebaum@gmail.com>
+Date:   Sun May 10 09:31:09 2015 -0400
+
+    conform to styleguide
+
+commit 6048cade751afbc03145679a0d30d625fda07726
+Author: Andrew FigPope <drewii2ii@gmail.com>
+Date:   Sun May 10 09:28:25 2015 -0400
+
+    Added support for trailing whitespace
+
+commit 4a4956a4abc51958ce8a6a7052cae608fadf9dd8
+Merge: 346bb94 3bbffd7
+Author: Tubebaum <tubebaum@gmail.com>
+Date:   Sun May 10 09:22:58 2015 -0400
+
+    Merge branch 'master' into config-parser
+
+commit 3bbffd737c4ea102e52158144f4d94b0b3f53e49
+Merge: 626742e 14c19e6
+Author: Thomas Huzij <tubebaum@gmail.com>
+Date:   Sun May 10 09:21:58 2015 -0400
+
+    Merge pull request #27 from marcioapaiva/parser_fixes
+    
+    Add support for game in oracle
+
+commit 346bb948471226f3cc57d23901bbdee0ee2505e0
+Merge: c0b0725 626742e
+Author: Tubebaum <tubebaum@gmail.com>
+Date:   Sun May 10 09:20:48 2015 -0400
+
+    Merge branch 'master' into config-parser
+
+commit 14c19e6e59aa63cb5aea3f53bed139495cd32c45
+Author: Andrew FigPope <drewii2ii@gmail.com>
+Date:   Sun May 10 09:20:02 2015 -0400
+
+    Add support for game in oracle
+
+commit 626742e3797420e1272bd02b5f22fc47acc8d9c0
+Merge: 8b20970 9e0256c
+Author: Thomas Huzij <tubebaum@gmail.com>
+Date:   Sun May 10 09:18:49 2015 -0400
+
+    Merge pull request #26 from marcioapaiva/parser_fixes
+    
+    Added multiple assignment
+
+commit 9e0256c46ecf89f6ba9bb19ce2430dbd9e9c0215
+Author: Andrew FigPope <drewii2ii@gmail.com>
+Date:   Sun May 10 09:16:23 2015 -0400
+
+    Fixed imperative parser call
+
+commit 4537da5133b5092865bad0416382629876fa58aa
+Author: Andrew FigPope <drewii2ii@gmail.com>
+Date:   Sun May 10 09:15:09 2015 -0400
+
+    Missing save, fixed for loop + whitespace
+
+commit 909fce5873428af81d4eb96d699d88588c73bdc1
+Author: Andrew FigPope <drewii2ii@gmail.com>
+Date:   Sun May 10 09:10:20 2015 -0400
+
+    Add support for newlines in function call parameter lists
+
+commit c0b0725e4fd163e0a115b235387139c27f6346ac
+Merge: 32c7d7d 8b20970
+Author: Tubebaum <tubebaum@gmail.com>
+Date:   Sun May 10 09:01:44 2015 -0400
+
+    Merge branch 'master' into config-parser
+
+commit 32c7d7de2c0e0a0c9a97dc1e9eae28eebb1c158b
+Author: Tubebaum <tubebaum@gmail.com>
+Date:   Sun May 10 08:59:48 2015 -0400
+
+    reverting method names for merge
+
+commit a0e1571a83f27699aa9d9a754513c9e5459b03ab
+Author: Andrew FigPope <drewii2ii@gmail.com>
+Date:   Sun May 10 08:56:39 2015 -0400
+
+    Made strings more robust
+
+commit 600b414a38b4dc2ba8dfce62d42005a8329c36c0
+Author: Andrew FigPope <drewii2ii@gmail.com>
+Date:   Sun May 10 08:35:56 2015 -0400
+
+    Added multiple assignment
+
+commit 8b209700b6557013cc58b5610afcc1fdd033ab1e
+Merge: 96cbd96 0a57bdd
+Author: Márcio Paiva <marcioapf@gmail.com>
+Date:   Sun May 10 04:40:34 2015 -0400
+
+    Merge pull request #25 from mdzhang/master
+    
+    WIP: Debugging newly defined default.skit file
+
+commit 16aea05f36891cade24a4160a17d04f2f53ecf5d
+Merge: 17412af 96cbd96
+Author: Tubebaum <tubebaum@gmail.com>
+Date:   Sat May 9 23:40:24 2015 -0400
+
+    Merge branch 'master' into config-parser
+
+commit 0a57bddab5e167e0c7f6ec92de94029fc04fadbb
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Sat May 9 23:14:48 2015 -0400
+
+    WIP: Debugging new default.skit file
+
+commit 16da30f0dc88c3c7dbad726a8a4950989da85360
+Merge: 4d4d544 96cbd96
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Sat May 9 22:30:03 2015 -0400
+
+    Merge https://github.com/marcioapaiva/pltcatan
+    
+    Conflicts:
+    	config_parser/default.skit
+    	engine/src/game.py
+
+commit 4d4d5449e90d1a75d4ce54f297dc9f6dbb12d8e5
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Sat May 9 22:26:45 2015 -0400
+
+    Getting ready for final pre-project submission testing
+    
+    - Switched default.skit to use actually supported properties
+    - Updated config map expected organization to match LRM
+    - Used InputManager.output() where possible
+
+commit 96cbd960ea3785bbc05098616391db58a2941db8
+Merge: 412a904 7340f12
+Author: Michelle Z <mdz2110@barnard.edu>
+Date:   Sat May 9 22:25:34 2015 -0400
+
+    Merge pull request #24 from marcioapaiva/example-funcs
+    
+    Imperative Parser Complete
+
+commit 17412afd51cc6c4a37db7e2707453c851a414e16
+Author: Tubebaum <tubebaum@gmail.com>
+Date:   Sat May 9 19:15:32 2015 -0400
+
+    Update documentation and temporarily disable engine configuration
+
+commit 412a904c3165723dbe712e09834545e0b65bcd26
+Merge: f9ee99b 7f2dfbc
+Author: Michelle Z <mdz2110@barnard.edu>
+Date:   Sat May 9 19:10:29 2015 -0400
+
+    Merge pull request #22 from mdzhang/master
+    
+    Overall victory point tallies; paying for structures
+
+commit 7340f1245e96673361d77cea0133c7dae98cef28
+Author: Andrew FigPope <drewii2ii@gmail.com>
+Date:   Sat May 9 16:17:59 2015 -0400
+
+    Oracle link examples
+
+commit 9a0064a9c24ba0a1c3476fb546bd5c9412c7fc8f
+Author: Andrew FigPope <drewii2ii@gmail.com>
+Date:   Sat May 9 16:10:44 2015 -0400
+
+    Made test more robust
+
+commit f7cb3e57b73fe319b2523059e8986e6e1931d4ec
+Author: Andrew FigPope <drewii2ii@gmail.com>
+Date:   Sat May 9 16:07:55 2015 -0400
+
+    Updated default.skit
+
+commit 1e229113fbc9588c33263c8ac5227e9260124b36
+Author: Andrew FigPope <drewii2ii@gmail.com>
+Date:   Sat May 9 16:04:08 2015 -0400
+
+    Bugfixes, fully set up dependency injection, can now parse all example functions (except comments)
+
+commit 7f2dfbc703e0d9ed33a85fb0a576ce67a89cfb68
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Thu May 7 11:31:36 2015 -0400
+
+    Fixed longest road bug
+    
+    - Ended up being a problem with global variables.
+    - TODO: Refactor LongestRoadSearch
+    - Fixed bug where updating edges didn't work for updating neighbor equivalent edge
+    - Caught bad input error for InputManager
+    - Moved all InputManager print statements to use InputManager.output
+
+commit 5b6314bd46b79da484b0222655b5aa3795b6a0c8
+Author: Andrew FigPope <drewii2ii@gmail.com>
+Date:   Sun May 3 23:23:47 2015 -0400
+
+    Added loops, boolean logic, and tests
+
+commit 480566579c080038ea976a31395b6aabae497386
+Author: Tubebaum <tubebaum@gmail.com>
+Date:   Sat May 2 23:06:39 2015 -0400
+
+    Implement multiple-file skit compilation
+    
+    - Support example 3c
+    - Correct bug for property references
+
+commit 7c8d9ddf27dffcc9ed0a5141adc5f393d80239e8
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Wed Apr 29 18:16:09 2015 -0400
+
+    Must pay for structures when building them
+    
+    - Fixed bugs where didn't restore structure count or resource cards after trying and failing to place a structure
+    - Initial settlement placement still has no resource charge
+
+commit d7e6c02566d673a851eb8cc89eb49ceb7a812c49
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Wed Apr 29 17:24:26 2015 -0400
+
+    Added FIXME to LongestRoadSearch
+
+commit 544f9f600c7c18aa25eb924cbf997d6f6c5bb6a2
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Wed Apr 29 17:21:34 2015 -0400
+
+    Special longest road and largest army points allocation done
+    
+    - Updated after every turn and during every do_build, play_card
+    - Fixed bug where player still able to play already played dev cards
+    - FIXME: Came across longest road computation bug during testing; error w/ roads of length > 2
+
+commit 2d79eb727792a8579390b6d14f2ece2587119444
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Wed Apr 29 16:18:34 2015 -0400
+
+    Finished preliminary testing of victory point tallies
+
+commit 4b757ab55cb855ea56e8cae7a2230bdd081a1818
+Merge: daa668b f9ee99b
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Wed Apr 29 16:09:41 2015 -0400
+
+    Merge https://github.com/marcioapaiva/pltcatan
+
+commit daa668beea8d9150b774402632426944c862466d
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Wed Apr 29 16:08:17 2015 -0400
+
+    Computing and viewing total victory point after each turn
+    
+    - Input manager method for viewing victory points added
+    - After each player turn, point counts are updated
+    - Special card points stored on player.special_points
+
+commit 7fdab112c0fb91dc15841d5288e3027cd49d94ca
+Author: Andrew FigPope <drewii2ii@gmail.com>
+Date:   Tue Apr 21 16:00:41 2015 -0400
+
+    Added debug flag
+
+commit 8fc71f08fd151f5c6cdfbf7a818202daf73f021b
+Author: Andrew FigPope <drewii2ii@gmail.com>
+Date:   Tue Apr 21 16:00:33 2015 -0400
+
+    Added comparisons and if statement
+
+commit f1333e6d68cec662d9cdf1e1ba4eda598736f00d
+Author: Andrew FigPope <drewii2ii@gmail.com>
+Date:   Tue Apr 21 14:53:05 2015 -0400
+
+    Added support for lambdas
+
+commit f9ee99bfa8597a12306bb05473ff9dd50268892e
+Merge: 3b51350 3c0599b
+Author: Márcio Paiva <marcioapf@gmail.com>
+Date:   Wed Apr 29 15:03:37 2015 -0400
+
+    Merge pull request #21 from marcioapaiva/improve_trade
+    
+    Trading with the bank.
+
+commit 3c0599b0e84e91f489a6283a02b906ed8cccb935
+Author: Marcio Paiva <marcioapf@gmail.com>
+Date:   Wed Apr 29 14:56:51 2015 -0400
+
+    Addressed small issues
+    
+    - More compact code for announce_trade_completed
+    - Location of functions
+
+commit db37ccdb38e021d82e0d9b60dd38055073ea7723
+Author: Marcio Paiva <marcioapf@gmail.com>
+Date:   Wed Apr 29 14:30:15 2015 -0400
+
+    Added trade with the bank.
+    
+    - Implemented do_trade_bank.
+    - Improved trade confirmation.
+    ! Trading rate of 4:1, any:any is hardcoded
+
+commit 3b513503176212d24ebc846f32834a6ba2a775c8
+Merge: c96d378 9deb14c
+Author: Márcio Paiva <marcioapf@gmail.com>
+Date:   Wed Apr 29 00:27:43 2015 -0400
+
+    Merge pull request #20 from mdzhang/master
+    
+    Structure placement validation; longest road calculation
+
+commit 9deb14ce700bce3af6be94c3b27792a0ef651535
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Tue Apr 28 20:28:05 2015 -0400
+
+    Longest Road implemented
+    
+    - Still messy and has only passed basic testing
+        - implementation: basically, creates a dict of players => structure edges
+            then for each player edge, finds 1 + len(path from edge src vertex) + len(path from edge dst vertex)
+            where len is a recursive call. bottoms out when no adjacent structure edges belonging to that player
+            that haven't been searched during that path search
+    - Removed unused print lines
+    - Added input manager method for viewing structures
+
+commit 891bbfa089901b341f83a164a7dd9ef4152e892b
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Tue Apr 28 19:33:03 2015 -0400
+
+    Fixed critical update edge bug
+    
+    - When updating an edge for a tile, must update equivalent edge for neighbor tile
+    - Fixed bug where equivalent edge for neighbor tile was incorrectly computed
+
+commit 67611bd4933b7e1aee2c68dfd711b3f3bdc790f4
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Tue Apr 28 19:03:56 2015 -0400
+
+    Added hex board helper methods
+    
+    - For finding adjacent vertices/edges of vertices/edges e.g. as used in placement validation
+    - Noted additional TODOs
+
+commit 28761ce87931b2247f81392dba59075b6a3da3ae
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Mon Apr 27 15:26:13 2015 -0400
+
+    Structure validation logic added
+    
+    - Vertex structures must have all empty adjacent vertices
+    - Initial roads must border last placed settlement
+    - New vertex structures must border an existing road
+
+commit c96d378ff4ff4e088923c576968fe386379b2856
+Merge: 49c4c70 f6e95cd
+Author: Michelle Z <mdz2110@barnard.edu>
+Date:   Wed Apr 22 11:33:27 2015 -0400
+
+    Merge pull request #18 from mdzhang/master
+    
+    Working Castle structure demo
+
+commit f6e95cd0322ed84cb7551a545f90797f726234f0
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Wed Apr 22 11:32:24 2015 -0400
+
+    Working Castle structure demo
+
+commit b6b6de5c7abf85d42808129eb55793af7ced84e5
+Merge: b0187e0 49c4c70
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Wed Apr 22 11:14:04 2015 -0400
+
+    Merge https://github.com/marcioapaiva/pltcatan
+
+commit 49c4c709ed191a6955a313ae4acd9565199756c2
+Merge: 67a751e 924ba27
+Author: Michelle Z <mdz2110@barnard.edu>
+Date:   Wed Apr 22 11:07:48 2015 -0400
+
+    Merge pull request #19 from marcioapaiva/config-parser
+    
+    Support NoneType in the configuration parser
+
+commit 924ba27965b404356f9f14577dd803fe4de2cb39
+Author: Tubebaum <tubebaum@gmail.com>
+Date:   Wed Apr 22 11:05:41 2015 -0400
+
+    Support NoneType in the configuration parser
+    
+    - Add demo.skit
+
+commit b0187e03abc4732883f694ca93a5cc97e041cf1b
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Wed Apr 22 10:33:30 2015 -0400
+
+    Working on demo.skit file
+
+commit 67a751ebdf33854701ea16084d9589aeb0611fb8
+Merge: 0622209 ab15eff
+Author: Michelle Z <mdz2110@barnard.edu>
+Date:   Wed Apr 22 10:15:09 2015 -0400
+
+    Merge pull request #16 from mdzhang/master
+    
+    Structures use Config; Config does coercions; Engine Castle Structure support for demo
+
+commit ab15eff0158efd938745fc67b8495a287d67d23b
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Wed Apr 22 10:12:32 2015 -0400
+
+    Added support for Castle structure for demo
+
+commit 7cb667e0af6506229eede5840e323c24f4cffcfb
+Merge: 7248cbd 0622209
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Wed Apr 22 09:47:45 2015 -0400
+
+    Merge https://github.com/marcioapaiva/pltcatan
+
+commit 0622209073ca828f8bf97cd9dae5a5f527f354e5
+Merge: ea2b905 97e20b9
+Author: Michelle Z <mdz2110@barnard.edu>
+Date:   Wed Apr 22 09:47:33 2015 -0400
+
+    Merge pull request #17 from marcioapaiva/config-parser
+    
+    Integrate parsers together and populate engine's config dict with dict produced by parser
+
+commit 7248cbdb8f4703b977b0601b422ffc04826b7f5f
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Wed Apr 22 09:45:06 2015 -0400
+
+    Config now, before trying to run its first get(), coerces config dict to necessary types
+    
+    - Will iterate over nested dict, coercing based on types stored at default path for path to nested
+    property
+    - 'Default path' is the path consisting of the rightmost key in the dot notation string that is not
+    a property replaced with 'default'
+
+commit 97e20b94de79e399cfbb674a0b6ac3d32d56d2fa
+Author: Tubebaum <tubebaum@gmail.com>
+Date:   Wed Apr 22 01:22:03 2015 -0400
+
+    Populate engine's config dict
+    
+    - Iterate through all members of engine's config dict and look for known properties
+    - Replace said property values with the corresponding values in the configuration parser's dict
+
+commit 693ae4ff5a190a6039b2590ff096b2665b3212eb
+Merge: 17710ed ea2b905
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Tue Apr 21 23:51:42 2015 -0400
+
+    Merge branch 'master' of https://github.com/marcioapaiva/pltcatan
+
+commit 17710edb80f605f887dc2a895eccf9e6e17b2105
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Tue Apr 21 23:49:23 2015 -0400
+
+    Engine config does some type coercion
+    
+    - Config.get() looks at game_config dict. User can specify whether or not to use coercions on the resulting value.
+    If coercions specified, Config looks at what type the value _should_ be by looking at type_config dict. If the current
+    type doesn't match the target type, Config uses a coercion function specified in type_mapping dict.
+
+commit 8e4b020de09f3b35fd20563a8827a291b07eee6f
+Author: Tubebaum <tubebaum@gmail.com>
+Date:   Tue Apr 21 22:48:53 2015 -0400
+
+    Support new imperatiave function syntax within the configuration parser
+    
+    - Abuse the lexer internals to circumvent counting limitations of regular expressions
+
+commit 213baec9f147efe103974f205587ca758de70b16
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Tue Apr 21 21:03:36 2015 -0400
+
+    Structures moved to config
+    
+    - Reduced to single Structure class whose prior subclasses are now the result of instantiating objects
+    and reading their properties on initialization from config.
+    - Note: Possibly consider Vertex- or EdgeStructures instantiated based on structure type, i.e. structure.constraints.type;
+    right now just built on knowledge that roads are edges, cities/settlements are vertices
+
+commit 853b052f631cb932e1110ea860b61a89fc9b167f
+Author: Tubebaum <tubebaum@gmail.com>
+Date:   Tue Apr 21 14:56:10 2015 -0400
+
+    Update default.skit to match new syntax for imperative functions
+
+commit 93fef550f7323f8b01270fec47bb99fc79ac7009
+Author: Tubebaum <tubebaum@gmail.com>
+Date:   Tue Apr 21 14:41:30 2015 -0400
+
+    Eliminate segfault
+
+commit 7acf5610e621edee5c3f36ad7c58c1b1a2d6de2f
+Author: Andrew FigPope <drewii2ii@gmail.com>
+Date:   Tue Apr 21 14:33:16 2015 -0400
+
+    Fix broken parser integration
+
+commit 33bd35381a1af911952f1450986c7990ff1c7a83
+Author: Tubebaum <tubebaum@gmail.com>
+Date:   Tue Apr 21 14:14:18 2015 -0400
+
+    hotfix
+
+commit ea2b90570391f06c49a03263d03fc13819dc8503
+Merge: c28fd01 5fc96bb
+Author: Andrew FigPope <drewii2ii@gmail.com>
+Date:   Tue Apr 21 14:01:59 2015 -0400
+
+    Merge pull request #15 from marcioapaiva/hotfix
+    
+    Fixed parser bugs
+
+commit 5fc96bb6fa4072e10986defae41528ce5650d6ba
+Author: Andrew FigPope <drewii2ii@gmail.com>
+Date:   Tue Apr 21 14:00:29 2015 -0400
+
+    Fixed parser bugs
+
+commit c28fd01e95dd2755dac0a21d00e7a8d43292f1b4
+Merge: 688b246 ad5ea3e
+Author: Michelle Z <mdz2110@barnard.edu>
+Date:   Tue Apr 21 13:52:14 2015 -0400
+
+    Merge pull request #13 from mdzhang/master
+    
+    Development Card types are taken from config
+
+commit 688b2469080667817389986c85cf50cdf696bc40
+Merge: 416ce3b 3568ab5
+Author: Andrew FigPope <drewii2ii@gmail.com>
+Date:   Tue Apr 21 13:35:17 2015 -0400
+
+    Merge pull request #14 from marcioapaiva/folder-rename
+    
+    Makes imperative + config parser modules
+
+commit 3568ab574768212afd39df1c7bdcb67b3e598ff6
+Author: Andrew FigPope <drewii2ii@gmail.com>
+Date:   Tue Apr 21 13:34:23 2015 -0400
+
+    Made main folder a module as well to allow relative imports
+
+commit 519148fac52703e3bd4ce88dd10b19759719043b
+Author: Andrew FigPope <drewii2ii@gmail.com>
+Date:   Tue Apr 21 13:31:36 2015 -0400
+
+    Renamed config-parser to config_parser
+
+commit 68a436b99f6a221ade4852b8ceb6ce9da2af1a34
+Author: Andrew FigPope <drewii2ii@gmail.com>
+Date:   Tue Apr 21 13:24:43 2015 -0400
+
+    Renamed folder to use as module
+
+commit 416ce3b474b6a3c004f75e850a247afde01363df
+Author: Andrew FigPope <drewii2ii@gmail.com>
+Date:   Tue Apr 21 13:18:31 2015 -0400
+
+    Added dill to requirements
+
+commit afcd4ec388734234f6a267b84c943e923710f772
+Merge: d507519 5d4ab91
+Author: Andrew FigPope <drewii2ii@gmail.com>
+Date:   Tue Apr 21 13:16:10 2015 -0400
+
+    Merge pull request #10 from marcioapaiva/imper-parser
+    
+    Imperative Parser: Take 1
+
+commit 5d4ab91e5f8de7b6520d3d796686dc7478fb7074
+Author: Andrew FigPope <drewii2ii@gmail.com>
+Date:   Mon Apr 20 17:11:32 2015 -0400
+
+    Addressed pull request comments
+
+commit d56c028cf4f374ce3f44f9fee86ad568427ee214
+Author: Andrew FigPope <drewii2ii@gmail.com>
+Date:   Mon Apr 20 17:06:43 2015 -0400
+
+    Brought comments in line w/ engine
+
+commit 3751504a934fd4ccd5cd131678131977ec6a104d
+Author: Andrew FigPope <drewii2ii@gmail.com>
+Date:   Wed Apr 15 11:18:20 2015 -0400
+
+    Added enums to requirements.txt and updated dependencies.txt
+
+commit 37e7a6f9c26bf3249988ea798c6aa55f765fc445
+Author: Andrew FigPope <drewii2ii@gmail.com>
+Date:   Wed Apr 15 11:10:48 2015 -0400
+
+    Added docstrings, re-organized directory structure, added grammar printing
+
+commit cc9a0daaa8b348fda32fa7bd06ce142a6967dc3d
+Author: Andrew FigPope <drewii2ii@gmail.com>
+Date:   Tue Apr 14 10:10:35 2015 -0400
+
+    Unvendored ply from config-parser, and changed input_parser to imperative-parser
+
+commit 474f9efcb2ed8c97f1b2935843c5bfc109fa6766
+Author: Andrew FigPope <drewii2ii@gmail.com>
+Date:   Mon Apr 13 16:54:19 2015 -0400
+
+    Added bracket accesses, and fixed some comments
+
+commit 37e7a188750b27f7f369289140cdf250d6fae78d
+Author: Andrew FigPope <drewii2ii@gmail.com>
+Date:   Mon Apr 13 16:53:55 2015 -0400
+
+    Added function generation, game state mocking
+
+commit 08a148338fd40a13fff97aaac62c8f4f64e90469
+Author: Andrew FigPope <drewii2ii@gmail.com>
+Date:   Mon Apr 13 12:57:45 2015 -0400
+
+    Added string declarations
+
+commit e87a120eae4e475a44d3685ca8b45b6e8d9bacd0
+Author: Andrew FigPope <drewii2ii@gmail.com>
+Date:   Mon Apr 13 12:55:42 2015 -0400
+
+    Updated ipython
+
+commit d5dfe795abc57d5f526f15bed33c45a1f0ed20f4
+Author: Andrew FigPope <drewii2ii@gmail.com>
+Date:   Wed Apr 8 17:54:47 2015 -0400
+
+    Managed requirements
+
+commit 0b3fe8d1538e2b22114ecb1da3632318ad9973dc
+Author: Andrew FigPope <drewii2ii@gmail.com>
+Date:   Wed Apr 8 17:54:35 2015 -0400
+
+    Added property access
+
+commit 3ab1dd824860e63ae0c8c018af6193ab33f25dc7
+Author: Andrew FigPope <drewii2ii@gmail.com>
+Date:   Wed Apr 8 17:49:06 2015 -0400
+
+    Added helper functions to simplify grammar development, changed tabs to spaces, and added list declarations
+
+commit 60efba4f88b421d587a626b26aaa276cbbe4ec99
+Author: Andrew FigPope <drewii2ii@gmail.com>
+Date:   Wed Apr 8 14:13:31 2015 -0400
+
+    Moved I/O loop into main call, and added parsing hook
+
+commit ccfbe31ba68925fd0e69e9a918727a42e2bc4737
+Author: Andrew FigPope <drewii2ii@gmail.com>
+Date:   Wed Apr 8 14:13:00 2015 -0400
+
+    Moved function calls and declarations to Python AST
+
+commit 7586a648c9c644658176104ba67dfb49910abadb
+Author: Andrew FigPope <drewii2ii@gmail.com>
+Date:   Wed Apr 1 17:38:02 2015 -0400
+
+    Moved arithmetic to python AST
+
+commit 0219dde6e59ce556bf87907abc2fd29499663804
+Author: Andrew FigPope <drewii2ii@gmail.com>
+Date:   Wed Apr 1 16:14:18 2015 -0400
+
+    Added function definition and lookup
+
+commit 7e7f8fc70ba027dca0982c4972fcba1b8b454ac1
+Author: Andrew FigPope <drewii2ii@gmail.com>
+Date:   Wed Apr 1 15:00:27 2015 -0400
+
+    Basic parser + symbol table
+
+commit d50751976a4c910ad790d71863197381ea802e9d
+Merge: 4266e9e 337cc5c
+Author: Andrew FigPope <drewii2ii@gmail.com>
+Date:   Tue Apr 21 13:13:30 2015 -0400
+
+    Merge pull request #11 from marcioapaiva/config-parser
+    
+    Create the front end for the compiler
+
+commit 337cc5c199a98f9a4c0384f53526cdc2919ea29a
+Author: Tubebaum <tubebaum@gmail.com>
+Date:   Tue Apr 21 13:01:14 2015 -0400
+
+    Add support for example 3b
+    - Allow user to @extend structure and substructures without need for multiple @extend properties
+    - Update team roles
+
+commit 87a16c7f25a14850fe90bfb7d665b90824f27416
+Author: Tubebaum <tubebaum@gmail.com>
+Date:   Tue Apr 21 09:11:17 2015 -0400
+
+    Support example 3A
+    
+    - Allow user to add to previously defined values using the plus operator
+    - Move some code into separate functions for readability
+    - Create bash script that directly calls skit.py
+
+commit ad5ea3eda33270005e7c395211d57df27390ac6a
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Fri Apr 17 16:42:17 2015 -0400
+
+    Cleaned up small typos and unnecessary files resulting from hasty commit on new DevCard design
+
+commit ee8ec831495bb2596d78e68804fae5c3bacc0254
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Fri Apr 17 16:19:30 2015 -0400
+
+    Single development card; dev card types taken from config
+    
+    - config defines dev cards type in a skit like dict
+    - DevelopmentCard takes defaults from config upon initialization
+    - new dev cards are created by bank, which looks at all cards defined in config.cards.development,
+    and passes their dict to DevelopmentCard constructor as kwargs arg
+    - DevelopmentCard constructor, after taking in defaults, overwrites them with contents of kwargs
+
+commit 4266e9ec710c4abda5b4de9eecee5a4f6d872c0f
+Merge: 390e552 217bfa7
+Author: Márcio Paiva <marcioapf@gmail.com>
+Date:   Wed Apr 15 15:27:39 2015 -0400
+
+    Merge pull request #9 from mdzhang/master
+
+commit 217bfa7d7f61af65540a059cdb6d4a3b6aa7d87b
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Wed Apr 15 15:04:12 2015 -0400
+
+    Implemented InputManager do_trade()
+    
+    - Prompts for comma separated list of indexes corresponding to numbered allowable values list displayed to user
+
+commit 1ef9fa048b79e9f46710e5c2a62823b548a8034b
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Wed Apr 15 11:38:59 2015 -0400
+
+    Implemented build, buy_card, play_card InputManager commands
+
+commit c96a41a8c3a1bae4490f6cda40ac325fdc7e0ae7
+Author: Tubebaum <tubebaum@gmail.com>
+Date:   Wed Apr 15 07:37:55 2015 -0400
+
+    Remove copy of ply from project
+    - User must have ply installed to compile code
+    - Can be installed w/ pip install ply
+
+commit 358286052270629dcb042bdf3dcb2684dd4ec07e
+Author: Tubebaum <tubebaum@gmail.com>
+Date:   Wed Apr 15 07:08:07 2015 -0400
+
+    Add support for aliases
+    
+    - Users can now extend structures by using @extend
+    - Dot notation is interpreted at runtime and resolved to match value from compiled Skit properties
+
+commit c2290292ddafaa5f40dd0e83bdc1c4f6a646c4b0
+Author: Tubebaum <tubebaum@gmail.com>
+Date:   Wed Apr 15 04:45:08 2015 -0400
+
+    Compile skit code with pickling
+    
+    - dict generated by parser is pickled and saved in tmp/
+    - This compilation only occurs when explicitly asked for with -c or
+    - when user attempts to simply run but skit code files have been recently modified
+
+commit 36b9668ba2e051449bdedc56dc3239111c75c9c9
+Merge: b7f115f 390e552
+Author: Tubebaum <tubebaum@gmail.com>
+Date:   Wed Apr 15 02:40:05 2015 -0400
+
+    Merge branch 'master' into config-parser
+
+commit b7f115f96f03774c6bf4ecc253d3cfc6f21e4b28
+Author: Tubebaum <tubebaum@gmail.com>
+Date:   Wed Apr 15 02:37:56 2015 -0400
+
+    Begin building skit compiler user interface
+    
+    - Remove useless Settings class
+    - Create new skit compile script that will allow a user to compile their skit code
+
+commit 313491c31f4713845ef2635768df959896575226
+Merge: 0cb5d3f 390e552
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Tue Apr 14 19:32:46 2015 -0400
+
+    Merge branch 'master' of https://github.com/marcioapaiva/pltcatan
+
+commit 0cb5d3fa73f1adaebcac28b4096926450815523c
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Mon Apr 13 19:31:47 2015 -0400
+
+    Fixing bugs
+    
+    - Fixed structure placement bug
+    - Fixed resource distribution bug
+    - Prettier SIGINT handling
+
+commit 390e552fdc27224d5a1f85fa734c105c65fccb53
+Merge: fbb496a f2b46cd
+Author: Márcio Paiva <marcioapf@gmail.com>
+Date:   Mon Apr 13 18:37:13 2015 -0400
+
+    Merge pull request #8 from mdzhang/master
+    
+    Development Cards, Robber. Changes not tested.
+
+commit f2b46cd35e2482dbe7c8bd543c3517d2250a22d0
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Mon Apr 13 15:41:40 2015 -0400
+
+    Updated development card naming
+    
+    - primary methods are draw_card() and play_card() now
+    - increase a player's knight count when KnightCard played
+
+commit c10e06827955d8cf790e819a208c53ddc1a31579
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Mon Apr 13 15:33:17 2015 -0400
+
+    Refactored logic between Robber and KnightCard.
+
+commit 7007ff73873cfb5035122f7ef2429930b5867a67
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Mon Apr 13 15:09:32 2015 -0400
+
+    Added robber effect; needs testing
+    
+    - Built up calamity and robber classes
+    - Robber will block board yield distribution
+    - Game tiles now have calamities on them which are checked by the board
+    - Improved structures, dev cards to use super init calls when relevant
+    - Removed unnecessary imports; cleaned up PEP violations
+
+commit a034c256f114e11b59117be23c6b6b928e19d06d
+Merge: 8b114ea fbb496a
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Mon Apr 13 11:29:21 2015 -0400
+
+    Merge branch 'master' of https://github.com/marcioapaiva/pltcatan
+
+commit 8b114ea6f71912907b9e80a292ebc9744e470ac1
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Mon Apr 13 11:26:56 2015 -0400
+
+    Added development card support.
+    
+    - New classes added for different development cards.
+    - Development card deck card allocations specified in config.
+    - Bank has a deck of development cards and method to purchase them.
+
+commit fbb496aa12e70ad9e2eb7624d138de0df0df2cd2
+Merge: 5de9bc9 92a59d7
+Author: Márcio Paiva <marcioapf@gmail.com>
+Date:   Fri Apr 10 15:32:32 2015 -0400
+
+    Merge pull request #7 from mdzhang/master
+
+commit 5f586d24ee9490175bc8c86067d70ae993365a2c
+Author: Thomas Huzij <tph2109@columbia.edu>
+Date:   Fri Apr 10 10:48:09 2015 -0400
+
+    build cards
+
+commit 3562093701063b31ca9b6a05cd709331b7bcfb4c
+Author: Tubebaum <tubebaum@gmail.com>
+Date:   Fri Apr 10 09:04:30 2015 -0400
+
+    build structures and board
+
+commit 92a59d72501561dcb4b5c576ca4a21f0b5c30083
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Thu Apr 9 19:02:16 2015 -0400
+
+    Improved concept of structures, improved ui
+    
+    - Augmenting/Update/Extension- Structure classes added to support
+      updatestructures like cities, extensionstructures like in tutorial
+      etc.
+    - New structure directory created; old structures moved out of vertex
+      and edge directories into structure directory
+    - Board now supports updating edges and placing edge structures
+    - Improved UI.
+    - Initial settlement placement stage added (valid placement not yet
+      enforced)
+
+commit 5de9bc9c168d4393a1400eaaff05501967ea6b30
+Merge: f5f0df6 75363cb
+Author: Michelle Z <mdz2110@barnard.edu>
+Date:   Thu Apr 9 15:00:58 2015 -0400
+
+    Merge pull request #5 from marcioapaiva/config-parser
+    
+    Merging in first pass config parser
+
+commit 47b3ea8f2ac14174a14b76ca4e06fbb47565c3f8
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Wed Apr 8 16:58:13 2015 -0400
+
+    Added trade, trade criteria, and trading entities like bank, harbor, player
+    
+    - TradeOffer consists of requested and offered resources, stored as
+      dictionary where keys are resource types and values are resource
+      counts
+    - TradingEntity is anything that can store and trade resources (e.g.
+      bank, player)
+    - TradingIntermediary is anything that can trade resources belonging to
+      a TradingEntity
+    - Harbors are TradingIntermediary's that define TradeCriteria
+    - TODO: Testing; Harbor placement on board
+
+commit 75363cb9b5aa59ffb8477097d3675d512adaf800
+Merge: ca1cebd f5f0df6
+Author: Tubebaum <tubebaum@gmail.com>
+Date:   Wed Apr 8 14:06:45 2015 -0400
+
+    Merge branch 'master' into config-parser
+
+commit ca1cebdfb571a823bd2c507727f0038997ee4236
+Author: Thomas Huzij <tph2109@columbia.edu>
+Date:   Wed Apr 1 19:52:01 2015 -0400
+
+    improve directory structure
+
+commit f5f0df634a5eaa348ae640eafddfc0e2f38362a6
+Merge: 45242bd 1f6af91
+Author: Michelle Z <mdz2110@barnard.edu>
+Date:   Wed Apr 1 17:04:34 2015 -0400
+
+    Merge pull request #3 from marcioapaiva/local
+    
+    Simple front-end.
+
+commit 1f6af914d3e1e9b73d10b32168de5c104f6c8afb
+Author: Marcio Paiva <marcioapf@gmail.com>
+Date:   Wed Apr 1 17:00:54 2015 -0400
+
+    Addressing minor legibility issues
+
+commit bfb3f68dc3ae12e2e55ff71c5da329b96a6c9680
+Merge: 64f24cf 45242bd
+Author: Marcio Paiva <marcioapf@gmail.com>
+Date:   Wed Apr 1 16:35:41 2015 -0400
+
+    Merge branch 'master' into local
+
+commit 45242bd1a05ae72b981ccac8908015179dbd0add
+Merge: 4c8b00e 7f25f2b
+Author: Márcio Paiva <marcioapf@gmail.com>
+Date:   Wed Apr 1 16:24:09 2015 -0400
+
+    Merge pull request #4 from mdzhang/master
+    
+    Chit values / Resource types / Ditribute resources / Place structures
+
+commit 7f25f2bcd09815ef3821e8af1fc8c7014765e02b
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Wed Apr 1 15:52:53 2015 -0400
+
+    Board can distribute resources to players, place structures
+    
+    - Skeleton City, Settlement, Player classes made
+    - Edge/Vertex mappings moved to different class to avoid circular dependencies
+    - GameBoard can distribute resources using distribute_resources_for_roll(roll_value)
+    - Can place structure on board via call to GameBoard.place_structure()
+    - Methods to update shared tile vertex
+    - General style moved to docs/python/styleguide.md (WIP)
+
+commit ecc6928737c5052c7c7a46259cb5e4e85748c746
+Author: Thomas Huzij <tph2109@columbia.edu>
+Date:   Wed Apr 1 14:28:08 2015 -0400
+
+    completely parse default Catan game
+
+commit 64f24cfd4136ffe2d0f95e39f8f9a384ede234f1
+Author: Marcio Paiva <marcioapf@gmail.com>
+Date:   Wed Apr 1 14:14:08 2015 -0400
+
+    Minor indentation changes
+
+commit 30d6cace8eacd32238dc337d4faee4dfc3a7a72f
+Author: Marcio Paiva <marcioapf@gmail.com>
+Date:   Wed Apr 1 13:53:11 2015 -0400
+
+    Addressing pull request changes
+    
+    Mainly renaming variables, adding docs and changing formatting for
+    existing docs.
+
+commit d310cb503ed71cfc18e98762180430c180019a75
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Wed Apr 1 08:54:30 2015 -0400
+
+    Board tiles have chit values and resource types
+    
+    - Added random/default chit value and resource type assignment methods
+    - Bug in hex_board.iter_tiles() fixed
+    - hex_board.iter_tiles() no longer uses mirroring of axial coordinates
+      during traversal i.e. starts at westmost tile in ring and goes around
+      in clockwise direction
+
+commit e3425aa6f5eeee4988acbef964530f873f3725df
+Author: Marcio Paiva <marcioapf@gmail.com>
+Date:   Wed Apr 1 08:42:04 2015 -0400
+
+    Separating InputManager class
+
+commit 9d0ea0b12cb968c19e4cb3d067dd08e9fc5ebeb6
+Author: Marcio Paiva <marcioapf@gmail.com>
+Date:   Wed Apr 1 08:27:39 2015 -0400
+
+    Simple front-end. Do something on python start.py.
+
+commit cb6aa76eafc0e6c160a15ed89f330c407ca2f7d9
+Author: Thomas Huzij <tph2109@columbia.edu>
+Date:   Wed Apr 1 08:20:11 2015 -0400
+
+    parse simple properties and structures
+
+commit 85a004ee32322900a008f17ca498986217119770
+Merge: 54f01df 4c8b00e
+Author: Thomas Huzij <tph2109@columbia.edu>
+Date:   Wed Apr 1 05:35:20 2015 -0400
+
+    Merge branch 'master' into config-parser
+
+commit 54f01df74ffb40aab99092f83bb937dd29f988c6
+Author: Thomas Huzij <tph2109@columbia.edu>
+Date:   Wed Apr 1 05:33:56 2015 -0400
+
+    correctly tokenize default skit configuration
+
+commit 4a2e6a93229840a7f9966891ec45fffa07a60530
+Author: Thomas Huzij <tph2109@columbia.edu>
+Date:   Wed Apr 1 05:15:32 2015 -0400
+
+    add default skit configuration
+
+commit 4c8b00eee3bb8d9e0063750e51defa7309a91c37
+Merge: 7b3db3e 3485c62
+Author: Márcio Paiva <marcioapf@gmail.com>
+Date:   Tue Mar 31 22:03:08 2015 -0400
+
+    Merge pull request #1 from mdzhang/master
+    
+    Basic board/edge/vertex logic.
+
+commit bbae534ca5cd436e2e9d911f2a3ef0ebc51fac9f
+Author: Thomas Huzij <tph2109@columbia.edu>
+Date:   Tue Mar 31 15:11:57 2015 -0400
+
+    complete lexer
+
+commit 3485c62b4f9ec06df6b9992eef3d1570fb68e13a
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Tue Mar 31 08:30:00 2015 -0400
+
+    Addressed first pull request review notes
+    
+    - Remove IntelliJ file from tracking
+    - Removed IntelliJ auto __author__ lines from __init__.py files
+
+commit 94126fcd66d9a06343c44b27ee9f72792a24a6b5
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Mon Mar 30 23:29:41 2015 -0400
+
+    WIP Adding resources and chit values to board tiles.
+
+commit c879970383d4f98e3bb41154395b90d58998ae35
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Mon Mar 30 16:18:43 2015 -0400
+
+    Rearranged file organization/import
+    
+    - Also removed local IDE files from repo
+
+commit e34b6b7f0af4eeafeeff52f02fed795d711e2f52
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Mon Mar 30 14:45:32 2015 -0400
+
+    Board tiles have shared edges and vertices.
+    
+    - Switched directions to use Python backported enum; note that this
+      means python must have enum34 package installed
+
+commit fedb3aad92b5fd1f97845fd76d55f2b9eb3a5798
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Thu Mar 26 20:22:16 2015 -0400
+
+    Built basic board with tiles; indexed using hex axial coordinates.
+    
+    WIP: adding edges/vertices during board creation
+
+commit 560f1a73d337924c0ea3edecf43562e7344c12c3
+Author: mdzhang <zhang.michelle.d@gmail.com>
+Date:   Thu Mar 26 14:25:47 2015 -0400
+
+    mdzhang initial Skit commit
+
+commit 7b3db3e7fbd3b701842ee14a1db7fec2582179cb
+Author: Thomas Huzij <tph2109@columbia.edu>
+Date:   Wed Mar 25 20:05:50 2015 -0400
+
+    Conform to styleguide
+
+commit 1dea1c42df342a2780a4948363a470945d7e8e19
+Author: Thomas Huzij <tph2109@columbia.edu>
+Date:   Wed Mar 25 17:50:39 2015 -0400
+
+    Perform minor cleanup
+
+commit ec9ea4078a550ddb554edf0c49e6c4e08e8760d8
+Author: Thomas Huzij <tph2109@columbia.edu>
+Date:   Wed Mar 25 17:47:41 2015 -0400
+
+    Add naming conventions
+
+commit 54e7daa8fabf8e998b123ff24c7d87dc88907f10
+Author: Thomas Huzij <tph2109@columbia.edu>
+Date:   Wed Mar 25 14:33:06 2015 -0400
+
+    Clean up markdown source
+
+commit de99ac9f66f105334c44bce8b79eed5eef55e90d
+Author: Thomas Huzij <tph2109@columbia.edu>
+Date:   Wed Mar 25 14:29:48 2015 -0400
+
+    Add string literal rules
+
+commit 5b612203df2f81202072974800a19ea1de6e1213
+Author: Thomas Huzij <tph2109@columbia.edu>
+Date:   Wed Mar 25 14:19:22 2015 -0400
+
+    Correct syntax issues
+
+commit a11ec39757662310625668bebfb89be714d42020
+Author: Thomas Huzij <tph2109@columbia.edu>
+Date:   Wed Mar 25 14:17:17 2015 -0400
+
+    Clearer delineation of rules
+
+commit 74816e09444faeec385e9679af387577ca9cee20
+Author: Thomas Huzij <tph2109@columbia.edu>
+Date:   Wed Mar 25 13:58:07 2015 -0400
+
+    Introduce styleguide to project
+
+commit 78d241bd91530c968ef4d3ddda70b364208efece
+Author: Thomas Huzij <tph2109@columbia.edu>
+Date:   Wed Mar 25 12:18:15 2015 -0400
+
+    Clean up style inconsistencies
+
+commit f579d181caa7930c68157875ae3b3ce774b6fb52
+Author: Marcio Paiva <marcioapf@gmail.com>
+Date:   Wed Mar 4 20:50:31 2015 -0500
+
+    Changed tiles representation
+    
+    Dropped all graph stuff. Tiles are now located by axial coordinates
+    (http://www.redblobgames.com/grids/hexagons). It seems there is a
+    consensus that they're easier to work with. It will certainly help in
+    case we decide we need to draw the board in the future.
+    The board is now a dictionary that maps a pair of coordinates to a tile.
+    Tile is a class which will contain the tile data, like type and number
+    but, for now, it has only an id.
+    Added the simple class Vector2 just to help in some cases where we need
+    to sum and multiply 2-tuples.
+    
+    Also changed some constructs to support Python2 (I was taking a look at
+    drawing libraries, and one of the main - PyGame - has only recently
+    adopted Python3, and you have to compile it from source to obtain
+    support to it). The code now runs fine with both "python game_loop.py"
+    or "python3 game_loop.py".
+
+commit c3103ca09f53bae756186b56ea091a89da68ccc5
+Author: Marcio Paiva <marcioapf@gmail.com>
+Date:   Thu Feb 26 12:11:11 2015 -0500
+
+    Added hidden "sea tiles" around the board
+    
+    This way we can refer to every edge and vertices as 2-tuples and
+    3-tuples of tiles(Nodes)
+
+commit 1cf5793138c39eabc61c23b344e208a631836eff
+Author: Marcio Paiva <marcioapf@gmail.com>
+Date:   Thu Feb 26 11:48:02 2015 -0500
+
+    Implemented roll dice and added players default
+
+commit 2b63d1518337abc0145dc5bff78c8540784902c0
+Author: Marcio Paiva <marcioapf@gmail.com>
+Date:   Thu Feb 26 09:37:06 2015 -0500
+
+    Added unit tests file
+
+commit 1650c40f055c9f155a3926d417a2c2d63de9a857
+Author: Marcio Paiva <marcioapf@gmail.com>
+Date:   Thu Feb 26 08:51:55 2015 -0500
+
+    Python 3
+
+commit 80f0eb6aab7c261ba037d8f9a9b3a3a164d62b7d
+Author: Marcio Paiva <marcioapf@gmail.com>
+Date:   Thu Feb 26 08:50:03 2015 -0500
+
+    Implemented prompt for use in users' turns
+
+commit 39b6301785f87ee89c5180295581a392c2318f4c
+Author: Marcio Paiva <marcioapf@gmail.com>
+Date:   Wed Feb 25 18:54:59 2015 -0500
+
+    Corrected board graph
+
+commit 1e0fc1cad8fc095c8e5928fa77d8d4190a4b445b
+Author: Marcio Paiva <marcioapf@gmail.com>
+Date:   Wed Feb 25 17:11:26 2015 -0400
+
+    Initial draft
+    
+    Board is generated using a BFS of given length from the center Node.
+    Depth = 2 implies usual board size (19 tiles)
+
+commit 692d0d78e5cb019a7a76f6a06f5e530f05ec7bb8
+Author: Marcio Paiva <marcioapf@gmail.com>
+Date:   Wed Feb 25 17:10:07 2015 -0400
+
+    Gitignoring .pyc files
+
+commit 54e967537a7aad8a08910adb0c38d7168da5a858
+Author: Márcio Paiva <marcioapf@gmail.com>
+Date:   Wed Feb 11 19:13:37 2015 -0500
+
+    Initial commit
