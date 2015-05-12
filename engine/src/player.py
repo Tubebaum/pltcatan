@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from engine.src.lib.utils import Utils
+import re
 from engine.src.config.config import Config
 from engine.src.structure.structure import Structure
 from engine.src.trading.trading_entity import TradingEntity
@@ -82,8 +83,8 @@ class Player(TradingEntity):
         if structure_count > 0:
             self.remaining_structure_counts[structure_name] -= 1
 
-            # TODO: conversions between underscore and camel case
-            config_path = 'game.structure.player_built.' + structure_name.lower()
+            structure_name = re.sub(r'\s', '_', structure_name).lower()
+            config_path = 'game.structure.player_built.' + structure_name
             structure_dict = Config.get(config_path)
 
             return Structure(self, **structure_dict)
