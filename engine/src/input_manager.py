@@ -264,7 +264,7 @@ class InputManager(cmd.Cmd):
         for player in self.game.players:
             points = player.get_total_points() if player == self.player \
                 else player.get_visible_points()
-            msg += '{}:\t{}'.format(player, points)
+            msg += '{}:\t{}\n'.format(player, points)
 
         InputManager.output(msg)
 

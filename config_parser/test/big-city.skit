@@ -1,4 +1,4 @@
-bigcity: {
+big-city: {
     @extend: default,
     game: {
         @extend: default.game,
@@ -6,7 +6,7 @@ bigcity: {
             @extend: default.game.structure,
             player-built: {
                 @extend: default.game.structure.player-built,
-                bigcity: {
+                big-city: {
                     name: "Big City",
                     cost: {
                         ore: 5
