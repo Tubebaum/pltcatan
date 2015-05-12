@@ -29,7 +29,7 @@ class Structure(object):
         return None
 
     def is_augmenting_structure(self):
-        return self.extends or self.upgrades
+        return bool(self.extends or self.upgrades)
 
     def __str__(self):
         return '{} owned by {}'.format(self.name, self.owning_player)
