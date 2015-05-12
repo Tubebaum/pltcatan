@@ -134,6 +134,9 @@ class EdgeMeta(object):
 
     def __eq__(self, other):
 
+        if other is None:
+            return False
+
         matches_this = self.x == other.x and \
                        self.y == other.y and \
                        self.edge_dir == other.edge_dir
@@ -143,6 +146,7 @@ class EdgeMeta(object):
                            self.neighbor_edge_dir == other.edge_dir
 
         return matches_this or matches_neighbor
+
 
 class LongestRoadSearch(object):
 
