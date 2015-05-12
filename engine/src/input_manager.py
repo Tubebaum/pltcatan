@@ -278,7 +278,6 @@ class InputManager(cmd.Cmd):
 
         InputManager.output(msg)
 
-    # TODO
     def do_view_structures(self, line):
         """View your vertex and edge structures."""
 
