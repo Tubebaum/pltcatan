@@ -1,4 +1,5 @@
 import pdb
+import re
 from engine.src.config.config import Config
 from engine.src.lib.utils import Utils
 from engine.src.exceptions import *
@@ -111,7 +112,9 @@ class Game(object):
             # Allocate points
             if structure.augments():
                 # TODO: conversions from camelcase to underscore
-                points = structure.point_value - Config.get('game.structure.player_built.' + structure_name.lower()).point_value
+                structure_name = re.sub(r'\s', '_', structure_name).lower()
+                augments = re.sub(r'\s', '_', structure.augments()).lower()
+                points = structure.point_value - Config.get('game.structure.player_built.' + augments + '.point_value')
             else:
                 points = structure.point_value
 

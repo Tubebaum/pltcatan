@@ -333,7 +333,7 @@ class GameBoard(HexBoard):
             # matches the existing structure.
             if (not new_value.is_augmenting_structure()) or \
                     (new_value.is_augmenting_structure() and \
-                     old_value.name != new_value.augments):
+                     old_value.name != new_value.augments()):
                 raise InvalidBaseStructureException(old_value, new_value)
 
         # If the player is not replacing an existing structure, make sure it's
